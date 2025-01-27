@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Volunteer!</h1>
+    <p>This is your dashboard where you can view upcoming events and track your hours.</p>
+    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+    
+</body>
+</html>

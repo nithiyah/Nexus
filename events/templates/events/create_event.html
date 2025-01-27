@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .checkbox-group label {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            border: 1px solid #007BFF;
+            color: #007BFF;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .checkbox-group input[type="checkbox"]:checked + label {
+            background-color: #007BFF;
+            color: white;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create an Event</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <label for="id_name">Event Name:</label>
+            {{ form.name }}
+
+            <label for="id_description">Description:</label>
+            {{ form.description }}
+
+            <label for="id_date">Date & Time:</label>
+            {{ form.date }}
+
+            <label for="id_location">Location:</label>
+            {{ form.location }}
+
+            <label for="id_volunteers_needed">Number of Volunteers Needed:</label>
+            {{ form.volunteers_needed }}
+
+            <label for="id_roles_responsibilities">Roles & Responsibilities:</label>
+            {{ form.roles_responsibilities }}
+
+            
+            <label for="id_category">Select Event Category:</label>
+            <div class="checkbox-group">
+                {{ form.category }}
+            </div>
+            
+            <button type="submit" class="btn">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
