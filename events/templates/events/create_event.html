@@ -73,8 +73,14 @@
         .popup button:hover {
             background-color: #218838;
         }
+
+
+        .btn {
+            background-color: #0056b3;
+        }
     </style>
 </head>
+<a href="{% url 'organisation_dashboard' %}" class="btn">Return to Dashboard</a>
 <body>
     <div class="container">
         <h2>Create an Event</h2>
@@ -107,6 +113,6 @@
             <button type="submit" class="btn">Submit</button>
         </form>
     </div>
-
+    
 </body>
 </html>

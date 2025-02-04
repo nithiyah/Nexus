@@ -59,3 +59,9 @@ def delete_event(request, event_id):
         return redirect('organisation_dashboard')
 
     return render(request, 'events/delete_event.html', {'event': event})
+
+
+@login_required
+def volunteer_dashboard(request):
+    events = Event.objects.all()  # Volunteers can see all events
+    return render(request, 'events/volunteer_dashboard.html', {'events': events})

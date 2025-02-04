@@ -55,6 +55,10 @@
             border-radius: 4px;
             color: white;
         }
+
+        .btn {
+            background-color: rgb(59, 133, 43);
+        }
         .btn-edit {
             background-color: #007bff;
         }
@@ -65,6 +69,7 @@
 </head>
 <body>
     <h1>Your Events</h1>
+    <a href="{% url 'create_event' %}" class="btn">Create New Event</a>
 
     {% if events %}
         {% for event in events %}

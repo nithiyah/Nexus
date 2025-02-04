@@ -55,3 +55,16 @@ def volunteer_dashboard(request):
 @login_required
 def organisation_dashboard(request):
     return render(request, 'accounts/organisation_dashboard.html')
+
+
+# @login_required
+# def organisation_dashboard_redirect(request):
+#     return redirect('organisation_dashboard')  # This will redirect to the events app dashboard
+
+
+@login_required
+def login_redirect(request):
+    if request.user.user_type == 'organisation':
+        return redirect('organisation_dashboard')
+    else:
+        return redirect('volunteer_dashboard')  # Adjust if you have a volunteer view
