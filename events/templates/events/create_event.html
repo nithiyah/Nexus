@@ -48,6 +48,31 @@
         .btn:hover {
             background-color: #0056b3;
         }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+        }
+        .popup button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .popup button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -74,7 +99,6 @@
             <label for="id_roles_responsibilities">Roles & Responsibilities:</label>
             {{ form.roles_responsibilities }}
 
-            
             <label for="id_category">Select Event Category:</label>
             <div class="checkbox-group">
                 {{ form.category }}
@@ -83,5 +107,6 @@
             <button type="submit" class="btn">Submit</button>
         </form>
     </div>
+
 </body>
 </html>
