@@ -1,75 +1,46 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Organisation Dashboard</title>
-</head>
-<body>
-    <h1>Welcome, {{ request.user.username }}!</h1>
-    <h2>Your Events</h2>
-    <a href="{% url 'create_event' %}" class="btn">Create New Event</a>
-    <p>Manage your events and view volunteer applications here.</p>
-
-    {% if events %}
-        <ul>
-            {% for event in events %}
-                <li>
-                    <strong>{{ event.name }}</strong> - {{ event.date|date:"F j, Y, g:i a" }} at {{ event.location }}
-                    <p>{{ event.description }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No events created yet.</p>
-    {% endif %}
-
-    <a href="{% url 'logout' %}">Logout</a>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Organisation Dashboard</title>
-    <style>
-        .card {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .card h3 {
-            margin: 0;
-            font-size: 1.5em;
-        }
-        .card p {
-            margin: 8px 0;
-        }
-        .card-buttons {
-            margin-top: 12px;
-        }
-        .btn {
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            color: white;
-        }
-
-        .btn {
-            background-color: rgb(59, 133, 43);
-        }
-        .btn-edit {
-            background-color: #007bff;
-        }
-        .btn-delete {
-            background-color: #dc3545;
-        }
-    </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Organisation Dashboard</title>
+        <style>
+            .card {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 16px;
+                margin: 16px 0;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .card h3 {
+                margin: 0;
+                font-size: 1.5em;
+            }
+            .card p {
+                margin: 8px 0;
+            }
+            .card-buttons {
+                margin-top: 12px;
+            }
+            .btn {
+                padding: 8px 12px;
+                text-decoration: none;
+                border-radius: 4px;
+                color: white;
+            }
+    
+            .btn {
+                background-color: rgb(59, 133, 43);
+            }
+            .btn-edit {
+                background-color: #007bff;
+            }
+            .btn-delete {
+                background-color: #dc3545;
+            }
+        </style>
+    </head>
 <body>
     <h1>Your Events</h1>
-    <p>Template Loaded Successfully</p>  <!-- Add this to ensure the correct template is rendered -->
     <a href="{% url 'events:create_event' %}" class="btn">Create New Event</a>
 
     {% if events %}
