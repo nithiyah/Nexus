@@ -29,17 +29,20 @@
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>
-
+    
     <h2>Filter Events</h2>
     <form method="get">
-        <!-- Category Dropdown -->
-        <label for="category">Category:</label>
-        <select name="category" id="category">
-            <option value="">-- Select Category --</option>
-            {% for cat in categories %}
-                <option value="{{ cat }}" {% if request.GET.category == cat %}selected{% endif %}>{{ cat }}</option>
+        <!-- Multiple Select Checkboxes for Categories -->
+        <fieldset>
+            <legend>Categories:</legend>
+            {% for category in categories %}
+                <label>
+                    <input type="checkbox" name="category" value="{{ category }}"
+                           {% if category in selected_categories %}checked{% endif %}>
+                    {{ category }}
+                </label><br>
             {% endfor %}
-        </select>
+        </fieldset>
     
         <!-- Location Filter -->
         <label for="location">Location:</label>
@@ -51,7 +54,6 @@
     
         <button type="submit">Filter</button>
     </form>
-    
     
     <h2>Available Events:</h2>
     {% if events %}

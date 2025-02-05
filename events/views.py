@@ -43,22 +43,49 @@ def organisation_dashboard(request):
 #         return render(request, 'events/volunteer_dashboard.html', {'events': events})
 #     return redirect('home')
 
+# @login_required
+# def volunteer_dashboard(request):
+#     if request.user.user_type == 'volunteer':
+#         # Retrieve all events
+#         events = Event.objects.all()
+
+#         # Get distinct categories for the dropdown
+#         categories = Event.objects.values_list('category', flat=True).distinct()
+
+#         # Filtering logic
+#         category = request.GET.get('category')
+#         location = request.GET.get('location')
+#         date = request.GET.get('date')
+
+#         if category:
+#             events = events.filter(category=category)
+#         if location:
+#             events = events.filter(location__icontains=location)
+#         if date:
+#             events = events.filter(date=date)
+
+#         return render(request, 'events/volunteer_dashboard.html', {
+#             'events': events,
+#             'categories': categories  # Pass categories to template
+#         })
+#     return redirect('home')
+
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
-        # Retrieve all events
         events = Event.objects.all()
 
-        # Get distinct categories for the dropdown
+        # Get distinct categories from events
         categories = Event.objects.values_list('category', flat=True).distinct()
 
-        # Filtering logic
-        category = request.GET.get('category')
+        # Retrieve selected categories from GET parameters (as a list)
+        selected_categories = request.GET.getlist('category')
         location = request.GET.get('location')
         date = request.GET.get('date')
 
-        if category:
-            events = events.filter(category=category)
+        # Apply filters
+        if selected_categories:
+            events = events.filter(category__in=selected_categories)
         if location:
             events = events.filter(location__icontains=location)
         if date:
@@ -66,7 +93,8 @@ def volunteer_dashboard(request):
 
         return render(request, 'events/volunteer_dashboard.html', {
             'events': events,
-            'categories': categories  # Pass categories to template
+            'categories': categories,
+            'selected_categories': selected_categories  # Pass selected categories for pre-checking
         })
     return redirect('home')
 
