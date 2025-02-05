@@ -14,12 +14,60 @@ def organisation_dashboard(request):
     return redirect('home')
 
 
+# @login_required
+# def volunteer_dashboard(request):
+#     if request.user.user_type == 'volunteer':
+#         # To display all the events
+#         events = Event.objects.all()
+#         return render(request, 'events/volunteer_dashboard.html', {'events': events})
+#     return redirect('home')
+
+# @login_required
+# def volunteer_dashboard(request):
+#     if request.user.user_type == 'volunteer':
+#         # Retrieve all events
+#         events = Event.objects.all()
+
+#         # Filtering logic
+#         category = request.GET.get('category')
+#         location = request.GET.get('location')
+#         date = request.GET.get('date')
+
+#         if category:
+#             events = events.filter(category=category)
+#         if location:
+#             events = events.filter(location__icontains=location)
+#         if date:
+#             events = events.filter(date=date)
+
+#         return render(request, 'events/volunteer_dashboard.html', {'events': events})
+#     return redirect('home')
+
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
-        # To display all the events
+        # Retrieve all events
         events = Event.objects.all()
-        return render(request, 'events/volunteer_dashboard.html', {'events': events})
+
+        # Get distinct categories for the dropdown
+        categories = Event.objects.values_list('category', flat=True).distinct()
+
+        # Filtering logic
+        category = request.GET.get('category')
+        location = request.GET.get('location')
+        date = request.GET.get('date')
+
+        if category:
+            events = events.filter(category=category)
+        if location:
+            events = events.filter(location__icontains=location)
+        if date:
+            events = events.filter(date=date)
+
+        return render(request, 'events/volunteer_dashboard.html', {
+            'events': events,
+            'categories': categories  # Pass categories to template
+        })
     return redirect('home')
 
 

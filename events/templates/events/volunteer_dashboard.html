@@ -30,7 +30,29 @@
         <button type="submit">Logout</button>
     </form>
 
-    <!-- Display Events -->
+    <h2>Filter Events</h2>
+    <form method="get">
+        <!-- Category Dropdown -->
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <option value="">-- Select Category --</option>
+            {% for cat in categories %}
+                <option value="{{ cat }}" {% if request.GET.category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+    
+        <!-- Location Filter -->
+        <label for="location">Location:</label>
+        <input type="text" name="location" id="location" value="{{ request.GET.location }}">
+    
+        <!-- Date Filter -->
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" value="{{ request.GET.date }}">
+    
+        <button type="submit">Filter</button>
+    </form>
+    
+    
     <h2>Available Events:</h2>
     {% if events %}
         {% for event in events %}
@@ -38,12 +60,14 @@
                 <h3>{{ event.name }}</h3>
                 <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
                 <p><strong>Location:</strong> {{ event.location }}</p>
+                <p><strong>Category:</strong> {{ event.get_category_display }}</p>
                 <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
                 <p>{{ event.description }}</p>
             </div>
         {% endfor %}
     {% else %}
-        <p>No events are available at the moment. Check back later!</p>
+        <p>No events found matching your criteria.</p>
     {% endif %}
+    
 </body>
 </html>
