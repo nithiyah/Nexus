@@ -3,14 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Volunteer Dashboard</title>
+    <style>
+        .event-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .event-card h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .event-card p {
+            margin: 8px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome, Volunteer!</h1>
     <p>This is your dashboard where you can view upcoming events and track your hours.</p>
+
+    <!-- Logout Button -->
     <form action="{% url 'logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>
-    
+
+    <!-- Display Events -->
+    <h2>Available Events:</h2>
+    {% if events %}
+        {% for event in events %}
+            <div class="event-card">
+                <h3>{{ event.name }}</h3>
+                <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+                <p><strong>Location:</strong> {{ event.location }}</p>
+                <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
+                <p>{{ event.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No events are available at the moment. Check back later!</p>
+    {% endif %}
 </body>
 </html>

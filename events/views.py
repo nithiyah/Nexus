@@ -17,6 +17,7 @@ def organisation_dashboard(request):
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
+        # To display all the events
         events = Event.objects.all()
         return render(request, 'events/volunteer_dashboard.html', {'events': events})
     return redirect('home')
