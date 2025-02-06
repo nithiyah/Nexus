@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Organisation Dashboard</title>
+{% extends 'base.html' %}
+
+{% block title %}Organisation Dashboard{% endblock %}
+
+{% block content %}
         <style>
             .card {
                 border: 1px solid #ccc;
@@ -38,7 +38,6 @@
                 background-color: #dc3545;
             }
         </style>
-    </head>
 <body>
     <h1>Your Events</h1>
     <a href="{% url 'events:create_event' %}" class="btn">Create New Event</a>
@@ -64,3 +63,4 @@
     {% endif %}
 </body>
 </html>
+{% endblock %}

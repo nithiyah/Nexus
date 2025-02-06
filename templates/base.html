@@ -1,0 +1,76 @@
+{% load static %}  <!-- Add this at the top -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4264c9;
+            padding: 10px 20px;
+        }
+        .navbar img {
+            height: 40px;
+            cursor: pointer;
+        }
+        .navbar a {
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .navbar a:hover {
+            background-color: #a6a2a2;
+        }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <!-- Logo: Clicking redirects to the dashboard -->
+    <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
+        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo">  <!-- This is now correctly loaded -->
+    </a>
+
+    <div class="navbar-right">
+        {% if 'chat' in request.resolver_match.namespaces %}
+            <a href="{% url 'chat:chat_home' %}">Chat</a>
+        {% endif %}
+        <a href="{% url 'events:volunteer_dashboard' %}">My Events</a>
+        {% if 'accounts' in request.resolver_match.namespaces %}
+            <a href="{% url 'accounts:profile' %}">Profile</a>
+        {% endif %}
+
+        <!-- Logout Button -->
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

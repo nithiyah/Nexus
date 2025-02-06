@@ -1,35 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Volunteer Dashboard</title>
-    <style>
-        .event-card {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .event-card h3 {
-            margin: 0;
-            font-size: 1.5em;
-        }
-        .event-card p {
-            margin: 8px 0;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Volunteer Dashboard{% endblock %}
+
+{% block content %}
     <h1>Welcome, Volunteer!</h1>
     <p>This is your dashboard where you can view upcoming events and track your hours.</p>
 
-    <!-- Logout Button -->
-    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-    
     <h2>Filter Events</h2>
     <form method="get">
         <!-- Multiple Select Checkboxes for Categories -->
@@ -43,18 +19,18 @@
                 </label><br>
             {% endfor %}
         </fieldset>
-    
+
         <!-- Location Filter -->
         <label for="location">Location:</label>
         <input type="text" name="location" id="location" value="{{ request.GET.location }}">
-    
+
         <!-- Date Filter -->
         <label for="date">Date:</label>
         <input type="date" name="date" id="date" value="{{ request.GET.date }}">
-    
+
         <button type="submit">Filter</button>
     </form>
-    
+
     <h2>Available Events:</h2>
     {% if events %}
         {% for event in events %}
@@ -70,6 +46,4 @@
     {% else %}
         <p>No events found matching your criteria.</p>
     {% endif %}
-    
-</body>
-</html>
+{% endblock %}
