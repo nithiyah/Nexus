@@ -14,118 +14,31 @@ def organisation_dashboard(request):
     return redirect('home')
 
 
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         # To display all the events
-#         events = Event.objects.all()
-#         return render(request, 'events/volunteer_dashboard.html', {'events': events})
-#     return redirect('home')
-
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         # Retrieve all events
-#         events = Event.objects.all()
-
-#         # Filtering logic
-#         category = request.GET.get('category')
-#         location = request.GET.get('location')
-#         date = request.GET.get('date')
-
-#         if category:
-#             events = events.filter(category=category)
-#         if location:
-#             events = events.filter(location__icontains=location)
-#         if date:
-#             events = events.filter(date=date)
-
-#         return render(request, 'events/volunteer_dashboard.html', {'events': events})
-#     return redirect('home')
-
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         # Retrieve all events
-#         events = Event.objects.all()
-
-#         # Get distinct categories for the dropdown
-#         categories = Event.objects.values_list('category', flat=True).distinct()
-
-#         # Filtering logic
-#         category = request.GET.get('category')
-#         location = request.GET.get('location')
-#         date = request.GET.get('date')
-
-#         if category:
-#             events = events.filter(category=category)
-#         if location:
-#             events = events.filter(location__icontains=location)
-#         if date:
-#             events = events.filter(date=date)
-
-#         return render(request, 'events/volunteer_dashboard.html', {
-#             'events': events,
-#             'categories': categories  # Pass categories to template
-#         })
-#     return redirect('home')
-
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         events = Event.objects.all()
-
-#         # Get distinct categories from events
-#         categories = Event.objects.values_list('category', flat=True).distinct()
-
-#         # Retrieve selected categories from GET parameters (as a list)
-#         selected_categories = request.GET.getlist('category')
-#         location = request.GET.get('location')
-#         date = request.GET.get('date')
-
-#         # Apply filters
-#         if selected_categories:
-#             events = events.filter(category__in=selected_categories)
-#         if location:
-#             events = events.filter(location__icontains=location)
-#         if date:
-#             events = events.filter(date=date)
-
-#         return render(request, 'events/volunteer_dashboard.html', {
-#             'events': events,
-#             'categories': categories,
-#             'selected_categories': selected_categories  # Pass selected categories for pre-checking
-#         })
-#     return redirect('home')
-
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
-        # Retrieve all events
         events = Event.objects.all()
-        
-        # Get events the volunteer has already registered for
-        registered_event_ids = VolunteerEvent.objects.filter(volunteer=request.user).values_list('event_id', flat=True)
-        
-        # Filtering logic
-        selected_categories = request.GET.getlist('category')
-        location = request.GET.get('location')
-        date = request.GET.get('date')
 
-        if selected_categories:
-            events = events.filter(category__in=selected_categories)
-        if location:
-            events = events.filter(location__icontains=location)
-        if date:
-            events = events.filter(date=date)
+        # Get events the volunteer has registered for
+        registered_event_ids = VolunteerEvent.objects.filter(volunteer=request.user, status='registered').values_list('event_id', flat=True)
+
+        # Compute the number of registered volunteers per event
+        event_volunteer_counts = {}
+        for event in events:
+            event_volunteer_counts[event.id] = VolunteerEvent.objects.filter(event=event, status='registered').count()
 
         return render(request, 'events/volunteer_dashboard.html', {
             'events': events,
-            'categories': Event.objects.values_list('category', flat=True).distinct(),
-            'selected_categories': selected_categories,
-            'registered_event_ids': registered_event_ids  # Pass registered event IDs to the template
+            'registered_event_ids': registered_event_ids,
+            'event_volunteer_counts': event_volunteer_counts,  # Pass precomputed counts to the template
         })
-    return redirect('home')
+
+
+@login_required
+def volunteer_events(request):
+    registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
+    return render(request, 'events/volunteer_events.html', {'registered_events': registered_events})
+
 
 # Edit Event View
 @login_required
@@ -174,27 +87,55 @@ def create_event(request):
 
     return render(request, 'events/create_event.html', {'form': form})
 
-
-
 @login_required
 def register_for_event(request, event_id):
-    """ View to allow volunteers to register for an event """
     event = get_object_or_404(Event, id=event_id)
+
+    # Count currently registered volunteers
+    registered_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
+
+    # Check if the user is already registered or on the waitlist
+    existing_registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
     
-    # Check if the volunteer is already registered
-    if VolunteerEvent.objects.filter(event=event, volunteer=request.user).exists():
+    if existing_registration:
         messages.info(request, 'You have already registered for this event.')
     else:
-        # Create a new registration entry
-        VolunteerEvent.objects.create(event=event, volunteer=request.user)
-        messages.success(request, 'You have successfully registered for the event.')
+        if registered_count < event.volunteers_needed:
+            # Register the volunteer
+            VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
+            messages.success(request, 'You have successfully registered for the event.')
+        else:
+            # Event is full, add to waiting list
+            VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
+            messages.info(request, 'The event is full. You have been added to the waiting list.')
 
     return redirect('events:volunteer_dashboard')
+
+@login_required
+def cancel_registration(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    # Find the volunteer's registration (registered or waitlisted)
+    registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
+    
+    if registration:
+        registration.delete()
+        messages.success(request, 'You have successfully canceled your registration.')
+
+        # Move the first waitlisted volunteer to "registered" if a spot opens
+        waitlisted_volunteers = VolunteerEvent.objects.filter(event=event, status='waiting_list').order_by('registered_at')
+        if waitlisted_volunteers.exists():
+            next_volunteer = waitlisted_volunteers.first()
+            next_volunteer.status = 'registered'
+            next_volunteer.save()
+            messages.info(request, f"{next_volunteer.volunteer.username} has been moved from the waitlist to registered.")
+
+    return redirect('events:volunteer_events')
+
 
 
 # Display volunteer registered events
 @login_required
 def volunteer_events(request):
-    """ View to display events the volunteer has registered for. """
     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
     return render(request, 'events/volunteer_events.html', {'registered_events': registered_events})

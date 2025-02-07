@@ -13,6 +13,11 @@
                 <p><strong>Location:</strong> {{ registration.event.location }}</p>
                 <p><strong>Category:</strong> {{ registration.event.category }}</p>
                 <p>{{ registration.event.description }}</p>
+
+                <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" style="background-color: red;">Cancel Registration</button>
+                </form>
             </div>
         {% endfor %}
     {% else %}

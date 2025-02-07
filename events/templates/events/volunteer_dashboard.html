@@ -30,7 +30,6 @@
 
         <button type="submit">Filter</button>
     </form>
-
     <h2>Available Events:</h2>
     {% if events %}
         {% for event in events %}
@@ -44,6 +43,11 @@
     
                 {% if event.id in registered_event_ids %}
                     <button disabled style="background-color: grey; color: white;">Registered</button>
+                {% elif event_volunteer_counts.event.id >= event.volunteers_needed %}
+                    <form action="{% url 'events:register_for_event' event.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: orange;">Register for Waiting List</button>
+                    </form>
                 {% else %}
                     <form action="{% url 'events:register_for_event' event.id %}" method="post">
                         {% csrf_token %}
@@ -55,6 +59,8 @@
     {% else %}
         <p>No events found matching your criteria.</p>
     {% endif %}
+    
+
     
     
 {% endblock %}
