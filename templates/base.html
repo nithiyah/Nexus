@@ -46,7 +46,7 @@
 <div class="navbar">
     <!-- Logo: Clicking redirects to the dashboard -->
     <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
-        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo">  <!-- This is now correctly loaded -->
+        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" style="height: 40px;">  <!-- This is now correctly loaded -->
     </a>
 
     <div class="navbar-right">
