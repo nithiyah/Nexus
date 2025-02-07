@@ -41,9 +41,20 @@
                 <p><strong>Category:</strong> {{ event.get_category_display }}</p>
                 <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
                 <p>{{ event.description }}</p>
+    
+                {% if event.id in registered_event_ids %}
+                    <button disabled style="background-color: grey; color: white;">Registered</button>
+                {% else %}
+                    <form action="{% url 'events:register_for_event' event.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Register</button>
+                    </form>
+                {% endif %}
             </div>
         {% endfor %}
     {% else %}
         <p>No events found matching your criteria.</p>
     {% endif %}
+    
+    
 {% endblock %}

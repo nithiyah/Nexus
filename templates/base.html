@@ -50,10 +50,12 @@
     </a>
 
     <div class="navbar-right">
+        <a href="{% url 'events:volunteer_events' %}">My Events</a>
+
         {% if 'chat' in request.resolver_match.namespaces %}
             <a href="{% url 'chat:chat_home' %}">Chat</a>
         {% endif %}
-        <a href="{% url 'events:volunteer_dashboard' %}">My Events</a>
+        
         {% if 'accounts' in request.resolver_match.namespaces %}
             <a href="{% url 'accounts:profile' %}">Profile</a>
         {% endif %}

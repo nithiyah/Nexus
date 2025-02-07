@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}My Registered Events{% endblock %}
+
+{% block content %}
+    <h1>My Registered Events</h1>
+
+    {% if registered_events %}
+        {% for registration in registered_events %}
+            <div class="event-card">
+                <h3>{{ registration.event.name }}</h3>
+                <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y H:i" }}</p>
+                <p><strong>Location:</strong> {{ registration.event.location }}</p>
+                <p><strong>Category:</strong> {{ registration.event.category }}</p>
+                <p>{{ registration.event.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You haven't registered for any events yet.</p>
+    {% endif %}
+{% endblock %}
