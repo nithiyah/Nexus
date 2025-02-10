@@ -5,6 +5,7 @@
 {% block content %}
     <h1>My Registered Events</h1>
 
+    <h2>Registered Events</h2>
     {% if registered_events %}
         {% for registration in registered_events %}
             <div class="event-card">
@@ -23,4 +24,27 @@
     {% else %}
         <p>You haven't registered for any events yet.</p>
     {% endif %}
+
+    <h2>Waiting List</h2>
+    {% if waitlisted_events %}
+        {% for registration in waitlisted_events %}
+            <div class="event-card">
+                <h3>{{ registration.event.name }}</h3>
+                <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y H:i" }}</p>
+                <p><strong>Location:</strong> {{ registration.event.location }}</p>
+                <p><strong>Category:</strong> {{ registration.event.category }}</p>
+                <p>{{ registration.event.description }}</p>
+                <p style="color: orange;"><strong>Status:</strong> Waiting List</p>
+
+                <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" style="background-color: rgb(204, 88, 88);">Cancel Registration</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You are not on any event waiting lists.</p>
+    {% endif %}
+
 {% endblock %}
+
