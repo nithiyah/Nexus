@@ -16,7 +16,7 @@
 
                 <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" style="background-color: red;">Cancel Registration</button>
+                    <button type="submit" style="background-color: rgb(204, 88, 88);">Cancel Registration</button>
                 </form>
             </div>
         {% endfor %}

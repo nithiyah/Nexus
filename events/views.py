@@ -22,16 +22,33 @@ def volunteer_dashboard(request):
         # Get events the volunteer has registered for
         registered_event_ids = VolunteerEvent.objects.filter(volunteer=request.user, status='registered').values_list('event_id', flat=True)
 
-        # Compute the number of registered volunteers per event
-        event_volunteer_counts = {}
-        for event in events:
-            event_volunteer_counts[event.id] = VolunteerEvent.objects.filter(event=event, status='registered').count()
+        # Filtering logic
+        selected_categories = request.GET.getlist('category')
+        location = request.GET.get('location', '').strip()
+        date = request.GET.get('date', '').strip()
+
+        if selected_categories:
+            events = events.filter(category__in=selected_categories)
+        if location:
+            events = events.filter(location__icontains=location)
+        if date:
+            events = events.filter(date=date)
+
+        # Ensure unique categories for filtering dropdown
+        category_choices = dict(Event.CATEGORY_CHOICES)  # Fetch category labels
+        categories = list(category_choices.keys())  # Get category keys to match stored values
+
+        # Compute number of registered volunteers per event
+        event_volunteer_counts = {event.id: VolunteerEvent.objects.filter(event=event, status='registered').count() for event in events}
 
         return render(request, 'events/volunteer_dashboard.html', {
             'events': events,
-            'registered_event_ids': registered_event_ids,
-            'event_volunteer_counts': event_volunteer_counts,  # Pass precomputed counts to the template
+            'categories': categories,
+            'category_labels': category_choices,  # Pass category label mapping to template
+            'selected_categories': selected_categories,
+            'event_volunteer_counts': event_volunteer_counts,
         })
+    return redirect('home')
 
 
 @login_required

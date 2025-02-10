@@ -38,7 +38,7 @@ class Event(models.Model):
     location = models.CharField(max_length=255)
     volunteers_needed = models.PositiveIntegerField()
     roles_responsibilities = models.TextField()
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=False, default='education')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=False, default='Education')
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()})"
@@ -54,7 +54,7 @@ class VolunteerEvent(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="registered_volunteers")
     volunteer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="registered_events")
     registered_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='registered')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Registered')
 
     class Meta:
         unique_together = ('event', 'volunteer')  # Prevent duplicate registrations
