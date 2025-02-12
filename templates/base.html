@@ -45,12 +45,14 @@
 <!-- Navbar -->
 <div class="navbar">
     <!-- Logo: Clicking redirects to the dashboard -->
+    {% load static %}
     <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
-        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" style="height: 40px;">  <!-- This is now correctly loaded -->
-    </a>
+        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" style="height: 40px;">  
 
     <div class="navbar-right">
-        <a href="{% url 'events:volunteer_events' %}">My Events</a>
+        <!-- <a href="{% url 'events:volunteer_events' %}">My Events</a> -->
+        <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">My Events</a>
+
 
         {% if 'chat' in request.resolver_match.namespaces %}
             <a href="{% url 'chat:chat_home' %}">Chat</a>

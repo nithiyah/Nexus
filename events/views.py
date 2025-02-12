@@ -252,3 +252,12 @@ def volunteer_events(request):
         'registered_events': registered_events,
         'waitlisted_events': waitlisted_events
     })
+
+
+@login_required
+def organisation_events(request):
+    """View for organisations to see their events."""
+    if request.user.user_type == 'organisation':
+        events = Event.objects.filter(organisation=request.user)
+        return render(request, 'events/organisation_events.html', {'events': events})
+    return redirect('home')
