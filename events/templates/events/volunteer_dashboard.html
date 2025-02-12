@@ -38,15 +38,17 @@
                 <p><strong>Category:</strong> {{ event.get_category_display }}</p>
                 <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
                 <p>{{ event.description }}</p>
+                
+                <!-- Display number of open spots -->
+                {% if event.open_spots > 0 %}
+                    <p style="color: green;"><strong>{{ event.open_spots }} Open Spot{{ event.open_spots|pluralize }}</strong></p>
+                {% else %}
+                    <p style="color: red;"><strong>No Open Spots</strong></p>
+                {% endif %}
 
                 {% if event.id in registered_event_ids %}
                     <button disabled style="background-color: grey; color: white;">Registered</button>
-                {% elif event.volunteer_count >= event.volunteers_needed %}
-                    <form action="{% url 'events:register_for_event' event.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: orange;">Register for Waiting List</button>
-                    </form>
-                {% else %}
+                {% elif event.open_spots > 0%}
                     <form action="{% url 'events:register_for_event' event.id %}" method="post">
                         {% csrf_token %}
                         <button type="submit">Register</button>
