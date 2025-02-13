@@ -110,56 +110,7 @@ def create_event(request):
 
     return render(request, 'events/create_event.html', {'form': form})
 
-# @login_required
-# def register_for_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
 
-#     # Count currently registered volunteers
-#     registered_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
-
-#     # Check if the user is already registered or waitlisted
-#     existing_registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
-    
-#     if existing_registration:
-#         messages.info(request, 'You have already registered for this event.')
-#     else:
-#         if registered_count < event.volunteers_needed:
-#             # Register the volunteer as "registered"
-#             VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
-#             messages.success(request, 'You have successfully registered for the event.')
-#         else:
-#             # Event is full, add to waiting list
-#             VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
-#             messages.info(request, 'The event is full. You have been added to the waiting list.')
-
-#     return redirect('events:volunteer_dashboard')
-
-# @login_required
-# def register_for_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-
-#     # Count currently registered volunteers
-#     registered_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
-
-#     # Check if the user is already registered or waitlisted
-#     existing_registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
-    
-#     if existing_registration:
-#         if existing_registration.status == 'waiting_list':
-#             messages.info(request, 'You are already on the waiting list for this event.')
-#         else:
-#             messages.info(request, 'You have already registered for this event.')
-#     else:
-#         if registered_count < event.volunteers_needed:
-#             # Register the volunteer as "registered"
-#             VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
-#             messages.success(request, 'You have successfully registered for the event.')
-#         else:
-#             # Event is full, add to waiting list
-#             VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
-#             messages.info(request, 'The event is full. You have been added to the waiting list.')
-
-#     return redirect('events:volunteer_dashboard')
 @login_required
 def register_for_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -189,27 +140,6 @@ def register_for_event(request, event_id):
     return redirect('events:volunteer_dashboard')
 
 
-# @login_required
-# def cancel_registration(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-    
-#     # Find the volunteer's registration (registered or waitlisted)
-#     registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
-    
-#     if registration:
-#         registration.delete()
-#         messages.success(request, 'You have successfully canceled your registration.')
-
-#         # Move the first waitlisted volunteer to "registered" if a spot opens
-#         waitlisted_volunteers = VolunteerEvent.objects.filter(event=event, status='waiting_list').order_by('registered_at')
-#         if waitlisted_volunteers.exists():
-#             next_volunteer = waitlisted_volunteers.first()
-#             next_volunteer.status = 'registered'
-#             next_volunteer.save()
-#             messages.info(request, f"{next_volunteer.volunteer.username} has been moved from the waitlist to registered.")
-
-#     return redirect('events:volunteer_events')
-
 @login_required
 def cancel_registration(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -232,16 +162,7 @@ def cancel_registration(request, event_id):
     return redirect('events:volunteer_events')
 
 
-# @login_required
-# def volunteer_events(request):
-#     # Get events where the volunteer is registered or on the waiting list
-#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
-#     waitlisted_events = VolunteerEvent.objects.filter(volunteer=request.user, status='waiting_list')
 
-#     return render(request, 'events/volunteer_events.html', {
-#         'registered_events': registered_events,
-#         'waitlisted_events': waitlisted_events
-#     })
 @login_required
 def volunteer_events(request):
     # Get events where the volunteer is registered or on the waiting list

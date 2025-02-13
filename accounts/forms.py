@@ -4,15 +4,19 @@ from .models import CustomUser
 
 class VolunteerRegistrationForm(UserCreationForm):
 
+    full_name = forms.CharField(max_length=255, required=True, help_text="Enter your full name.") 
     contact_number = forms.CharField(max_length=10, required=True, help_text= "Enter your contact number.")
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'contact_number', 'password1', 'password2']
+        fields = ['full_name', 'username', 'email', 'contact_number',
+                   'password1', 'password2']
 
 class OrganisationRegistrationForm(UserCreationForm):
     organisation_name = forms.CharField(max_length=255, required=True)
+    personnel_name = forms.CharField(max_length=255, required=True, help_text="Enter the personnel contact name.")
     contact_number = forms.CharField(max_length=10, required=True, help_text= "Enter your contact number.")
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'contact_number', 'organisation_name', 'password1', 'password2']
+        fields = ['organisation_name', 'personnel_name', 'username', 
+                  'email', 'contact_number', 'password1', 'password2']
