@@ -161,8 +161,6 @@ def cancel_registration(request, event_id):
 
     return redirect('events:volunteer_events')
 
-
-
 @login_required
 def volunteer_events(request):
     # Get events where the volunteer is registered or on the waiting list
@@ -175,23 +173,33 @@ def volunteer_events(request):
     })
 
 
+# @login_required
+# def organisation_events(request):
+#     if request.user.user_type != 'organisation':
+#         return redirect('home')
+
+#     events = Event.objects.filter(organisation=request.user)
+
+#     # Fetch all volunteer registrations for the organisation's events
+#     event_volunteers = VolunteerEvent.objects.filter(event__in=events).select_related('volunteer')
+
+#     print("Event Volunteers Data Sent to Template:", event_volunteers)  # Debugging Output
+
+#     return render(request, 'events/organisation_events.html', {
+#         'events': events,
+#         'event_volunteers': event_volunteers,  # Pass all volunteers as a list
+#     })
 @login_required
 def organisation_events(request):
-    if request.user.user_type != 'organisation':
-        return redirect('home')
-
     events = Event.objects.filter(organisation=request.user)
 
-    # Fetch all volunteer registrations for the organisation's events
-    event_volunteers = VolunteerEvent.objects.filter(event__in=events).select_related('volunteer')
-
-    print("Event Volunteers Data Sent to Template:", event_volunteers)  # Debugging Output
+    # Preprocess event volunteers
+    for event in events:
+        event.volunteers = VolunteerEvent.objects.filter(event=event)
 
     return render(request, 'events/organisation_events.html', {
-        'events': events,
-        'event_volunteers': event_volunteers,  # Pass all volunteers as a list
+        'events': events
     })
-
 
 
 #Under organisation events page
