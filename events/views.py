@@ -177,8 +177,34 @@ def volunteer_events(request):
 
 @login_required
 def organisation_events(request):
-    """View for organisations to see their events."""
-    if request.user.user_type == 'organisation':
-        events = Event.objects.filter(organisation=request.user)
-        return render(request, 'events/organisation_events.html', {'events': events})
-    return redirect('home')
+    if request.user.user_type != 'organisation':
+        return redirect('home')
+
+    events = Event.objects.filter(organisation=request.user)
+
+    # Fetch all volunteer registrations for the organisation's events
+    event_volunteers = VolunteerEvent.objects.filter(event__in=events).select_related('volunteer')
+
+    print("Event Volunteers Data Sent to Template:", event_volunteers)  # Debugging Output
+
+    return render(request, 'events/organisation_events.html', {
+        'events': events,
+        'event_volunteers': event_volunteers,  # Pass all volunteers as a list
+    })
+
+
+
+#Under organisation events page
+@login_required
+def remove_volunteer(request, registration_id):
+    """Allows an organisation to remove a volunteer from an event."""
+    registration = get_object_or_404(VolunteerEvent, id=registration_id)
+
+    # Ensure only the event creator can remove volunteers
+    if registration.event.organisation == request.user:
+        registration.delete()
+        messages.success(request, f"{registration.volunteer.full_name} has been removed from the event.")
+    else:
+        messages.error(request, "You are not authorized to remove volunteers from this event.")
+
+    return redirect('events:organisation_events')

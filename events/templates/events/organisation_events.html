@@ -4,5 +4,50 @@
 
 {% block content %}
     <h1>My Events</h1>
- 
+
+    {% if events %}
+        {% for event in events %}
+            <div class="event-card">
+                <h3>{{ event.name }}</h3>
+                <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+                <p><strong>Location:</strong> {{ event.location }}</p>
+                <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+                <p>{{ event.description }}</p>
+
+                <h4>Volunteers Signed Up:</h4>
+
+                {% with event_volunteers|dictsort:"event.id" as volunteers %}
+                    {% if volunteers %}
+                        <table border="1">
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Mobile Number</th>
+                                <th>Action</th>
+                            </tr>
+                            {% for registration in volunteers %}
+                                {% if registration.event.id == event.id %}
+                                    <tr>
+                                        <td>{{ registration.volunteer.full_name }}</td>
+                                        <td>{{ registration.volunteer.email }}</td>
+                                        <td>{{ registration.volunteer.mobile_number }}</td>
+                                        <td>
+                                            <form action="{% url 'events:remove_volunteer' registration.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" style="background-color: red; color: white;">Remove User</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <p>No volunteers have signed up yet.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You haven't created any events yet.</p>
+    {% endif %}
 {% endblock %}
