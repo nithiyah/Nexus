@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Complete Feedback Form{% endblock %}
+
+{% block content %}
+    <h1>Feedback for {{ event.name }}</h1>
+    <p>Please fill out this form to share your feedback on the event.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" style="background-color: green; color: white; padding: 8px 16px; border: none; cursor: pointer;">
+            Submit Feedback
+        </button>
+    </form>
+{% endblock %}

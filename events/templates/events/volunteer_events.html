@@ -14,6 +14,17 @@
                 <p><strong>Category:</strong> {{ registration.event.category }}</p>
                 <p>{{ registration.event.description }}</p>
 
+             <!-- Feedback Form Section -->
+            {% if registration.event.feedback_form and registration.event.feedback_form.published %}
+                <h4>Feedback Form</h4>
+                <a href="{% url 'events:complete_feedback' registration.event.id %}" class="btn"
+                style="background-color: green; color: white; padding: 8px 16px; border: none; cursor: pointer;">
+                    Complete Feedback Form
+                </a>
+            {% else %}
+                <p style="color: red;"><strong>The feedback form has not been published yet.</strong></p>
+            {% endif %}
+
                 <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
                     {% csrf_token %}
                     <button type="submit" style="background-color: rgb(204, 88, 88);">Cancel Registration</button>

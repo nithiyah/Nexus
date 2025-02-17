@@ -12,8 +12,12 @@ urlpatterns = [
     path('my-events/', views.volunteer_events, name='volunteer_events'),
     path('organisation-events/', views.organisation_events, name='organisation_events'),
     path('register/<int:event_id>/', views.register_for_event, name='register_for_event'),
-    path('cancel/<int:event_id>/', views.cancel_registration, name='cancel_registration'),  # Add this
+    path('cancel/<int:event_id>/', views.cancel_registration, name='cancel_registration'),  
     path('remove-volunteer/<int:registration_id>/', views.remove_volunteer, name='remove_volunteer'),
-
+    path('publish-feedback/<int:event_id>/', views.publish_feedback, name='publish_feedback'),
+    path('submit-feedback/<int:event_id>/', views.submit_feedback, name='submit_feedback'),
+    path('view-feedback/<int:event_id>/', views.view_feedback, name='view_feedback'),
+    path('create-feedback/<int:event_id>/', views.create_feedback_form, name='create_feedback_form'),
+    path("complete-feedback/<int:event_id>/", views.complete_feedback, name="complete_feedback"),
 
 ]

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback for {{ event.name }}{% endblock %}
+
+{% block content %}
+    <h1>Feedback for {{ event.name }}</h1>
+
+    {% if feedback_entries %}
+        <table border="1">
+            <tr>
+                <th>Volunteer</th>
+                <th>Feedback Response</th>
+            </tr>
+            {% for feedback in feedback_entries %}
+                <tr>
+                    <td>{{ feedback.volunteer.full_name }}</td>
+                    <td>{{ feedback.response }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No feedback has been submitted yet.</p>
+    {% endif %}
+{% endblock %}

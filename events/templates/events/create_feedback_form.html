@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Feedback Form{% endblock %}
+
+{% block content %}
+    <h1>Create Feedback Form for {{ event.name }}</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="background-color: green; color: white;">Save Feedback Form</button>
+    </form>
+
+    <a href="{% url 'events:organisation_events' %}">Back to My Events</a>
+{% endblock %}
+
+

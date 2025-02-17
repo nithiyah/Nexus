@@ -35,10 +35,26 @@
                     </tr>
                 {% endfor %}
             </table>
+
+            <!-- Feedback Form Controls -->
+            <div style="margin-top: 15px;">
+                <a href="{% url 'events:create_feedback_form' event.id %}" class="btn" style="background-color: green; color: white;">Create/Edit Feedback Form</a>
+
+                {% if event.date < today %}
+                    <form action="{% url 'events:publish_feedback' event.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: blue; color: white;">Publish Feedback</button>
+                    </form>
+
+                    <form action="{% url 'events:view_feedback' event.id %}" method="get" style="display: inline;">
+                        <button type="submit" style="background-color: purple; color: white;">View Feedback</button>
+                    </form>
+                {% endif %}
+            </div>
+
         {% else %}
             <p>No volunteers have signed up yet.</p>
         {% endif %}
     </div>
-{% endfor %}
-
+    {% endfor %}
 {% endblock %}
