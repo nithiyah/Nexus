@@ -178,30 +178,59 @@ def cancel_registration(request, event_id):
 
     return redirect('events:volunteer_events')
 
+# @login_required
+# def volunteer_events(request):
+#     # Get events where the volunteer is registered or on the waiting list
+#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
+#     waitlisted_events = VolunteerEvent.objects.filter(volunteer=request.user, status='waiting_list')
+#     # Fetch feedback forms linked to the events this volunteer attended
+#     # feedback_forms = {
+#     #     event.event.id: FeedbackResponse.objects.filter(
+#     #         feedback_form__event=event.event, volunteer=request.user
+#     #     ).first()
+#     #     for event in registered_events
+#     # }
+#     # feedback_forms = {
+#     #     event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
+#     #     for event in registered_events
+#     # }
+    
+#     # Check if a feedback response exists for each event
+#     feedback_forms = {
+#         event.event.id: FeedbackResponse.objects.filter(
+#             feedback_form__event=event.event, volunteer=request.user
+#         ).exists()  # Returns True if feedback exists, otherwise False
+#         for event in registered_events
+#     }
+
+#     return render(request, 'events/volunteer_events.html', {
+#         'registered_events': registered_events,
+#         'waitlisted_events': waitlisted_events,
+#         'feedback_forms': feedback_forms,  # Pass feedback data to the template
+
+#     })
+
 @login_required
 def volunteer_events(request):
-    # Get events where the volunteer is registered or on the waiting list
-    registered_events = VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
-    waitlisted_events = VolunteerEvent.objects.filter(volunteer=request.user, status='waiting_list')
-    # Fetch feedback forms linked to the events this volunteer attended
-    # feedback_forms = {
-    #     event.event.id: FeedbackResponse.objects.filter(
-    #         feedback_form__event=event.event, volunteer=request.user
-    #     ).first()
-    #     for event in registered_events
-    # }
-    feedback_forms = {
-        event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
-        for event in registered_events
-    }
+    # Get all events the volunteer has registered for
+    registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
 
+    for registration in registered_events:
+        # Check if event has a feedback form
+        feedback_form = getattr(registration.event, "feedback_form", None)
+        if feedback_form:
+            feedback_exists = FeedbackResponse.objects.filter(
+                feedback_form=feedback_form, 
+                volunteer=request.user
+            ).exists()
+            registration.has_submitted_feedback = feedback_exists
+        else:
+            registration.has_submitted_feedback = None  # No feedback form exists
 
     return render(request, 'events/volunteer_events.html', {
         'registered_events': registered_events,
-        'waitlisted_events': waitlisted_events,
-        'feedback_forms': feedback_forms,  # Pass feedback data to the template
-
     })
+
 
 @login_required
 def organisation_events(request):
@@ -328,16 +357,49 @@ def submit_feedback(request, event_id):
     return render(request, 'events/submit_feedback.html', {'form': form, 'event': event})
 
 # organisations to view submitted volunteer feedback forms
+# @login_required
+# def view_feedback(request, event_id):
+#     event = get_object_or_404(Event, id=event_id)
+#     #Fitlers the responses based on the correct event
+#     feedback_entries = FeedbackResponse.objects.filter(feedback_form__event=event)  
+
+#     return render(request, 'events/view_feedback.html', {
+#         'event': event,
+#         'feedback_entries': feedback_entries,
+#     })
+
+import json
+from django.http import JsonResponse
+
 @login_required
 def view_feedback(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    #Fitlers the responses based on the correct event
-    feedback_entries = FeedbackResponse.objects.filter(feedback_form__event=event)  
+    feedback_entries = FeedbackResponse.objects.filter(feedback_form__event=event)
+
+    # Compute Average Ratings
+    ratings = {
+        "rating_1": 0, "rating_2": 0, "rating_3": 0, "rating_4": 0, "rating_5": 0
+    }
+    total_responses = feedback_entries.count()
+
+    if total_responses > 0:
+        for feedback in feedback_entries:
+            ratings["rating_1"] += feedback.rating_1
+            ratings["rating_2"] += feedback.rating_2
+            ratings["rating_3"] += feedback.rating_3
+            ratings["rating_4"] += feedback.rating_4
+            ratings["rating_5"] += feedback.rating_5
+
+        # Calculate averages
+        for key in ratings:
+            ratings[key] = round(ratings[key] / total_responses, 2)
 
     return render(request, 'events/view_feedback.html', {
         'event': event,
         'feedback_entries': feedback_entries,
+        'average_ratings': json.dumps(list(ratings.values())),  # Convert to JSON-safe format
     })
+
 
 
 @login_required
