@@ -4,7 +4,35 @@
 
 {% block content %}
     <h1>Feedback for {{ event.name }}</h1>
-
+    <h2>Feedback Summary</h2>
+    <canvas id="feedbackChart" width="400" height="200"></canvas>
+    
+        <!-- Load Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+        <script>
+            // Get the average ratings from Django context
+            var averageRatings = JSON.parse('{{ average_ratings|escapejs }}');
+    
+            var ctx = document.getElementById('feedbackChart').getContext('2d');
+            var feedbackChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Overall Experience', 'Registration', 'Venue', 'Schedule', 'Communication'],
+                    datasets: [{
+                        label: 'Average Ratings',
+                        data: averageRatings,
+                        backgroundColor: ['blue', 'green', 'purple', 'orange', 'red']
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, max: 5 }
+                    }
+                }
+            });
+        </script>
+    
     {% if feedback_entries %}
         <div style="display: flex; flex-wrap: wrap; gap: 15px;">
             {% for feedback in feedback_entries %}
@@ -37,33 +65,5 @@
         <p>No feedback has been submitted yet.</p>
     {% endif %}
 
-    <h2>Feedback Summary</h2>
-<canvas id="feedbackChart" width="400" height="200"></canvas>
-
-    <!-- Load Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        // Get the average ratings from Django context
-        var averageRatings = JSON.parse('{{ average_ratings|escapejs }}');
-
-        var ctx = document.getElementById('feedbackChart').getContext('2d');
-        var feedbackChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Overall Experience', 'Registration', 'Venue', 'Schedule', 'Communication'],
-                datasets: [{
-                    label: 'Average Ratings',
-                    data: averageRatings,
-                    backgroundColor: ['blue', 'green', 'purple', 'orange', 'red']
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true, max: 5 }
-                }
-            }
-        });
-    </script>
 
 {% endblock %}
