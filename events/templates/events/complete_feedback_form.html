@@ -8,10 +8,67 @@
 
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
 
-        <button type="submit" style="background-color: green; color: white; padding: 8px 16px; border: none; cursor: pointer;">
-            Submit Feedback
-        </button>
+        <!-- Displaying the feedback questions dynamically -->
+        <p><strong>{{ feedback_form.question_1 }}</strong></p>
+        <label><input type="radio" name="rating_1" value="1"> 1 - Poor</label>
+        <label><input type="radio" name="rating_1" value="2"> 2 - Fair</label>
+        <label><input type="radio" name="rating_1" value="3"> 3 - Good</label>
+        <label><input type="radio" name="rating_1" value="4"> 4 - Very Good</label>
+        <label><input type="radio" name="rating_1" value="5"> 5 - Excellent</label>
+
+        <p><strong>{{ feedback_form.question_2 }}</strong></p>
+        <label><input type="radio" name="rating_2" value="1"> 1 - Poor</label>
+        <label><input type="radio" name="rating_2" value="2"> 2 - Fair</label>
+        <label><input type="radio" name="rating_2" value="3"> 3 - Good</label>
+        <label><input type="radio" name="rating_2" value="4"> 4 - Very Good</label>
+        <label><input type="radio" name="rating_2" value="5"> 5 - Excellent</label>
+
+        <p><strong>{{ feedback_form.question_3 }}</strong></p>
+        <label><input type="radio" name="rating_3" value="1"> 1 - Poor</label>
+        <label><input type="radio" name="rating_3" value="2"> 2 - Fair</label>
+        <label><input type="radio" name="rating_3" value="3"> 3 - Good</label>
+        <label><input type="radio" name="rating_3" value="4"> 4 - Very Good</label>
+        <label><input type="radio" name="rating_3" value="5"> 5 - Excellent</label>
+
+        <p><strong>{{ feedback_form.question_4 }}</strong></p>
+        <label><input type="radio" name="rating_4" value="1"> 1 - Poor</label>
+        <label><input type="radio" name="rating_4" value="2"> 2 - Fair</label>
+        <label><input type="radio" name="rating_4" value="3"> 3 - Good</label>
+        <label><input type="radio" name="rating_4" value="4"> 4 - Very Good</label>
+        <label><input type="radio" name="rating_4" value="5"> 5 - Excellent</label>
+
+        <p><strong>{{ feedback_form.question_5 }}</strong></p>
+        <label><input type="radio" name="rating_5" value="1"> 1 - Poor</label>
+        <label><input type="radio" name="rating_5" value="2"> 2 - Fair</label>
+        <label><input type="radio" name="rating_5" value="3"> 3 - Good</label>
+        <label><input type="radio" name="rating_5" value="4"> 4 - Very Good</label>
+        <label><input type="radio" name="rating_5" value="5"> 5 - Excellent</label>
+
+        <!-- Additional open-ended questions -->
+        {% if feedback_form.additional_question_1 %}
+            <p><strong>{{ feedback_form.additional_question_1 }}</strong></p>
+            <textarea name="additional_answer_1"></textarea>
+        {% endif %}
+
+        {% if feedback_form.additional_question_2 %}
+            <p><strong>{{ feedback_form.additional_question_2 }}</strong></p>
+            <textarea name="additional_answer_2"></textarea>
+        {% endif %}
+
+        <!-- Follow-up options -->
+        <p><strong>Would you like to be notified about future events?</strong></p>
+        <select name="notify_future_events">
+            <option value="True">Yes</option>
+            <option value="False">No</option>
+        </select>
+
+        <p><strong>Can we contact you for follow-up?</strong></p>
+        <select name="allow_follow_up_contact">
+            <option value="True">Yes</option>
+            <option value="False">No</option>
+        </select>
+
+        <button type="submit" style="background-color: green; color: white;">Submit Feedback</button>
     </form>
 {% endblock %}

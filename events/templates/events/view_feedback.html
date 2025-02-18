@@ -9,12 +9,30 @@
         <table border="1">
             <tr>
                 <th>Volunteer</th>
-                <th>Feedback Response</th>
+                <th>Overall Event Experience</th>
+                <th>Registration Process</th>
+                <th>Venue Rating</th>
+                <th>Event Timing</th>
+                <th>Communication</th>
+                <th>Liked Most</th>
+                <th>Liked Least</th>
+                <th>Suggestions</th>
+                <th>Notify Future Events</th>
+                <th>Follow-up Permission</th>
             </tr>
             {% for feedback in feedback_entries %}
                 <tr>
                     <td>{{ feedback.volunteer.full_name }}</td>
-                    <td>{{ feedback.response }}</td>
+                    <td>{{ feedback.rating_1 }}</td>
+                    <td>{{ feedback.rating_2 }}</td>
+                    <td>{{ feedback.rating_3 }}</td>
+                    <td>{{ feedback.rating_4 }}</td>
+                    <td>{{ feedback.rating_5 }}</td>
+                    <td>{{ feedback.additional_answer_1 }}</td>
+                    <td>{{ feedback.additional_answer_2 }}</td>
+                    <td>{{ feedback.improvement_suggestions }}</td>
+                    <td>{{ feedback.notify_future_events|yesno:"Yes,No" }}</td>
+                    <td>{{ feedback.allow_follow_up_contact|yesno:"Yes,No" }}</td>
                 </tr>
             {% endfor %}
         </table>
