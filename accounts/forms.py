@@ -20,3 +20,12 @@ class OrganisationRegistrationForm(UserCreationForm):
         model = CustomUser
         fields = ['organisation_name', 'personnel_name', 'username', 
                   'email', 'contact_number', 'password1', 'password2']
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['profile_picture', 'full_name', 'email', 'contact_number']
+        widgets = {
+            'email': forms.EmailInput(attrs={'readonly': 'readonly'}),
+        }

@@ -51,16 +51,20 @@
 
     <div class="navbar-right">
         <!-- <a href="{% url 'events:volunteer_events' %}">My Events</a> -->
-        <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">My Events</a>
+        <a href="{% if request.user.user_type == 'organisation' %}
+        {% url 'events:organisation_events' %}{% else %}
+        {% url 'events:volunteer_events' %}{% endif %}">My Events</a>
 
 
         {% if 'chat' in request.resolver_match.namespaces %}
             <a href="{% url 'chat:chat_home' %}">Chat</a>
         {% endif %}
         
-        {% if 'accounts' in request.resolver_match.namespaces %}
-            <a href="{% url 'accounts:profile' %}">Profile</a>
+        {% if 'chat' in request.resolver_match.namespaces %}
+            <a href="{% u   qrl 'accounts:profile' %}">Profile</a>
         {% endif %}
+
+
 
         <!-- Logout Button -->
         <form action="{% url 'logout' %}" method="post" style="display:inline;">

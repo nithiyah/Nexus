@@ -74,6 +74,7 @@ from django.contrib.auth import login
 from .forms import VolunteerRegistrationForm, OrganisationRegistrationForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from .forms import ProfileUpdateForm
 
 
 def welcome(request):
@@ -119,3 +120,17 @@ def register_organisation(request):
     else:
         form = OrganisationRegistrationForm()
     return render(request, 'accounts/register_organisation.html', {'form': form})
+
+
+@login_required
+def profile_view(request):
+    user = request.user  # Get logged-in user
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('accounts:profile')  # Redirect to profile page after saving
+    else:
+        form = ProfileUpdateForm(instance=user)
+    
+    return render(request, 'accounts/profile.html', {'form': form})

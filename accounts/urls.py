@@ -4,6 +4,7 @@ from django.urls import path
 from .views import CustomLoginView
 from django.contrib.auth.views import LogoutView
 from .views import welcome, register_volunteer, register_organisation
+from .views import profile_view
 
 urlpatterns = [
     path('', welcome, name='home'),  # Root URL for welcome page
@@ -18,6 +19,9 @@ urlpatterns = [
     # path('dashboard/', dashboard_redirect, name='dashboard_redirect'),
     path('login/redirect/', views.login_redirect, name='login_redirect'),  # Custom redirect
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('profile/', profile_view, name='profile'),
+
+
 ]
 
 # urlpatterns += [
