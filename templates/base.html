@@ -60,14 +60,16 @@
             <a href="{% url 'chat:chat_home' %}">Chat</a>
         {% endif %}
         
-        {% if 'chat' in request.resolver_match.namespaces %}
-            <a href="{% u   qrl 'accounts:profile' %}">Profile</a>
+        <!-- {% if 'accounts' in request.resolver_match.namespaces %}
+            <a href="{% url 'accounts:profile' %}">Profile</a>
+        {% endif %} -->
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}">Profile</a>
         {% endif %}
 
 
-
         <!-- Logout Button -->
-        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button type="submit" style="background:none; border:none; color:white; cursor:pointer;">Logout</button>
         </form>

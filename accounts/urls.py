@@ -5,7 +5,7 @@ from .views import CustomLoginView
 from django.contrib.auth.views import LogoutView
 from .views import welcome, register_volunteer, register_organisation
 from .views import profile_view
-
+app_name = 'accounts'  # Ensures 'accounts:profile' works
 urlpatterns = [
     path('', welcome, name='home'),  # Root URL for welcome page
     path('login/', CustomLoginView.as_view(), name='login'), 

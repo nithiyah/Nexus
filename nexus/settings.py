@@ -46,8 +46,9 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_REDIRECT_URL = '/login/redirect/'  # Redirect after successful login
-LOGOUT_REDIRECT_URL = 'home'  # Redirect after logout
+# LOGOUT_REDIRECT_URL = 'home'  # Redirect after logout
 
+LOGOUT_REDIRECT_URL = 'accounts:login'  # Redirects users to login page after logout
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,6 +61,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'nexus.urls'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 TEMPLATES = [
     {
