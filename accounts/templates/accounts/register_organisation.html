@@ -3,5 +3,5 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Register</button>
-    <p>Return to Login Page <a href="{% url 'login' %}">Log In</a></p>
+    <p>Return to Login Page <a href="{% url 'accounts:login' %}">Log In</a></p>
 </form>
