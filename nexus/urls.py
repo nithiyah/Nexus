@@ -25,7 +25,11 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('events/', include('events.urls')),  # events app URLs
     path('api/', include('api.urls')), # API urls
-    path('accounts/', include('accounts.urls', namespace='accounts')),  # Ensure namespace is set
+
+
+    #had to delete a url because i got the namespace error
+    # path('accounts/', include('accounts.urls')),  # Ensure namespace is set
+    # path('accounts/', include('accounts.urls', namespace='accounts')),  # Ensure namespace is set
 
 ]
 

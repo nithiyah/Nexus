@@ -11,12 +11,6 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'), 
     path('register/volunteer/', views.register_volunteer, name='register_volunteer'),
     path('register/organisation/', views.register_organisation, name='register_organisation'),
-
-    #trying to move dashboard entirely to events app
-    # path('dashboard/organisation/', views.organisation_dashboard, name='organisation_dashboard'),
-    # path('dashboard/volunteer/', views.volunteer_dashboard, name='volunteer_dashboard'),
-
-    # path('dashboard/', dashboard_redirect, name='dashboard_redirect'),
     path('login/redirect/', views.login_redirect, name='login_redirect'),  # Custom redirect
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', profile_view, name='profile'),
