@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat Rooms{% endblock %}
+
+{% block content %}
+    <h1>Chat Rooms</h1>
+
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <a href="{% url 'chat:room' event.id %}">
+                        Chat Room for {{ event.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No Listed Events. Create an event to access chat rooms.</p>
+    {% endif %}
+{% endblock %}

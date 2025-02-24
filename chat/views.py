@@ -6,9 +6,18 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
+# def chat_home(request):
+#     chat_rooms = ChatRoom.objects.all()
+#     return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
+
 def chat_home(request):
-    chat_rooms = ChatRoom.objects.all()
-    return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
+    # Get events created by the logged-in organization
+    if request.user.is_authenticated and request.user.user_type == "organisation":
+        events = Event.objects.filter(organisation=request.user)
+    else:
+        events = []  # Empty list if user is not an organization
+
+    return render(request, "chat/chat_home.html", {"events": events})
 
 
 def chat_room(request, event_id):
