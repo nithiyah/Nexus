@@ -25,6 +25,8 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('events/', include('events.urls')),  # events app URLs
     path('api/', include('api.urls')), # API urls
+    path('chat/', include('chat.urls')), # chat urls
+
 
 
     #had to delete a url because i got the namespace error

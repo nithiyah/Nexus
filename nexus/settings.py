@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'django_extensions',
+    'channels',
+    'chat',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -81,6 +83,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'nexus.wsgi.application'
+ASGI_APPLICATION = "nexus.asgi.application"
+
+# Redis setup for WebSocket communication
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis in production
+    },
+}
 
 
 # Database
