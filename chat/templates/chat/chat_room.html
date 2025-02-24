@@ -1,32 +1,50 @@
 {% extends "base.html" %}
-{% block title %}Chat for {{ event.name }}{% endblock %}
+
+{% block title %}Chat Room - {{ chatroom.event.name }}{% endblock %}
 
 {% block content %}
-<h2>Chat Room: {{ event.name }}</h2>
+    <h1>Chat Room for {{ chatroom.event.name }}</h1>
 
-<div id="chat-log">
-    {% for message in messages %}
-        <p><strong>{{ message.sender.username }}:</strong> {{ message.content }} <small>{{ message.timestamp }}</small></p>
-    {% endfor %}
-</div>
+    <div id="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+        {% for message in messages %}
+            <p><strong>{{ message.sender.username }}</strong>: {{ message.content }} 
+            <small>({{ message.timestamp|date:"H:i" }})</small></p>
+        {% empty %}
+            <p>No messages yet. Start the conversation!</p>
+        {% endfor %}
+    </div>
 
-<input id="chat-message-input" type="text" placeholder="Type a message...">
-<button id="chat-message-submit">Send</button>
+    <form id="chat-form" method="post">
+        {% csrf_token %}
+        <input type="text" id="chat-message" name="content" placeholder="Type a message..." required>
+        <button type="submit">Send</button>
+    </form>
 
-<script>
-    const roomId = "{{ chatroom.id }}";
-    const socket = new WebSocket(`ws://${window.location.host}/ws/chat/${roomId}/`);
-
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        const chatLog = document.getElementById("chat-log");
-        chatLog.innerHTML += `<p><strong>${data.sender}:</strong> ${data.message} <small>${data.timestamp}</small></p>`;
-    };
-
-    document.getElementById("chat-message-submit").onclick = function() {
-        const messageInput = document.getElementById("chat-message-input");
-        socket.send(JSON.stringify({ "message": messageInput.value }));
-        messageInput.value = "";
-    };
-</script>
+    <script>
+        document.getElementById("chat-form").onsubmit = function(event) {
+            event.preventDefault();
+            let messageInput = document.getElementById("chat-message");
+            let message = messageInput.value.trim();
+            
+            if (message.length > 0) {
+                fetch("{% url 'chat:send_message' chatroom.event.id %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({content: message})
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          let chatBox = document.getElementById("chat-box");
+                          let newMessage = `<p><strong>${data.sender}</strong>: ${data.content} <small>(${data.timestamp})</small></p>`;
+                          chatBox.innerHTML += newMessage;
+                          messageInput.value = "";
+                          chatBox.scrollTop = chatBox.scrollHeight;
+                      }
+                  });
+            }
+        };
+    </script>
 {% endblock %}

@@ -11,6 +11,10 @@ class ChatRoom(models.Model):
     def __str__(self):
         return f"Chat Room for {self.event.name}"
 
+
+# Each event has one chat room.
+# Messages are linked to a specific chat room.
+# Messages store who sent them, the text, and when.
 class Message(models.Model):
     """Messages sent in a chat room."""
     chatroom = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")

@@ -25,7 +25,7 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('events/', include('events.urls')),  # events app URLs
     path('api/', include('api.urls')), # API urls
-    path('chat/', include('chat.urls')), # chat urls
+    path('chat/', include('chat.urls', namespace='chat')), # chat urls
 
 
 

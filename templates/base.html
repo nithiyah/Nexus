@@ -47,8 +47,9 @@
     <!-- Logo: Clicking redirects to the dashboard -->
     {% load static %}
     <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
-        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" style="height: 40px;">  
-
+        <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" style="height: 40px;">
+    </a>  <!-- Closing tag added -->
+    
     <div class="navbar-right">
         <!-- <a href="{% url 'events:volunteer_events' %}">My Events</a> -->
         <a href="{% if request.user.user_type == 'organisation' %}

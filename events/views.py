@@ -8,7 +8,7 @@ from .forms import FeedbackFormForm
 from django.utils.timezone import now
 from .models import Event, VolunteerEvent, FeedbackForm, FeedbackResponse
 from .forms import FeedbackResponseForm  # Import the form
-
+from chat.models import ChatRoom
 
 
 @login_required
@@ -121,6 +121,8 @@ def create_event(request):
             event = form.save(commit=False)
             event.organisation = request.user
             event.save()
+            # Create a chat room when an event is created
+            ChatRoom.objects.create(event=event)
             return redirect('events:organisation_dashboard')
     else:
         form = EventForm()
