@@ -81,18 +81,17 @@ def delete_chat_room(request, event_id):
     return redirect("events:organisation_events")
 
 
-
 # send message view 
 @csrf_exempt
 def send_message(request, event_id):
     if request.method == "POST":
-        chat_room = get_object_or_404(ChatRoom, event__id=event_id)
+        chatroom = get_object_or_404(ChatRoom, event__id=event_id)  # ✅ Ensure consistency in field name
         data = json.loads(request.body)
         content = data.get("content", "").strip()
 
         if content:
             message = Message.objects.create(
-                chat_room=chat_room,
+                chatroom=chatroom,  # ✅ Match the field name from the Message model
                 sender=request.user,
                 content=content
             )
