@@ -14,6 +14,12 @@
                 <p><strong>Category:</strong> {{ registration.event.category }}</p>
                 <p>{{ registration.event.description }}</p>
 
+
+                <!-- Chat Room Button -->
+                <a href="{% url 'chat:chat_room' registration.event.id %}" class="btn"
+                style="background-color: orange; color: white; padding: 8px 16px; border: none; cursor: pointer;">
+                    Join Chat Room
+                </a>
                 <!-- Feedback Form Section -->
                 {% if registration.event.feedback_form %}
                     {% if registration.event.feedback_form.published %}
