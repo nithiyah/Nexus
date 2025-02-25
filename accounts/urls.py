@@ -2,7 +2,7 @@
 from . import views
 from django.urls import path
 from .views import CustomLoginView
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, LoginView
 from .views import welcome, register_volunteer, register_organisation
 from .views import profile_view
 app_name = 'accounts'  # Ensures 'accounts:profile' works

@@ -102,7 +102,7 @@ def register_volunteer(request):
             user.user_type = 'volunteer'
             user.save()
             login(request, user)
-            return redirect('login')
+            return redirect('accounts:login')
     else:
         form = VolunteerRegistrationForm()
     return render(request, 'accounts/register_volunteer.html', {'form': form})
@@ -116,7 +116,7 @@ def register_organisation(request):
             user.user_type = 'organisation'
             user.save()
             login(request, user)
-            return redirect('login')
+            return redirect('accounts:login')
     else:
         form = OrganisationRegistrationForm()
     return render(request, 'accounts/register_organisation.html', {'form': form})

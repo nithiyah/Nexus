@@ -17,7 +17,7 @@ from chat.models import ChatRoom, Message
 #     return render(request, 'chat/chat_home.html', {'chat_rooms': chat_rooms})
 @login_required
 def chat_home(request):
-    """Shows all chat rooms the logged-in user has access to."""
+    """Shows all chat rooms the logged-in user has access to, including participant count."""
     
     if request.user.user_type == 'volunteer':
         # Get all events where the user is registered
@@ -31,7 +31,12 @@ def chat_home(request):
     else:
         chat_rooms = ChatRoom.objects.none()  # Empty queryset for unknown user types
 
+    # Attach participant count to each chat room
+    for room in chat_rooms:
+        room.participant_count = VolunteerEvent.objects.filter(event=room.event).count()
+
     return render(request, "chat/chat_home.html", {"chat_rooms": chat_rooms})
+
 # def chat_home(request):
 #     # Get events created by the logged-in organization
 #     if request.user.is_authenticated and request.user.user_type == "organisation":
@@ -171,3 +176,4 @@ def create_event(request):
         form = EventForm()
 
     return render(request, 'events/create_event.html', {'form': form})
+

@@ -11,7 +11,8 @@
                 <li>
                     <a href="{% url 'chat:chat_room' room.event.id %}">
                         {{ room.event.name }} - Chat Room
-                    </a>
+                    </a> 
+                    <span>({{ room.participant_count }} Participants)</span>
                 </li>
             {% endfor %}
         </ul>

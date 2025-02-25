@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+LOGIN_URL = "accounts:login"
+
+
 LOGIN_REDIRECT_URL = '/login/redirect/'  # Redirect after successful login
 # LOGOUT_REDIRECT_URL = 'home'  # Redirect after logout
 
