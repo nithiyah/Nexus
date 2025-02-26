@@ -177,3 +177,21 @@ def create_event(request):
 
     return render(request, 'events/create_event.html', {'form': form})
 
+from django.http import JsonResponse
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def get_online_users(request, event_id):
+    """Returns the number of online users in a chat room."""
+    room_group_name = f"chat_{event_id}"
+    channel_layer = get_channel_layer()
+
+    # Get the list of connected WebSocket channels for the room
+    try:
+        online_users = async_to_sync(channel_layer.group_channels)(room_group_name)
+    except Exception:
+        online_users = []
+
+    return JsonResponse({"count": len(online_users)})

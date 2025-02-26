@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@govtechsg/sgds": "^2.3.6"
+  }
+}

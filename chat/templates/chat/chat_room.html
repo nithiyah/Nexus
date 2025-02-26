@@ -20,7 +20,12 @@
         <button type="submit">Send</button>
     </form>
 
-    <script>
+    <div id="online-users" style="margin-bottom: 10px; font-weight: bold;">
+        Online Users: <span id="user-count">0</span>
+    </div>
+    
+
+    <!-- <script>
         document.getElementById("chat-form").onsubmit = function(event) {
             event.preventDefault();
             let messageInput = document.getElementById("chat-message");
@@ -46,5 +51,34 @@
                   });
             }
         };
+    </script> -->
+
+
+    <script>
+        const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/{{ chatroom.id }}/");
+    
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+    
+            if (data.type === "user_online" || data.type === "user_offline") {
+                updateUserCount();
+            }
+    
+            if (data.type === "chat_message") {
+                let chatBox = document.getElementById("chat-box");
+                let newMessage = `<p><strong>${data.sender}</strong>: ${data.message} <small>(${data.timestamp})</small></p>`;
+                chatBox.innerHTML += newMessage;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+    
+        function updateUserCount() {
+            fetch("{% url 'chat:get_online_users' chatroom.id %}")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("user-count").innerText = data.count;
+                });
+        }
     </script>
+    
 {% endblock %}
