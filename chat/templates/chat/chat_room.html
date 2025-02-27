@@ -25,8 +25,15 @@
     </div>
 
     <script>
-        const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/chat/{{ chatroom.id }}/");
-    
+
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+
+        // const chatSocket = new WebSocket(protocol + "://" + window.location.host + "/ws/chat/{{ chatroom.event.id }}/");
+        // this doesnt work because chatroom.id is used to refer to the chat room itself, when we add event, it doesnt match the server routing
+        
+        
+        const chatSocket = new WebSocket(protocol + "://" + window.location.host + "/ws/chat/{{ chatroom.id }}/");
+
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
     

@@ -432,5 +432,5 @@ def volunteer_list(request, event_id):
 
     return render(request, "events/volunteer_list.html", {
         "event": event,
-        "volunteers": volunteers
+        "volunteers": volunteers,
     })
