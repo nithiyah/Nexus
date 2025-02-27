@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback Hub{% endblock %}
+
+{% block content %}
+    <h1>Feedback Hub</h1>
+    <p>Select an event to manage feedback:</p>
+
+    {% if events %}
+        {% for event in events %}
+            <div class="event-card" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+                <h3>{{ event.name }}</h3>
+                <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+
+                <!-- Feedback Management Buttons -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <a href="{% url 'events:create_feedback_form' event.id %}" class="btn"
+                       style="background-color: green; color: white; padding: 10px; border-radius: 5px;">
+                        Create/Edit Feedback Form
+                    </a>
+
+                    <a href="{% url 'events:publish_feedback' event.id %}" class="btn"
+                       style="background-color: blue; color: white; padding: 10px; border-radius: 5px;">
+                        Publish Feedback
+                    </a>
+
+                    <a href="{% url 'events:view_feedback' event.id %}" class="btn"
+                       style="background-color: purple; color: white; padding: 10px; border-radius: 5px;">
+                        View Submitted Feedback
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You have no events listed.</p>
+    {% endif %}
+
+{% endblock %}

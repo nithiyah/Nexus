@@ -3,20 +3,29 @@
 {% block title %}Chat Rooms{% endblock %}
 
 {% block content %}
-    <h1>Chat Rooms</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Chat Rooms</h1>
 
     {% if chat_rooms %}
-        <ul>
+        <div class="row">
             {% for room in chat_rooms %}
-                <li>
-                    <a href="{% url 'chat:chat_room' room.event.id %}">
-                        {{ room.event.name }} - Chat Room
-                    </a> 
-                    <span>({{ room.participant_count }} Participants)</span>
-                </li>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ room.event.name }} - Chat Room</h5>
+                            <p class="card-text"><strong>Participants:</strong> {{ room.participant_count }}</p>
+                            <a href="{% url 'chat:chat_room' room.event.id %}" class="btn btn-primary w-100">
+                                Join Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>No chat rooms available.</p>
+        <div class="alert alert-info text-center">
+            <p>No chat rooms available.</p>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

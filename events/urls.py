@@ -19,5 +19,9 @@ urlpatterns = [
     path('view-feedback/<int:event_id>/', views.view_feedback, name='view_feedback'),
     path('create-feedback/<int:event_id>/', views.create_feedback_form, name='create_feedback_form'),
     path("complete-feedback/<int:event_id>/", views.complete_feedback, name="complete_feedback"),
+    path('feedback-hub/', views.feedback_hub, name='feedback_hub'),
+    path('volunteer-list/<int:event_id>/', views.volunteer_list, name='volunteer_list'),
+
+
 
 ]

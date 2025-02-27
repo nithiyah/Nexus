@@ -3,60 +3,96 @@
 {% block title %}Volunteer Dashboard{% endblock %}
 
 {% block content %}
-    <h1>Welcome, Volunteer!</h1>
-    <p>This is your dashboard where you can view upcoming events and track your hours.</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary">Welcome, Volunteer!</h1>
+    </div>
 
-    <h2>Filter Events</h2>
-    <form method="get">
-        <fieldset>
-            <legend>Categories:</legend>
-            {% for category in categories %}
-                <label>
-                    <input type="checkbox" name="category" value="{{ category }}"
-                           {% if category in selected_categories %}checked{% endif %}>
-                    {{ category }}
-                </label><br>
-            {% endfor %}
-        </fieldset>
+    <p class="text-muted">Explore upcoming events, track your hours, and connect with organizations.</p>
 
-        <label for="location">Location:</label>
-        <input type="text" name="location" id="location" value="{{ request.GET.location }}">
+    <!-- Event Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title text-center">Filter Events</h4>
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <fieldset>
+                            <legend>Categories:</legend>
+                            {% for category in categories %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="category" value="{{ category }}"
+                                           {% if category in selected_categories %}checked{% endif %}>
+                                    <label class="form-check-label">{{ category }}</label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
 
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" value="{{ request.GET.date }}">
+                    <div class="col-md-4">
+                        <label for="location" class="form-label">Location:</label>
+                        <input type="text" class="form-control" name="location" id="location" value="{{ request.GET.location }}" placeholder="Enter location">
+                    </div>
 
-        <button type="submit">Filter</button>
-    </form>
+                    <div class="col-md-4">
+                        <label for="date" class="form-label">Date:</label>
+                        <input type="date" class="form-control" name="date" id="date" value="{{ request.GET.date }}">
+                    </div>
+                </div>
 
-    <h2>Available Events:</h2>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Available Events -->
+    <h2 class="text-center text-success mb-3">Available Events</h2>
+
     {% if events %}
-        {% for event in events %}
-            <div class="event-card">
-                <h3>{{ event.name }}</h3>
-                <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
-                <p><strong>Location:</strong> {{ event.location }}</p>
-                <p><strong>Category:</strong> {{ event.get_category_display }}</p>
-                <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
-                <p>{{ event.description }}</p>
-                
-                <!-- Display number of open spots -->
-                {% if event.open_spots > 0 %}
-                    <p style="color: green;"><strong>{{ event.open_spots }} Open Spot{{ event.open_spots|pluralize }}</strong></p>
-                {% else %}
-                    <p style="color: red;"><strong>No Open Spots</strong></p>
-                {% endif %}
+        <div class="row">
+            {% for event in events %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ event.name }}</h5>
+                            <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+                            <p><strong>Location:</strong> {{ event.location }}</p>
+                            <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+                            <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
+                            <p class="text-muted">{{ event.description }}</p>
 
-                {% if event.id in registered_event_ids %}
-                    <button disabled style="background-color: grey; color: white;">Registered</button>
-                {% elif event.open_spots > 0%}
-                    <form action="{% url 'events:register_for_event' event.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit">Register</button>
-                    </form>
-                {% endif %}
-            </div>
-        {% endfor %}
+                            <!-- Open Spots Display -->
+                            {% if event.open_spots > 0 %}
+                                <p class="text-success"><strong>{{ event.open_spots }} Open Spot{{ event.open_spots|pluralize }}</strong></p>
+                            {% else %}
+                                <p class="text-danger"><strong>No Open Spots</strong></p>
+                            {% endif %}
+
+                            <div class="d-grid">
+                                {% if event.id in registered_event_ids %}
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fas fa-check-circle"></i> Registered
+                                    </button>
+                                {% elif event.open_spots > 0 %}
+                                    <form action="{% url 'events:register_for_event' event.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-user-plus"></i> Register
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>No events found matching your criteria.</p>
+        <div class="alert alert-info text-center">
+            <p>No events found matching your criteria.</p>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

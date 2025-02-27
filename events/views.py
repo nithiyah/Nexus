@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from .forms import FeedbackFormForm
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 from .models import Event, VolunteerEvent, FeedbackForm, FeedbackResponse
 from .forms import FeedbackResponseForm  # Import the form
 from chat.models import ChatRoom
@@ -234,9 +234,27 @@ def volunteer_events(request):
     })
 
 
+# @login_required
+# def organisation_events(request):
+#     events = Event.objects.filter(organisation=request.user)
+#     current_time = localtime(now())  # Ensure correct timezone is used
+
+
+#     # Preprocess event volunteers
+#     for event in events:
+#         event.volunteers = VolunteerEvent.objects.filter(event=event)
+
+#     return render(request, 'events/organisation_events.html', {
+#         'events': events,
+#         'current_time': current_time, # Pass the current date to the template for the feedback form
+
+#     })
+from django.utils.timezone import now, localtime
+
 @login_required
 def organisation_events(request):
     events = Event.objects.filter(organisation=request.user)
+    current_time = localtime(now())  # Ensure correct timezone is used
 
     # Preprocess event volunteers
     for event in events:
@@ -244,8 +262,7 @@ def organisation_events(request):
 
     return render(request, 'events/organisation_events.html', {
         'events': events,
-        'today': now()  # Pass the current date to the template for the feedback form
-
+        'current_time': current_time,  # Ensure it's passed correctly
     })
 
 
@@ -297,28 +314,6 @@ def publish_feedback(request, event_id):
 
     return redirect("events:organisation_events")
 
-# @login_required
-# def publish_feedback(request, event_id):
-#     event = get_object_or_404(Event, id=event_id, organisation=request.user)
-
-#     feedback_form = event.feedback_form  # Fetch the related FeedbackForm
-#     if feedback_form:
-#         feedback_form.published = True
-#         feedback_form.save()
-#         messages.success(request, "Feedback form has been published.")
-#     else:
-#         messages.error(request, "No feedback form found for this event.")
-
-#     return redirect("events:organisation_events")
-
-# @login_required
-# def publish_feedback_form(request, event_id):
-#     feedback_form = get_object_or_404(FeedbackForm, event_id=event_id, created_by=request.user)
-#     feedback_form.published = True
-#     feedback_form.save()
-#     messages.success(request, "Feedback form published to volunteers!")
-#     return redirect("events:organisation_events")
-
 
 # volunteers to complete the feedback form
 @login_required
@@ -358,17 +353,6 @@ def submit_feedback(request, event_id):
 
     return render(request, 'events/submit_feedback.html', {'form': form, 'event': event})
 
-# organisations to view submitted volunteer feedback forms
-# @login_required
-# def view_feedback(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-#     #Fitlers the responses based on the correct event
-#     feedback_entries = FeedbackResponse.objects.filter(feedback_form__event=event)  
-
-#     return render(request, 'events/view_feedback.html', {
-#         'event': event,
-#         'feedback_entries': feedback_entries,
-#     })
 
 import json
 from django.http import JsonResponse
@@ -429,4 +413,24 @@ def complete_feedback(request, event_id):
         "form": form,
         "event": event,
         "feedback_form": feedback_form,
+    })
+
+
+
+@login_required
+def feedback_hub(request):
+    """Render the Feedback Hub page where organizations manage feedback."""
+    events = Event.objects.filter(organisation=request.user)  # Get all events for this organization
+    return render(request, "events/feedback_hub.html", {"events": events})
+
+
+@login_required
+def volunteer_list(request, event_id):
+    """View to show all volunteers registered for a specific event."""
+    event = get_object_or_404(Event, id=event_id, organisation=request.user)
+    volunteers = VolunteerEvent.objects.filter(event=event)  # Get all volunteers for this event
+
+    return render(request, "events/volunteer_list.html", {
+        "event": event,
+        "volunteers": volunteers
     })

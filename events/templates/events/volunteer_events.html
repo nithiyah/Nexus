@@ -3,55 +3,63 @@
 {% block title %}My Registered Events{% endblock %}
 
 {% block content %}
-    <h1>My Registered Events</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">My Registered Events</h1>
 
     {% if registered_events %}
-        {% for registration in registered_events %}
-            <div class="event-card">
-                <h3>{{ registration.event.name }}</h3>
-                <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y H:i" }}</p>
-                <p><strong>Location:</strong> {{ registration.event.location }}</p>
-                <p><strong>Category:</strong> {{ registration.event.category }}</p>
-                <p>{{ registration.event.description }}</p>
+        <div class="row">
+            {% for registration in registered_events %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ registration.event.name }}</h5>
+                            <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y H:i" }}</p>
+                            <p><strong>Location:</strong> {{ registration.event.location }}</p>
+                            <p><strong>Category:</strong> {{ registration.event.category }}</p>
+                            <p class="text-muted">{{ registration.event.description }}</p>
 
+                            <div class="d-grid gap-2">
+                                <!-- Chat Room Button -->
+                                <a href="{% url 'chat:chat_room' registration.event.id %}" class="btn btn-warning">
+                                    <i class="fas fa-comments"></i> Join Chat Room
+                                </a>
 
-                <!-- Chat Room Button -->
-                <a href="{% url 'chat:chat_room' registration.event.id %}" class="btn"
-                style="background-color: orange; color: white; padding: 8px 16px; border: none; cursor: pointer;">
-                    Join Chat Room
-                </a>
-                <!-- Feedback Form Section -->
-                {% if registration.event.feedback_form %}
-                    {% if registration.event.feedback_form.published %}
-                        <h4>Feedback Form</h4>
+                                <!-- Feedback Form Section -->
+                                {% if registration.event.feedback_form %}
+                                    {% if registration.event.feedback_form.published %}
+                                        {% if registration.has_submitted_feedback %}
+                                            <button class="btn btn-secondary" disabled>
+                                                <i class="fas fa-check-circle"></i> Form Submitted
+                                            </button>
+                                        {% else %}
+                                            <a href="{% url 'events:complete_feedback' registration.event.id %}" class="btn btn-success">
+                                                <i class="fas fa-edit"></i> Complete Feedback Form
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <p class="text-danger"><strong>The feedback form has not been published yet.</strong></p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-muted">No feedback form available for this event.</p>
+                                {% endif %}
 
-                        {% if registration.has_submitted_feedback %}
-                            <!-- If feedback is already submitted, show disabled button -->
-                            <button class="btn" disabled
-                                    style="background-color: gray; color: white; padding: 8px 16px; border: none; cursor: not-allowed;">
-                                Form Submitted
-                            </button>
-                        {% else %}
-                            <!-- If feedback is not submitted, show "Complete Feedback Form" button -->
-                            <a href="{% url 'events:complete_feedback' registration.event.id %}" class="btn"
-                            style="background-color: green; color: white; padding: 8px 16px; border: none; cursor: pointer;">
-                                Complete Feedback Form
-                            </a>
-                        {% endif %}
-                    {% else %}
-                        <p style="color: red;"><strong>The feedback form has not been published yet.</strong></p>
-                    {% endif %}
-                {% else %}
-                    <p style="color: gray;">No feedback form available for this event.</p>
-                {% endif %}
-
-                <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" style="background-color: rgb(204, 88, 88);">Cancel Registration</button>
-                </form>
-            </div>
-        {% endfor %}
+                                <!-- Cancel Registration Button -->
+                                <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-times"></i> Cancel Registration
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>You haven't registered for any events yet.</p>
-    {% endif %}   
+        <div class="alert alert-info text-center">
+            <p>You haven't registered for any events yet.</p>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
