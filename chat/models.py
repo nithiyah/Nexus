@@ -1,22 +1,17 @@
 from django.db import models
 from django.conf import settings
-from events.models import Event
+from events.models import Event  # ✅ Ensure this import is correct
 
-# Create your models here.
 class ChatRoom(models.Model):
-    """Each event will have its own chat room."""
+    """Each event has one chat room."""
     event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name="chatroom")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Chat Room for {self.event.name}"
 
-
-# Each event has one chat room.
-# Messages are linked to a specific chat room.
-# Messages store who sent them, the text, and when.
 class Message(models.Model):
-    """Messages sent in a chat room."""
+    """Messages within a chat room."""
     chatroom = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()

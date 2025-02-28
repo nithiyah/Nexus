@@ -8,9 +8,9 @@ User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        """Accept WebSocket connection."""
-        self.event_id = self.scope["url_route"]["kwargs"]["room_id"]  # ✅ FIXED: Match routing.py
-        self.room_group_name = f"chat_{self.event_id}"
+        """Accept the WebSocket connection."""
+        self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
+        self.room_group_name = f"chat_{self.room_id}"
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
@@ -26,7 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data["message"]
 
         # Save message to database asynchronously
-        chatroom = await sync_to_async(ChatRoom.objects.get)(id=self.event_id)
+        chatroom = await sync_to_async(ChatRoom.objects.get)(id=self.room_id)
         message_obj = await sync_to_async(Message.objects.create)(chatroom=chatroom, sender=sender, content=message)
 
         # Send message to the WebSocket group

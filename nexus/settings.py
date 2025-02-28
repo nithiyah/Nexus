@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'channels',
     'chat',
+   
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
