@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from events.models import Event  # ✅ Ensure this import is correct
+from events.models import Event  
 
 class ChatRoom(models.Model):
     """Each event has one chat room."""

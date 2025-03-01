@@ -92,9 +92,12 @@ ASGI_APPLICATION = "nexus.asgi.application"
 # Redis setup for WebSocket communication
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis in production
+        "BACKEND": "channels.layers.InMemoryChannelLayer", 
+        
+          # Use Redis in production
     },
 }
+
 
 
 # Database
