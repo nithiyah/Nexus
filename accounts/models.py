@@ -14,3 +14,10 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Call clean() before saving
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.username  #  Keep for easier debugging
