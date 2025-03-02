@@ -12,6 +12,7 @@
                     <div class="card shadow-lg border-0">
                         <div class="card-body">
                             <h5 class="card-title text-primary">{{ event.name }}</h5>
+                            <!-- <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p> -->
                             <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
                             <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
                             <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>

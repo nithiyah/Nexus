@@ -249,21 +249,53 @@ def volunteer_events(request):
 #         'current_time': current_time, # Pass the current date to the template for the feedback form
 
 #     })
-from django.utils.timezone import now, localtime
+
+
+# from django.utils.timezone import now, localtime
+
+# @login_required
+# def organisation_events(request):
+#     events = Event.objects.filter(organisation=request.user)
+#     current_time = localtime(now())  # Ensure correct timezone is used
+
+#     # Preprocess event volunteers
+#     for event in events:
+#         event.volunteers = VolunteerEvent.objects.filter(event=event)
+
+#     return render(request, 'events/organisation_events.html', {
+#         'events': events,
+#         'current_time': current_time,  # Ensure it's passed correctly
+#     })
+
+
+from django.utils.timezone import now, localtime, is_naive, make_aware
+
+
+# Converts event.date to timezone-aware before passing it to the template.
+# Ensures localtime() does not throw an error.
+
+from django.utils.timezone import now, localtime, is_naive, make_aware
 
 @login_required
 def organisation_events(request):
     events = Event.objects.filter(organisation=request.user)
-    current_time = localtime(now())  # Ensure correct timezone is used
-
-    # Preprocess event volunteers
+    
+    # Convert all event dates to timezone-aware before rendering
     for event in events:
+        if is_naive(event.date):  # If naive, make it timezone-aware
+            event.date = make_aware(event.date)
+
         event.volunteers = VolunteerEvent.objects.filter(event=event)
+
+    #  Ensure the current time is timezone-aware
+    current_time = now()  #`now()` will return a timezone-aware datetime
 
     return render(request, 'events/organisation_events.html', {
         'events': events,
-        'current_time': current_time,  # Ensure it's passed correctly
+        'current_time': current_time,
     })
+
+
 
 
 #Under organisation events page

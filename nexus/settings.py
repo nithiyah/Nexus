@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Singapore'  # Ensure this is correct
-USE_TZ = True  # Keep this True to use timezone-aware timestamps
+USE_TZ = False  # Keep this True to use timezone-aware timestamps
 
 
 USE_I18N = True
