@@ -28,9 +28,9 @@ from django.contrib.auth import get_user_model
 # need to update the different categories
 class Event(models.Model):
     CATEGORY_CHOICES = [
-        ('Education', 'Education'),
-        ('Social Development', 'Social Development'),
-        ('Senior Citizen', 'Senior Citizen'),
+        ('education', 'Education'),
+        ('social development', 'Social Development'),
+        ('senior citizen', 'Senior Citizen'),
     ]
 
     organisation = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
