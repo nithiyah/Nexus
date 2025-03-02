@@ -150,6 +150,29 @@ def chat_home(request):
 # Creates a chat room when the event is created (not just when accessed).
 # Prevents unauthorized users from joining chats (volunteers must be registered).
 # Ensures messages load correctly.
+
+from django.http import HttpResponseForbidden
+
+# @login_required
+# def chat_room(request, event_id):
+#     """Allow only registered volunteers and event organizers to access the chat room."""
+    
+#     event = get_object_or_404(Event, id=event_id)
+#     chatroom, created = ChatRoom.objects.get_or_create(event=event)
+
+#     # Check if user is the organiser OR a registered volunteer
+#     is_registered = VolunteerEvent.objects.filter(event=event, volunteer=request.user).exists()
+    
+#     if request.user == event.organisation or is_registered:
+#         messages = chatroom.messages.order_by("timestamp")  # Load previous messages
+#         return render(request, "chat/chat_room.html", {
+#             "event": event,
+#             "chatroom": chatroom,
+#             "messages": messages,
+#         })
+    
+#     return HttpResponseForbidden("You are not authorized to join this chat room.")
+
 @login_required
 def chat_room(request, event_id):
     """Allow only registered volunteers and event organizer to access the chat room."""
@@ -167,8 +190,9 @@ def chat_room(request, event_id):
             "chatroom": chatroom,
             "messages": messages,
         })
-    else:
-        return redirect("events:volunteer_events")  # Redirect if not authorized
+    # else:
+    #     return redirect("events:volunteer_events")  # Redirect if not authorized
+    return HttpResponseForbidden("You are not authorized to join this chat room.")
     
 
 # # send message view 
