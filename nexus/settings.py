@@ -41,11 +41,34 @@ INSTALLED_APPS = [
     'events',
     'api',
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'django_extensions',
     'channels',
     'chat',
    
 ]
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": [  # Only use JSON, disable HTML filtering form
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,  # 10 results per page
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Volunteer Management API",
+    "DESCRIPTION": "API for managing volunteers, organisations, and events.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "TAGS": [
+        {"name": "Events", "description": "Operations related to volunteer events"},
+        {"name": "Organisations", "description": "Operations related to organisations"},
+        {"name": "Volunteers", "description": "Operations related to volunteers"},
+    ],
+}
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_URL = "accounts:login"

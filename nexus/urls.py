@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 
 urlpatterns = [
@@ -26,9 +27,11 @@ urlpatterns = [
     path('events/', include('events.urls')),  # events app URLs
     path('api/', include('api.urls')), # API urls
     path('chat/', include('chat.urls', namespace='chat')), # chat urls
-    # path('chat/', include('chat.urls')),  # ✅ Include chat app URLs
+ 
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 
-
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 
     #had to delete a url because i got the namespace error
     # path('accounts/', include('accounts.urls')),  # Ensure namespace is set
