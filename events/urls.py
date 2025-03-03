@@ -21,6 +21,7 @@ urlpatterns = [
     path("complete-feedback/<int:event_id>/", views.complete_feedback, name="complete_feedback"),
     path('feedback-hub/', views.feedback_hub, name='feedback_hub'),
     path('volunteer-list/<int:event_id>/', views.volunteer_list, name='volunteer_list'),
+    path('complete-event/<int:event_id>/', views.complete_event, name='complete_event'),
 
 
 

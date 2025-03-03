@@ -42,10 +42,22 @@ class Event(models.Model):
     roles_responsibilities = models.TextField()
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=False, default='Education')
 
+    # Add event and particpation hours
+    duration_hours = models.FloatField(default=0) 
+
     def __str__(self):
         return f"{self.name} ({self.get_category_display()})"
 
+class VolunteerParticipation(models.Model):
+    volunteer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="participations")
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="participations")
+    hours_contributed = models.FloatField(default=0)
+    date_participated = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.volunteer.username} - {self.event.name}"
+    
+    
 # Implementing a waiting list
 class VolunteerEvent(models.Model):
     STATUS_CHOICES = [

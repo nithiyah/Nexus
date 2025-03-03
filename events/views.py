@@ -9,7 +9,8 @@ from django.utils.timezone import now, localtime
 from .models import Event, VolunteerEvent, FeedbackForm, FeedbackResponse
 from .forms import FeedbackResponseForm  # Import the form
 from chat.models import ChatRoom
-
+from django.db.models import Sum
+from .models import VolunteerParticipation 
 
 @login_required
 def organisation_dashboard(request):
@@ -28,6 +29,11 @@ def volunteer_dashboard(request):
             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
             .values_list('event_id', flat=True)
         )
+
+
+        # Compute total hours and total events count
+        total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(Sum('hours_contributed'))['hours_contributed__sum'] or 0
+        total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
 
         # Filtering logic
         selected_categories = request.GET.getlist('category')
@@ -59,9 +65,23 @@ def volunteer_dashboard(request):
             'category_labels': category_choices,
             'selected_categories': selected_categories,
             'registered_event_ids': registered_event_ids, 
+            'total_hours': total_hours,
+            'total_events': total_events,
         })
     return redirect('home')
 
+@login_required
+def complete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    
+    # Log hours for all volunteers who participated
+    participants = VolunteerParticipation.objects.filter(event=event)
+    for participant in participants:
+        participant.hours_contributed = event.duration_hours
+        participant.save()
+
+    messages.success(request, f"Event {event.name} marked as completed and hours logged.")
+    return redirect('events:organisation_dashboard')
 
 @login_required
 def volunteer_events(request):
@@ -466,3 +486,6 @@ def volunteer_list(request, event_id):
         "event": event,
         "volunteers": volunteers,
     })
+
+
+
