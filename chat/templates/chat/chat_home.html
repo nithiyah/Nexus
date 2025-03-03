@@ -4,16 +4,24 @@
 
 {% block content %}
     <div class="container mt-4">
-        <h1 class="text-center">Chat Rooms</h1>
-        <div class="list-group">
+        <h1 class="text-center mb-4">Chat Rooms</h1>
+        <div class="row">
             {% if chat_rooms %}
                 {% for room in chat_rooms %}
-                    <a href="{% url 'chat:chat_room' room.event.id %}" class="list-group-item list-group-item-action">
-                        <strong>{{ room.event.name }}</strong> - {{ room.participant_count }} Participants
-                    </a>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ room.event.name }}</h5>
+                                <p class="card-text text-muted">{{ room.participant_count }} Participants</p>
+                                <a href="{% url 'chat:chat_room' room.event.id %}" class="btn btn-primary">Join Chat</a>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
             {% else %}
-                <p class="text-muted">No chat rooms available.</p>
+                <div class="col-12 text-center">
+                    <p class="text-muted">No chat rooms available.</p>
+                </div>
             {% endif %}
         </div>
     </div>
