@@ -63,6 +63,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">Dashboard</a>
+                </li>
+
                 <!-- Feedback Hub for Organisations only  -->
                 {% if request.user.user_type == 'organisation' %}
                     <li class="nav-item">

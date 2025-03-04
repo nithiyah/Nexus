@@ -94,6 +94,10 @@
         .btn-delete { background-color: #dc3545; }
         .btn-delete:hover { background-color: #b21f2d; }
 
+
+        .ongoing { background-color: #f39c12; color: white; }  /* Orange for ongoing */
+        .completed { background-color: #28a745; color: white; }  /* Green for completed */
+
     </style>
 
     <div class="dashboard-header">
@@ -108,14 +112,13 @@
         {% if events %}
             {% for event in events %}
                 <div class="card">
-                    <!-- <span class="status-badge {% if event.date > current_time %}upcoming{% else %}completed{% endif %}">
-                        {% if event.date > current_time %}
-                            Upcoming
+                    <span class="status-badge {% if event.date.date >= current_time.date %}ongoing{% else %}completed{% endif %}">
+                        {% if event.date.date >= current_time.date %}
+                            Ongoing
                         {% else %}
                             Completed
                         {% endif %}
-                    </span> -->
-                    
+                    </span>
                     
                     <h3>{{ event.name }}</h3>
                     <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
