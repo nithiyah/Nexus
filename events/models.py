@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from datetime import datetime, timedelta
+from datetime import time 
 
 
 # need to update the different categories
@@ -15,9 +17,8 @@ class Event(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-
+    start_time = models.TimeField(default=time(9, 0))  # Default: 09:00 AM
+    end_time = models.TimeField(default=time(17, 0))  # Default: 05:00 PM
     location = models.CharField(max_length=255)
     volunteers_needed = models.PositiveIntegerField()
     roles_responsibilities = models.TextField()
@@ -26,9 +27,12 @@ class Event(models.Model):
     # # Add event and particpation hours
     # duration_hours = models.FloatField(default=0) 
     def get_duration_hours(self):
-        # Calculate duration of the event in hours.
-        duration = datetime.combine(self.date, self.end_time) - datetime.combine(self.date, self.start_time)
+        """Calculate duration of the event in hours."""
+        start_datetime = datetime.combine(self.date, self.start_time)
+        end_datetime = datetime.combine(self.date, self.end_time)
+        duration = end_datetime - start_datetime
         return duration.total_seconds() / 3600  # Convert seconds to hours
+
     
 
     def __str__(self):

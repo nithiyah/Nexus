@@ -4,9 +4,14 @@ from .models import Event, FeedbackForm, FeedbackResponse
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'description', 'date', 'location', 'volunteers_needed', 'roles_responsibilities', 'category']
+        fields = ['name', 'description', 'date', 'start_time', 'end_time' ,'location', 'volunteers_needed', 'roles_responsibilities', 'category']
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+
+            # Allows for event organiserts to input time data 
+            # Ensures accurate calculation of volunteer hours
+            'start_time': forms.TimeInput(attrs={'type': 'time'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time'}),
             'category': forms.RadioSelect,  # Use radio buttons for single category selection
         }
 

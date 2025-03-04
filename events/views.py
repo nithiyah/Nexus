@@ -22,7 +22,7 @@ def organisation_dashboard(request):
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
-        events = Event.objects.all()
+        events = Event.objects.all().distinct()  # Ensure unique events
 
         # Get events the volunteer has registered for
         registered_event_ids = set(
@@ -30,9 +30,12 @@ def volunteer_dashboard(request):
             .values_list('event_id', flat=True)
         )
 
+        # Compute total hours volunteered
+        total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+            Sum('hours_contributed')
+        )['hours_contributed__sum'] or 0
 
-        # Compute total hours and total events count
-        total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(Sum('hours_contributed'))['hours_contributed__sum'] or 0
+        # Compute total events participated
         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
 
         # Filtering logic
@@ -47,13 +50,13 @@ def volunteer_dashboard(request):
         if date:
             events = events.filter(date=date)
 
+        # Ensure distinct filtering
+        events = events.distinct()
+
         # Ensure unique categories for filtering dropdown
         category_choices = dict(Event.CATEGORY_CHOICES)
         categories = list(category_choices.keys())
 
-        # # Attach `volunteer_count` to each event
-        # for event in events:
-        #     event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
         # Attach `volunteer_count` and `open_spots` to each event
         for event in events:
             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
@@ -65,10 +68,11 @@ def volunteer_dashboard(request):
             'category_labels': category_choices,
             'selected_categories': selected_categories,
             'registered_event_ids': registered_event_ids, 
-            'total_hours': total_hours,
+            'total_hours': round(total_hours, 2),
             'total_events': total_events,
         })
     return redirect('home')
+
 
 @login_required
 def complete_event(request, event_id):

@@ -121,7 +121,9 @@
                     </span>
                     
                     <h3>{{ event.name }}</h3>
-                    <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+                    <!-- <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p> -->
+                    <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                    <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>                    
                     <p><strong>Location:</strong> {{ event.location }}</p>
                     <p><strong>Category:</strong> {{ event.get_category_display }}</p>
                     <p><strong>Volunteers Needed:</strong> {{ event.volunteers_needed }}</p>

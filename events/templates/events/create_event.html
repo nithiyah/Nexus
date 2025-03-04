@@ -24,10 +24,22 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="id_date" class="form-label">Date & Time:</label>
-                        <input type="datetime-local" id="id_date" name="date" class="form-control" required>
+                        <label for="id_date" class="form-label">Event Date:</label>
+                        <input type="date" id="id_date" name="date" class="form-control" required>
                     </div>
-                    
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_start_time" class="form-label">Start Time:</label>
+                            <input type="time" id="id_start_time" name="start_time" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_end_time" class="form-label">End Time:</label>
+                            <input type="time" id="id_end_time" name="end_time" class="form-control" required>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="id_location" class="form-label">Location:</label>
                         <input type="text" id="id_location" name="location" class="form-control" required>

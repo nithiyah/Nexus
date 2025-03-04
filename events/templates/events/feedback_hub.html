@@ -10,7 +10,9 @@
         {% for event in events %}
             <div class="event-card" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
                 <h3>{{ event.name }}</h3>
-                <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
+                <!-- <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p> -->
+                <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
 
                 <!-- Feedback Management Buttons -->
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
