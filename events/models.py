@@ -15,13 +15,21 @@ class Event(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
     location = models.CharField(max_length=255)
     volunteers_needed = models.PositiveIntegerField()
     roles_responsibilities = models.TextField()
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=False, default='Education')
 
-    # Add event and particpation hours
-    duration_hours = models.FloatField(default=0) 
+    # # Add event and particpation hours
+    # duration_hours = models.FloatField(default=0) 
+    def get_duration_hours(self):
+        # Calculate duration of the event in hours.
+        duration = datetime.combine(self.date, self.end_time) - datetime.combine(self.date, self.start_time)
+        return duration.total_seconds() / 3600  # Convert seconds to hours
+    
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()})"
