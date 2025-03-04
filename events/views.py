@@ -31,9 +31,14 @@ def volunteer_dashboard(request):
         )
 
         # Compute total hours volunteered
+        # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+        #     Sum('hours_contributed')
+        # )['hours_contributed__sum'] or 0
         total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-            Sum('hours_contributed')
-        )['hours_contributed__sum'] or 0
+                                                            total_hours=Sum('hours_contributed')
+                                                            )['total_hours'] or 0
+
+
 
         # Compute total events participated
         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
@@ -78,11 +83,38 @@ def volunteer_dashboard(request):
 def complete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     
+    # # Log hours for all volunteers who participated
+    # participants = VolunteerParticipation.objects.filter(event=event)
+    # for participant in participants:
+    #     # participant.hours_contributed = event.duration_hours
+    #     participant.save()
+
+    #to calculate the event duration
+    duration_hours = event.get_duration_hours()
+    # # Log hours for all volunteers who participated
+    # participants = VolunteerParticipation.objects.filter(event=event)
+    # for participant in participants:
+    #     participant.hours_contributed =  duration_hours
+    #     participant.save()
+    # Ensure event duration is calculated correctly
+    # duration_hours = event.get_duration_hours()
+
+    # # Log hours for all volunteers who participated
+    # participants = VolunteerParticipation.objects.filter(event=event)
+    # for participant in participants:
+    #     participant.hours_contributed = duration_hours
+    #     participant.save()
+    #     print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+    # Ensure event duration is calculated correctly
+    duration_hours = event.get_duration_hours()
+
     # Log hours for all volunteers who participated
     participants = VolunteerParticipation.objects.filter(event=event)
     for participant in participants:
-        participant.hours_contributed = event.duration_hours
+        participant.hours_contributed = duration_hours
         participant.save()
+        print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+
 
     messages.success(request, f"Event {event.name} marked as completed and hours logged.")
     
@@ -159,6 +191,40 @@ def create_event(request):
     return render(request, 'events/create_event.html', {'form': form})
 
 
+# @login_required
+# def register_for_event(request, event_id):
+#     event = get_object_or_404(Event, id=event_id)
+
+#     # Count currently registered volunteers
+#     registered_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
+
+#     # Check if the user is already registered or waitlisted
+#     existing_registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
+    
+#     if existing_registration:
+#         if existing_registration.status == 'waiting_list':
+#             messages.info(request, 'You are already on the waiting list for this event.')
+#         else:
+#             messages.info(request, 'You have already registered for this event.')
+#     else:
+#         if registered_count < event.volunteers_needed:
+#             # Register the volunteer as "registered"
+#             # VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
+            
+#             registration = VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
+
+#             # Ensure the volunteer participation record is also created
+#             VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
+
+#             messages.success(request, 'You have successfully registered for the event.')
+#         else:
+#             # Event is full, add to waiting list
+#             new_entry = VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
+#             new_entry.save()
+#             messages.info(request, 'The event is full. You have been added to the waiting list.')
+
+#     return redirect('events:volunteer_dashboard')
+
 @login_required
 def register_for_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -177,24 +243,41 @@ def register_for_event(request, event_id):
     else:
         if registered_count < event.volunteers_needed:
             # Register the volunteer as "registered"
-            VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
+            registration, created = VolunteerEvent.objects.get_or_create(event=event, volunteer=request.user, status='registered')
+
+            # Ensure the volunteer participation record is also created
+            # VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
+           
+            # Create a VolunteerEvent record
+            registration, created = VolunteerEvent.objects.get_or_create(event=event, volunteer=request.user, status='registered')
+
+            # Ensure the volunteer participation record is also created
+            participation, created = VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
+
+            if created:
+                print(f"DEBUG: Participation record created for {request.user.username} in event {event.name}")
+            else:
+                print(f"DEBUG: Participation record already exists for {request.user.username} in event {event.name}")
+
             messages.success(request, 'You have successfully registered for the event.')
         else:
             # Event is full, add to waiting list
             new_entry = VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
-            new_entry.save()
             messages.info(request, 'The event is full. You have been added to the waiting list.')
 
     return redirect('events:volunteer_dashboard')
-
 
 @login_required
 def cancel_registration(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     
     # Find the volunteer's registration (registered or waitlisted)
+    # registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
     registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
-    
+
+    # Remove the volunteer participation record as well
+    VolunteerParticipation.objects.filter(event=event, volunteer=request.user).delete()
+
     if registration:
         registration.delete()
         messages.success(request, 'You have successfully canceled your registration.')
