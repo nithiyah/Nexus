@@ -62,6 +62,14 @@
         <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+
+                <!-- Feedback Hub for Organisations only  -->
+                {% if request.user.user_type == 'organisation' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'events:feedback_hub' %}">Feedback Hub</a>
+                    </li>
+                {% endif %}
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">My Events</a>
                 </li>
