@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Nexus</title>
     
+    <!-- jQuery (Required for SGDS) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!-- SGDS CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds/css/sgds.css">
     <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds/js/sgds.js"></script>
@@ -14,7 +17,7 @@
     
     <style>
         body {
-            background-color: #bacddf;
+            background-color: #bacddf; /* Light blue background */
         }
         .login-container {
             max-width: 400px;
@@ -24,15 +27,23 @@
         .sgds-card {
             padding: 2rem;
             border-radius: 12px;
-            background-color: rgb(255, 255, 255);
+            background-color: white;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .btn-primary {
-            background-color: rgb(255, 255, 255);
+        /* Fixed SGDS Login Button */
+        .sgds-btn-login {
+            width: 100%;
+            background-color: var(--sgds-secondary);
+            color: white !important; /* Ensure text remains visible */
+            border-radius: 25px; /* Rounded button */
             border: none;
+            padding: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
         }
-        .btn-primary:hover {
-            background-color:  rgb(255, 255, 255);
+        .sgds-btn-login:hover {
+            background-color: #0056b3; /* Darker blue instead of white */
+            color: white !important; /* Ensure text stays visible */
         }
     </style>
 </head>
@@ -62,9 +73,8 @@
                         <label for="password">Password</label>
                     </div>
 
-                    <button type="submit" class="btn btn-success sgds w-100">Login</button>
-                    <!-- <button type="button" class="btn btn-info sgds">Info</button> -->
-                    <!-- <button type="button" class="sgds-btn sgds-btn-primary w-100">Login</button> -->
+                    <!-- Fixed SGDS Login Button -->
+                    <button type="submit" class="sgds-btn sgds-btn-login">Login</button>
                 </form>
 
                 <div class="text-center mt-3">
