@@ -81,7 +81,9 @@ def complete_event(request, event_id):
         participant.save()
 
     messages.success(request, f"Event {event.name} marked as completed and hours logged.")
-    return redirect('events:organisation_dashboard')
+    
+    # return redirect('events:organisation_dashboard')
+    return redirect('events:organisation_events')
 
 @login_required
 def volunteer_events(request):
@@ -110,7 +112,8 @@ def edit_event(request, event_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Event updated successfully!')
-            return redirect('events:organisation_dashboard')
+            # return redirect('events:organisation_dashboard')
+            return redirect('events:organisation_events')
     else:
         form = EventForm(instance=event)
 
@@ -124,7 +127,8 @@ def delete_event(request, event_id):
     if request.method == 'POST':
         event.delete()
         messages.success(request, 'Event deleted successfully!')
-        return redirect('events:organisation_dashboard')
+        # return redirect('events:organisation_dashboard')
+        return redirect('events:organisation_events')
 
     return render(request, 'events/delete_event.html', {'event': event})
 
@@ -143,7 +147,8 @@ def create_event(request):
             event.save()
             # Create a chat room when an event is created
             ChatRoom.objects.create(event=event)
-            return redirect('events:organisation_dashboard')
+            # return redirect('events:organisation_dashboard')
+            return redirect('events:organisation_events')
     else:
         form = EventForm()
 
@@ -200,37 +205,6 @@ def cancel_registration(request, event_id):
 
     return redirect('events:volunteer_events')
 
-# @login_required
-# def volunteer_events(request):
-#     # Get events where the volunteer is registered or on the waiting list
-#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
-#     waitlisted_events = VolunteerEvent.objects.filter(volunteer=request.user, status='waiting_list')
-#     # Fetch feedback forms linked to the events this volunteer attended
-#     # feedback_forms = {
-#     #     event.event.id: FeedbackResponse.objects.filter(
-#     #         feedback_form__event=event.event, volunteer=request.user
-#     #     ).first()
-#     #     for event in registered_events
-#     # }
-#     # feedback_forms = {
-#     #     event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
-#     #     for event in registered_events
-#     # }
-    
-#     # Check if a feedback response exists for each event
-#     feedback_forms = {
-#         event.event.id: FeedbackResponse.objects.filter(
-#             feedback_form__event=event.event, volunteer=request.user
-#         ).exists()  # Returns True if feedback exists, otherwise False
-#         for event in registered_events
-#     }
-
-#     return render(request, 'events/volunteer_events.html', {
-#         'registered_events': registered_events,
-#         'waitlisted_events': waitlisted_events,
-#         'feedback_forms': feedback_forms,  # Pass feedback data to the template
-
-#     })
 
 @login_required
 def volunteer_events(request):
@@ -253,39 +227,6 @@ def volunteer_events(request):
         'registered_events': registered_events,
     })
 
-
-# @login_required
-# def organisation_events(request):
-#     events = Event.objects.filter(organisation=request.user)
-#     current_time = localtime(now())  # Ensure correct timezone is used
-
-
-#     # Preprocess event volunteers
-#     for event in events:
-#         event.volunteers = VolunteerEvent.objects.filter(event=event)
-
-#     return render(request, 'events/organisation_events.html', {
-#         'events': events,
-#         'current_time': current_time, # Pass the current date to the template for the feedback form
-
-#     })
-
-
-# from django.utils.timezone import now, localtime
-
-# @login_required
-# def organisation_events(request):
-#     events = Event.objects.filter(organisation=request.user)
-#     current_time = localtime(now())  # Ensure correct timezone is used
-
-#     # Preprocess event volunteers
-#     for event in events:
-#         event.volunteers = VolunteerEvent.objects.filter(event=event)
-
-#     return render(request, 'events/organisation_events.html', {
-#         'events': events,
-#         'current_time': current_time,  # Ensure it's passed correctly
-#     })
 
 
 from django.utils.timezone import now, localtime, is_naive, make_aware
@@ -331,7 +272,8 @@ def remove_volunteer(request, registration_id):
     else:
         messages.error(request, "You are not authorized to remove volunteers from this event.")
 
-    return redirect('events:organisation_events')
+    # return redirect('events:organisation_events')
+    return redirect("events:organisation_dashboard")
 
 
 # organisation to create and edit feedback form
@@ -346,7 +288,8 @@ def create_feedback_form(request, event_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Feedback form updated successfully!")
-            return redirect("events:organisation_events")
+            # return redirect("events:organisation_events")
+            return redirect("events:organisation_dashboard")
     else:
         form = FeedbackFormForm(instance=feedback_form)
 
@@ -364,7 +307,8 @@ def publish_feedback(request, event_id):
     feedback_form.save()
     messages.success(request, "Feedback form has been published.")
 
-    return redirect("events:organisation_events")
+    # return redirect("events:organisation_events")
+    return redirect("events:organisation_dashboard")
 
 
 # volunteers to complete the feedback form
