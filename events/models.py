@@ -26,14 +26,29 @@ class Event(models.Model):
 
     # # Add event and particpation hours
     # duration_hours = models.FloatField(default=0) 
+##############################################################################
+    #CAN BE USED IN REPORT BECAUSE THIS CALCULATION DOESNT WORK 
+    # def get_duration_hours(self):
+    #     """Calculate duration of the event in hours."""
+    #     start_datetime = datetime.combine(self.date, self.start_time)
+    #     end_datetime = datetime.combine(self.date, self.end_time)
+    #     duration = end_datetime - start_datetime
+    #     return duration.total_seconds() / 3600  # Convert seconds to hours
+#############################################################################
     def get_duration_hours(self):
         """Calculate duration of the event in hours."""
-        start_datetime = datetime.combine(self.date, self.start_time)
-        end_datetime = datetime.combine(self.date, self.end_time)
-        duration = end_datetime - start_datetime
-        return duration.total_seconds() / 3600  # Convert seconds to hours
+        if self.start_time and self.end_time:
+            start_datetime = datetime.combine(self.date.date(), self.start_time)
+            end_datetime = datetime.combine(self.date.date(), self.end_time)
 
-    
+            # Ensure end time is after start time
+            if end_datetime < start_datetime:
+                return 0  # Invalid time range
+
+            duration = (end_datetime - start_datetime).total_seconds() / 3600
+            return round(duration, 2)  # Ensure hours are rounded properly
+        return 0
+
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()})"

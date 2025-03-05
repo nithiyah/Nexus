@@ -34,9 +34,15 @@ def volunteer_dashboard(request):
         # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
         #     Sum('hours_contributed')
         # )['hours_contributed__sum'] or 0
-        total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-                                                            total_hours=Sum('hours_contributed')
-                                                            )['total_hours'] or 0
+        # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+        #                                                     total_hours=Sum('hours_contributed')
+        #                                                     )['total_hours'] or 0
+        total_hours_data = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+                                                                total_hours=Sum('hours_contributed')
+                                                                )
+        total_hours = total_hours_data['total_hours'] or 0
+
+        print(f"DEBUG: Total hours calculated: {total_hours}")  # Debugging line
 
 
 
@@ -79,27 +85,58 @@ def volunteer_dashboard(request):
     return redirect('home')
 
 
-@login_required
-def complete_event(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+# @login_required
+# def complete_event(request, event_id):
+#     event = get_object_or_404(Event, id=event_id)
     
-    # # Log hours for all volunteers who participated
-    # participants = VolunteerParticipation.objects.filter(event=event)
-    # for participant in participants:
-    #     # participant.hours_contributed = event.duration_hours
-    #     participant.save()
+#     # # Log hours for all volunteers who participated
+#     # participants = VolunteerParticipation.objects.filter(event=event)
+#     # for participant in participants:
+#     #     # participant.hours_contributed = event.duration_hours
+#     #     participant.save()
 
-    #to calculate the event duration
-    duration_hours = event.get_duration_hours()
-    # # Log hours for all volunteers who participated
-    # participants = VolunteerParticipation.objects.filter(event=event)
-    # for participant in participants:
-    #     participant.hours_contributed =  duration_hours
-    #     participant.save()
+#     #to calculate the event duration
+#     duration_hours = event.get_duration_hours()
+#     # # Log hours for all volunteers who participated
+#     # participants = VolunteerParticipation.objects.filter(event=event)
+#     # for participant in participants:
+#     #     participant.hours_contributed =  duration_hours
+#     #     participant.save()
+#     # Ensure event duration is calculated correctly
+#     # duration_hours = event.get_duration_hours()
+
+#     # # Log hours for all volunteers who participated
+#     # participants = VolunteerParticipation.objects.filter(event=event)
+#     # for participant in participants:
+#     #     participant.hours_contributed = duration_hours
+#     #     participant.save()
+#     #     print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+#     # Ensure event duration is calculated correctly
+#     duration_hours = event.get_duration_hours()
+
+#     # Log hours for all volunteers who participated
+#     participants = VolunteerParticipation.objects.filter(event=event)
+#     for participant in participants:
+#         participant.hours_contributed = duration_hours
+#         participant.save()
+#         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+
+
+#     messages.success(request, f"Event {event.name} marked as completed and hours logged.")
+    
+#     # return redirect('events:organisation_dashboard')
+#     return redirect('events:organisation_events')
+
+# @login_required
+# def complete_event(request, event_id):
+
+def complete_event( event_id):
+    event = get_object_or_404(Event, id=event_id)
+
     # Ensure event duration is calculated correctly
     # duration_hours = event.get_duration_hours()
 
-    # # Log hours for all volunteers who participated
+    # Log hours for all volunteers who participated
     # participants = VolunteerParticipation.objects.filter(event=event)
     # for participant in participants:
     #     participant.hours_contributed = duration_hours
@@ -107,19 +144,26 @@ def complete_event(request, event_id):
     #     print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
     # Ensure event duration is calculated correctly
     duration_hours = event.get_duration_hours()
+    print(f"DEBUG: Calculated event duration: {duration_hours} hours for event {event.name}")
+
 
     # Log hours for all volunteers who participated
     participants = VolunteerParticipation.objects.filter(event=event)
+    if not participants.exists():
+        print(f"DEBUG: No volunteers found for event {event.name}")
+
     for participant in participants:
         participant.hours_contributed = duration_hours
         participant.save()
         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
 
+    print(f"DEBUG: Total volunteers updated: {participants.count()}")
 
-    messages.success(request, f"Event {event.name} marked as completed and hours logged.")
+
+    # messages.success(request, f"Event {event.name} marked as completed and hours logged.")
     
-    # return redirect('events:organisation_dashboard')
     return redirect('events:organisation_events')
+
 
 @login_required
 def volunteer_events(request):
