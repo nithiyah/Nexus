@@ -11,55 +11,40 @@ from .forms import FeedbackResponseForm  # Import the form
 from chat.models import ChatRoom
 from django.db.models import Sum
 from .models import VolunteerParticipation 
-
-@login_required
-def organisation_dashboard(request):
-    if request.user.user_type == 'organisation': 
-        events = Event.objects.filter(organisation=request.user)
-        return render(request, 'events/organisation_dashboard.html', {'events': events})
-    return redirect('home')
+import datetime
 
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
-        events = Event.objects.all().distinct()  # Ensure unique events
+        events = Event.objects.all().distinct()
 
-        # Get events the volunteer has registered for
+        # Get registered event IDs
         registered_event_ids = set(
             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
             .values_list('event_id', flat=True)
         )
 
         # Compute total hours volunteered
-        # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-        #     Sum('hours_contributed')
-        # )['hours_contributed__sum'] or 0
-        # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-        #                                                     total_hours=Sum('hours_contributed')
-        #                                                     )['total_hours'] or 0
-        total_hours_data = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-                                                                total_hours=Sum('hours_contributed')
-                                                                )
-        total_hours = total_hours_data['total_hours'] or 0
-
-        print(f"DEBUG: Total hours calculated: {total_hours}")  # Debugging line
-
-
+        total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+            total_hours=Sum('hours_contributed')
+        )['total_hours'] or 0
 
         # Compute total events participated
         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
 
         # Filtering logic
         selected_categories = request.GET.getlist('category')
-        location = request.GET.get('location', '').strip()
-        date = request.GET.get('date', '').strip()
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
 
         if selected_categories:
             events = events.filter(category__in=selected_categories)
-        if location:
-            events = events.filter(location__icontains=location)
-        if date:
-            events = events.filter(date=date)
+        
+        if start_date:
+            events = events.filter(date__gte=start_date)
+        
+        if end_date:
+            events = events.filter(date__lte=end_date)
 
         # Ensure distinct filtering
         events = events.distinct()
@@ -68,7 +53,7 @@ def volunteer_dashboard(request):
         category_choices = dict(Event.CATEGORY_CHOICES)
         categories = list(category_choices.keys())
 
-        # Attach `volunteer_count` and `open_spots` to each event
+        # Attach volunteer count and open spots to each event
         for event in events:
             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
             event.open_spots = max(event.volunteers_needed - event.volunteer_count, 0)
@@ -78,11 +63,84 @@ def volunteer_dashboard(request):
             'categories': categories,
             'category_labels': category_choices,
             'selected_categories': selected_categories,
-            'registered_event_ids': registered_event_ids, 
+            'registered_event_ids': registered_event_ids,
             'total_hours': round(total_hours, 2),
             'total_events': total_events,
         })
     return redirect('home')
+
+
+@login_required
+def organisation_dashboard(request):
+    if request.user.user_type == 'organisation': 
+        events = Event.objects.filter(organisation=request.user)
+        return render(request, 'events/organisation_dashboard.html', {'events': events})
+    return redirect('home')
+
+# @login_required
+# def volunteer_dashboard(request):
+#     if request.user.user_type == 'volunteer':
+#         events = Event.objects.all().distinct()  # Ensure unique events
+
+#         # Get events the volunteer has registered for
+#         registered_event_ids = set(
+#             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
+#             .values_list('event_id', flat=True)
+#         )
+
+#         # Compute total hours volunteered
+#         # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+#         #     Sum('hours_contributed')
+#         # )['hours_contributed__sum'] or 0
+#         # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+#         #                                                     total_hours=Sum('hours_contributed')
+#         #                                                     )['total_hours'] or 0
+#         total_hours_data = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+#                                                                 total_hours=Sum('hours_contributed')
+#                                                                 )
+#         total_hours = total_hours_data['total_hours'] or 0
+
+#         print(f"DEBUG: Total hours calculated: {total_hours}")  # Debugging line
+
+
+
+#         # Compute total events participated
+#         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
+
+#         # Filtering logic
+#         selected_categories = request.GET.getlist('category')
+#         location = request.GET.get('location', '').strip()
+#         date = request.GET.get('date', '').strip()
+
+#         if selected_categories:
+#             events = events.filter(category__in=selected_categories)
+#         if location:
+#             events = events.filter(location__icontains=location)
+#         if date:
+#             events = events.filter(date=date)
+
+#         # Ensure distinct filtering
+#         events = events.distinct()
+
+#         # Ensure unique categories for filtering dropdown
+#         category_choices = dict(Event.CATEGORY_CHOICES)
+#         categories = list(category_choices.keys())
+
+#         # Attach `volunteer_count` and `open_spots` to each event
+#         for event in events:
+#             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
+#             event.open_spots = max(event.volunteers_needed - event.volunteer_count, 0)
+
+#         return render(request, 'events/volunteer_dashboard.html', {
+#             'events': events,
+#             'categories': categories,
+#             'category_labels': category_choices,
+#             'selected_categories': selected_categories,
+#             'registered_event_ids': registered_event_ids, 
+#             'total_hours': round(total_hours, 2),
+#             'total_events': total_events,
+#         })
+#     return redirect('home')
 
 
 # @login_required

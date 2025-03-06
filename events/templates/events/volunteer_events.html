@@ -7,26 +7,24 @@
     <h1 class="text-center mb-4">My Registered Events</h1>
 
     {% if registered_events %}
-        <div class="row">
+        <div class="row g-4">  <!-- Added g-4 for spacing between cards -->
             {% for registration in registered_events %}
                 <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
+                    <div class="card shadow-sm mb-4 h-100">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ registration.event.name }}</h5>
+                            <p><strong>Organised by:</strong> {{ registration.event.organisation.username }}</p>
                             <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y" }}</p>
                             <p><strong>Time:</strong> {{ registration.event.start_time|time:"H:i" }} - {{ registration.event.end_time|time:"H:i" }}</p>
-                            <!-- <p><strong>Date:</strong> {{ registration.event.date|date:"M d, Y H:i" }}</p> -->
                             <p><strong>Location:</strong> {{ registration.event.location }}</p>
                             <p><strong>Category:</strong> {{ registration.event.category }}</p>
-                            <p class="text-muted">{{ registration.event.description }}</p>
+                            <p class="text-muted flex-grow-1">{{ registration.event.description }}</p>
                         
-                            <div class="d-grid gap-2">
-                                <!-- Chat Room Button -->
+                            <div class="d-grid gap-2 mt-auto">
                                 <a href="{% url 'chat:chat_room' registration.event.id %}" class="btn btn-warning w-100">
                                     <i class="fas fa-comments"></i> Join Chat Room
                                 </a>
                         
-                                <!-- Cancel Registration Button -->
                                 <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger w-100">
@@ -34,7 +32,6 @@
                                     </button>
                                 </form>
                         
-                                <!-- Feedback Form Section -->
                                 {% if registration.event.feedback_form %}
                                     {% if registration.event.feedback_form.published %}
                                         {% if registration.has_submitted_feedback %}
