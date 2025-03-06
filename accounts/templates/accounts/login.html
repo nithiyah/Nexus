@@ -88,7 +88,7 @@
                     <div class="form-floating mb-3 password-container">
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                         <label for="password">Password</label>
-                        <i class="bi bi-eye-fill toggle-password" id="togglePassword"></i>
+                        <i class="bi bi-eye-slash-fill toggle-password" id="togglePassword"></i>
                     </div>
 
                     <!-- Login Button -->
@@ -105,19 +105,21 @@
 
     <!-- JavaScript for Show/Hide Password -->
     <script>
-        document.getElementById("togglePassword").addEventListener("click", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             var passwordField = document.getElementById("password");
-            var icon = this;
+            var toggleIcon = document.getElementById("togglePassword");
 
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                icon.classList.remove("bi-eye-fill");
-                icon.classList.add("bi-eye-slash-fill");
-            } else {
-                passwordField.type = "password";
-                icon.classList.remove("bi-eye-slash-fill");
-                icon.classList.add("bi-eye-fill");
-            }
+            toggleIcon.addEventListener("click", function () {
+                if (passwordField.type === "password") {
+                    passwordField.type = "text";
+                    toggleIcon.classList.remove("bi-eye-slash-fill");
+                    toggleIcon.classList.add("bi-eye-fill");
+                } else {
+                    passwordField.type = "password";
+                    toggleIcon.classList.remove("bi-eye-fill");
+                    toggleIcon.classList.add("bi-eye-slash-fill");
+                }
+            });
         });
     </script>
 

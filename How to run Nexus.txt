@@ -1,0 +1,12 @@
+How to run Nexus
+
+1. Open terminal 
+2. cd to project folder
+3. Activate virtual environment
+venv\Scripts\activate
+4. run server
+python manage.py runserver 8080
+5. Open another terminal 
+6. Run Daphne (ASGI server) to serve Django using Django Channels
+daphne -b 0.0.0.0 -p 8001 nexus.asgi:application
+
