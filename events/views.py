@@ -375,7 +375,14 @@ def publish_feedback(request, event_id):
     event = get_object_or_404(Event, id=event_id, organisation=request.user)
 
     # Fetch the feedback form or return 404 if it doesn't exist
-    feedback_form = get_object_or_404(FeedbackForm, event=event)
+    # feedback_form = get_object_or_404(FeedbackForm, event=event)
+    feedback_form = FeedbackForm.objects.filter(event=event).first()
+
+
+
+    if not feedback_form:
+        messages.error(request, "No feedback form exists for this event.")
+        return redirect("events:feedback_event_page", event_id=event.id)  # Redirect back to event page
 
     # To publish the feedback form
     feedback_form.published = True  
