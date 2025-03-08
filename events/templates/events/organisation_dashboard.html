@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}My Events{% endblock %}
+{% block title %}My Dashboard{% endblock %}
 
 {% block content %}
     <div class="container mt-4">
@@ -14,7 +14,7 @@
                             <h5 class="card-title text-primary">{{ event.name }}</h5>
                             <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
                             <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
-                            <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                            <p class="card-t ext"><strong>Location:</strong> {{ event.location }}</p>
                             <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>
                             <p class="card-text flex-grow-1">{{ event.description }}</p>
                             
@@ -27,9 +27,17 @@
                                     <p class="text-danger">No volunteers have signed up yet.</p>
                                 {% endif %}
                                 
-                                <a href="{% url 'events:feedback_hub' %}" class="btn btn-dark w-100">
+                                <!-- <a href="{% url 'events:feedback_hub' %}" class="btn btn-dark w-100">
                                     Go to Feedback Hub
+                                </a> -->
+                                <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-dark w-100">
+                                    Manage Feedback
                                 </a>
+                                
+                                
+                                <!-- <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-dark w-100">
+                                    View Event Feedback
+                                </a> -->
                                 
                                 <a href="{% url 'chat:chat_room' event.id %}" class="btn btn-warning w-100">
                                     Open Chat Room

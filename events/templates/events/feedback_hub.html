@@ -3,38 +3,51 @@
 {% block title %}Feedback Hub{% endblock %}
 
 {% block content %}
-    <h1>Feedback Hub</h1>
-    <p>Select an event to manage feedback:</p>
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Feedback Hub</h1>
+    <p class="text-muted text-center">Manage feedback for your events below:</p>
 
     {% if events %}
-        {% for event in events %}
-            <div class="event-card" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
-                <h3>{{ event.name }}</h3>
-                <!-- <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p> -->
-                <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
-                <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for event in events %}
+                <div class="col">
+                    <div class="card shadow-lg border-0 h-100">
+                        <div class="card-body">
+                            <!-- Event Title -->
+                            <h4 class="card-title text-primary fw-bold text-center">{{ event.name }}</h4>
+                            
+                            <hr class="my-3">
 
-                <!-- Feedback Management Buttons -->
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <a href="{% url 'events:create_feedback_form' event.id %}" class="btn"
-                       style="background-color: green; color: white; padding: 10px; border-radius: 5px;">
-                        Create/Edit Feedback Form
-                    </a>
+                            <!-- Event Details -->
+                            <div class="mb-3">
+                                <p class="card-text"><i class="far fa-calendar-alt"></i> <strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                                <p class="card-text"><i class="far fa-clock"></i> <strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+                                <p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ event.location }}</p>
+                            </div>
 
-                    <a href="{% url 'events:publish_feedback' event.id %}" class="btn"
-                       style="background-color: blue; color: white; padding: 10px; border-radius: 5px;">
-                        Publish Feedback
-                    </a>
+                            <hr class="my-3">
 
-                    <a href="{% url 'events:view_feedback' event.id %}" class="btn"
-                       style="background-color: purple; color: white; padding: 10px; border-radius: 5px;">
-                        View Submitted Feedback
-                    </a>
+                            <!-- Feedback Management Buttons -->
+                            <div class="d-grid gap-3">
+                                <a href="{% url 'events:create_feedback_form' event.id %}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-edit"></i> Create/Edit Feedback Form
+                                </a>
+
+                                <a href="{% url 'events:publish_feedback' event.id %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-bullhorn"></i> Publish Feedback
+                                </a>
+
+                                <a href="{% url 'events:view_feedback' event.id %}" class="btn btn-dark btn-lg">
+                                    <i class="fas fa-eye"></i> View Submitted Feedback
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     {% else %}
-        <p>You have no events listed.</p>
+        <p class="text-center text-muted">You have no events listed.</p>
     {% endif %}
-
+</div>
 {% endblock %}

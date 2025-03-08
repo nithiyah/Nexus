@@ -14,7 +14,6 @@ from .models import VolunteerParticipation
 import datetime
 
 
-
 ###################### EVENT VIEW ######################
 # volunteer_dashboard
 # organisation_dashboard
@@ -37,6 +36,7 @@ import datetime
 # complete_feedback
 # feedback_hub
 # volunteer_list
+# feedback_event_poge
 
 ###################### EVENT VIEW ######################
 
@@ -511,3 +511,9 @@ def volunteer_list(request, event_id):
 
 
 
+@login_required
+def feedback_event_page(request, event_id):
+    # Render the Feedback Page for a specific event 
+    event = get_object_or_404(Event, id=event_id, organisation=request.user)
+
+    return render(request, "events/feedback_event.html", {"event": event})

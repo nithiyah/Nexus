@@ -23,6 +23,9 @@ urlpatterns = [
     path('volunteer-list/<int:event_id>/', views.volunteer_list, name='volunteer_list'),
     path('complete-event/<int:event_id>/', views.complete_event, name='complete_event'),
 
+    
+path('feedback/event/<int:event_id>/', views.feedback_event_page, name='feedback_event_page'),
+
 
 
 ]
