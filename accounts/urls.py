@@ -14,6 +14,7 @@ urlpatterns = [
     path('login/redirect/', views.login_redirect, name='login_redirect'),  # Custom redirect
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', profile_view, name='profile'),
+    
 
 
 ]

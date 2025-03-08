@@ -7,32 +7,59 @@ from django.urls import reverse
 from .forms import FeedbackFormForm
 from django.utils.timezone import now, localtime
 from .models import Event, VolunteerEvent, FeedbackForm, FeedbackResponse
-from .forms import FeedbackResponseForm  # Import the form
+from .forms import FeedbackResponseForm  
 from chat.models import ChatRoom
 from django.db.models import Sum
 from .models import VolunteerParticipation 
 import datetime
+
+
+
+###################### EVENT VIEW ######################
+# volunteer_dashboard
+# organisation_dashboard
+# complete_event
+# volunteer_events
+# edit_event
+# delete_event
+# create_event
+
+# register_for_event
+# cancel_registration
+# volunteer_events
+# organisation_events
+# remove_volunteer
+# create_feedback_form
+# publish_feedback
+# complete_feedback
+# submit_feedback
+# view_feedback
+# complete_feedback
+# feedback_hub
+# volunteer_list
+
+###################### EVENT VIEW ######################
 
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
         events = Event.objects.all().distinct()
 
-        # Get registered event IDs
+        # Registered eventid
         registered_event_ids = set(
             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
             .values_list('event_id', flat=True)
         )
 
-        # Compute total hours volunteered
+        # Get the total hours volunteered
         total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
             total_hours=Sum('hours_contributed')
         )['total_hours'] or 0
 
-        # Compute total events participated
+        # total events participated - volunteer
         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
 
-        # Filtering logic
+        # The filtering logic
         selected_categories = request.GET.getlist('category')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
@@ -46,14 +73,14 @@ def volunteer_dashboard(request):
         if end_date:
             events = events.filter(date__lte=end_date)
 
-        # Ensure distinct filtering
+        # To make sure its distinct filter
         events = events.distinct()
 
-        # Ensure unique categories for filtering dropdown
+        # To get unique categories for filtering dropdown
         category_choices = dict(Event.CATEGORY_CHOICES)
         categories = list(category_choices.keys())
 
-        # Attach volunteer count and open spots to each event
+        # Number of volunteer and open spots in each event
         for event in events:
             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
             event.open_spots = max(event.volunteers_needed - event.volunteer_count, 0)
@@ -77,116 +104,7 @@ def organisation_dashboard(request):
         return render(request, 'events/organisation_dashboard.html', {'events': events})
     return redirect('home')
 
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         events = Event.objects.all().distinct()  # Ensure unique events
 
-#         # Get events the volunteer has registered for
-#         registered_event_ids = set(
-#             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
-#             .values_list('event_id', flat=True)
-#         )
-
-#         # Compute total hours volunteered
-#         # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-#         #     Sum('hours_contributed')
-#         # )['hours_contributed__sum'] or 0
-#         # total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-#         #                                                     total_hours=Sum('hours_contributed')
-#         #                                                     )['total_hours'] or 0
-#         total_hours_data = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-#                                                                 total_hours=Sum('hours_contributed')
-#                                                                 )
-#         total_hours = total_hours_data['total_hours'] or 0
-
-#         print(f"DEBUG: Total hours calculated: {total_hours}")  # Debugging line
-
-
-
-#         # Compute total events participated
-#         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
-
-#         # Filtering logic
-#         selected_categories = request.GET.getlist('category')
-#         location = request.GET.get('location', '').strip()
-#         date = request.GET.get('date', '').strip()
-
-#         if selected_categories:
-#             events = events.filter(category__in=selected_categories)
-#         if location:
-#             events = events.filter(location__icontains=location)
-#         if date:
-#             events = events.filter(date=date)
-
-#         # Ensure distinct filtering
-#         events = events.distinct()
-
-#         # Ensure unique categories for filtering dropdown
-#         category_choices = dict(Event.CATEGORY_CHOICES)
-#         categories = list(category_choices.keys())
-
-#         # Attach `volunteer_count` and `open_spots` to each event
-#         for event in events:
-#             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
-#             event.open_spots = max(event.volunteers_needed - event.volunteer_count, 0)
-
-#         return render(request, 'events/volunteer_dashboard.html', {
-#             'events': events,
-#             'categories': categories,
-#             'category_labels': category_choices,
-#             'selected_categories': selected_categories,
-#             'registered_event_ids': registered_event_ids, 
-#             'total_hours': round(total_hours, 2),
-#             'total_events': total_events,
-#         })
-#     return redirect('home')
-
-
-# @login_required
-# def complete_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-    
-#     # # Log hours for all volunteers who participated
-#     # participants = VolunteerParticipation.objects.filter(event=event)
-#     # for participant in participants:
-#     #     # participant.hours_contributed = event.duration_hours
-#     #     participant.save()
-
-#     #to calculate the event duration
-#     duration_hours = event.get_duration_hours()
-#     # # Log hours for all volunteers who participated
-#     # participants = VolunteerParticipation.objects.filter(event=event)
-#     # for participant in participants:
-#     #     participant.hours_contributed =  duration_hours
-#     #     participant.save()
-#     # Ensure event duration is calculated correctly
-#     # duration_hours = event.get_duration_hours()
-
-#     # # Log hours for all volunteers who participated
-#     # participants = VolunteerParticipation.objects.filter(event=event)
-#     # for participant in participants:
-#     #     participant.hours_contributed = duration_hours
-#     #     participant.save()
-#     #     print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
-#     # Ensure event duration is calculated correctly
-#     duration_hours = event.get_duration_hours()
-
-#     # Log hours for all volunteers who participated
-#     participants = VolunteerParticipation.objects.filter(event=event)
-#     for participant in participants:
-#         participant.hours_contributed = duration_hours
-#         participant.save()
-#         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
-
-
-#     messages.success(request, f"Event {event.name} marked as completed and hours logged.")
-    
-#     # return redirect('events:organisation_dashboard')
-#     return redirect('events:organisation_events')
-
-# @login_required
-# def complete_event(request, event_id):
 
 def complete_event( event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -216,16 +134,13 @@ def complete_event( event_id):
         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
 
     print(f"DEBUG: Total volunteers updated: {participants.count()}")
-
-
-    # messages.success(request, f"Event {event.name} marked as completed and hours logged.")
     
     return redirect('events:organisation_events')
 
 
 @login_required
 def volunteer_events(request):
-    # Get all events the volunteer has participated in
+    # Get all the events that volunteer particpate in
     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
     
     feedback_forms = {
@@ -236,7 +151,8 @@ def volunteer_events(request):
 
     return render(request, 'events/volunteer_events.html', {
         'registered_events': registered_events,
-        'feedback_forms': feedback_forms,  # Pass the mapping to the template
+        # pass the mapping to the template
+        'feedback_forms': feedback_forms,  
     })
 
 
@@ -250,7 +166,7 @@ def edit_event(request, event_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Event updated successfully!')
-            # return redirect('events:organisation_dashboard')
+            
             return redirect('events:organisation_events')
     else:
         form = EventForm(instance=event)
@@ -265,7 +181,7 @@ def delete_event(request, event_id):
     if request.method == 'POST':
         event.delete()
         messages.success(request, 'Event deleted successfully!')
-        # return redirect('events:organisation_dashboard')
+        
         return redirect('events:organisation_events')
 
     return render(request, 'events/delete_event.html', {'event': event})
@@ -275,57 +191,24 @@ def delete_event(request, event_id):
 @login_required
 def create_event(request):
     if request.user.user_type != 'organisation':
-        return redirect('home')  # Only organizations can create events
-
+        return redirect('home')  
+    
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
             event.organisation = request.user
             event.save()
+
             # Create a chat room when an event is created
             ChatRoom.objects.create(event=event)
-            # return redirect('events:organisation_dashboard')
+            
             return redirect('events:organisation_events')
     else:
         form = EventForm()
 
     return render(request, 'events/create_event.html', {'form': form})
 
-
-# @login_required
-# def register_for_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-
-#     # Count currently registered volunteers
-#     registered_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
-
-#     # Check if the user is already registered or waitlisted
-#     existing_registration = VolunteerEvent.objects.filter(event=event, volunteer=request.user).first()
-    
-#     if existing_registration:
-#         if existing_registration.status == 'waiting_list':
-#             messages.info(request, 'You are already on the waiting list for this event.')
-#         else:
-#             messages.info(request, 'You have already registered for this event.')
-#     else:
-#         if registered_count < event.volunteers_needed:
-#             # Register the volunteer as "registered"
-#             # VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
-            
-#             registration = VolunteerEvent.objects.create(event=event, volunteer=request.user, status='registered')
-
-#             # Ensure the volunteer participation record is also created
-#             VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
-
-#             messages.success(request, 'You have successfully registered for the event.')
-#         else:
-#             # Event is full, add to waiting list
-#             new_entry = VolunteerEvent.objects.create(event=event, volunteer=request.user, status='waiting_list')
-#             new_entry.save()
-#             messages.info(request, 'The event is full. You have been added to the waiting list.')
-
-#     return redirect('events:volunteer_dashboard')
 
 @login_required
 def register_for_event(request, event_id):
@@ -410,7 +293,8 @@ def volunteer_events(request):
             ).exists()
             registration.has_submitted_feedback = feedback_exists
         else:
-            registration.has_submitted_feedback = None  # No feedback form exists
+            # feedback form doesnt exist
+            registration.has_submitted_feedback = None  
 
     return render(request, 'events/volunteer_events.html', {
         'registered_events': registered_events,
@@ -430,15 +314,17 @@ from django.utils.timezone import now, localtime, is_naive, make_aware
 def organisation_events(request):
     events = Event.objects.filter(organisation=request.user)
     
-    # Convert all event dates to timezone-aware before rendering
+    # Convert all the event dates to timezone-aware before it is rendered
     for event in events:
-        if is_naive(event.date):  # If naive, make it timezone-aware
+        if is_naive(event.date):  
+            # If it is naive, make it timezone-aware
             event.date = make_aware(event.date)
 
         event.volunteers = VolunteerEvent.objects.filter(event=event)
 
-    #  Ensure the current time is timezone-aware
-    current_time = now()  #`now()` will return a timezone-aware datetime
+    # Ensure the current time is timezone-aware
+    # now() will return a timezone-aware datetime
+    current_time = now()  
 
     return render(request, 'events/organisation_events.html', {
         'events': events,
@@ -448,10 +334,9 @@ def organisation_events(request):
 
 
 
-#Under organisation events page
+# remove_volunter: allows organisation to remove volunteer from event
 @login_required
 def remove_volunteer(request, registration_id):
-    """Allows an organisation to remove a volunteer from an event."""
     registration = get_object_or_404(VolunteerEvent, id=registration_id)
 
     # Ensure only the event creator can remove volunteers
@@ -459,7 +344,7 @@ def remove_volunteer(request, registration_id):
         registration.delete()
         messages.success(request, f"{registration.volunteer.full_name} has been removed from the event.")
     else:
-        messages.error(request, "You are not authorized to remove volunteers from this event.")
+        messages.error(request, "You are not authorised to remove volunteers from this event.")
 
     # return redirect('events:organisation_events')
     return redirect("events:organisation_dashboard")
@@ -477,7 +362,7 @@ def create_feedback_form(request, event_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Feedback form updated successfully!")
-            # return redirect("events:organisation_events")
+
             return redirect("events:organisation_dashboard")
     else:
         form = FeedbackFormForm(instance=feedback_form)
@@ -492,11 +377,11 @@ def publish_feedback(request, event_id):
     # Fetch the feedback form or return 404 if it doesn't exist
     feedback_form = get_object_or_404(FeedbackForm, event=event)
 
-    feedback_form.published = True  # Publish the feedback form
+    # To publish the feedback form
+    feedback_form.published = True  
     feedback_form.save()
     messages.success(request, "Feedback form has been published.")
 
-    # return redirect("events:organisation_events")
     return redirect("events:organisation_dashboard")
 
 
@@ -532,7 +417,7 @@ def submit_feedback(request, event_id):
             feedback.volunteer = request.user
             feedback.save()
             messages.success(request, "Feedback submitted successfully!")
-            return redirect('events:volunteer_events')  # Redirect to Volunteer My Events page
+            return redirect('events:volunteer_events')  
     else:
         form = FeedbackForm()
 
@@ -547,7 +432,7 @@ def view_feedback(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     feedback_entries = FeedbackResponse.objects.filter(feedback_form__event=event)
 
-    # Compute Average Ratings
+    # To get the Average Ratings
     ratings = {
         "rating_1": 0, "rating_2": 0, "rating_3": 0, "rating_4": 0, "rating_5": 0
     }
@@ -561,14 +446,16 @@ def view_feedback(request, event_id):
             ratings["rating_4"] += feedback.rating_4
             ratings["rating_5"] += feedback.rating_5
 
-        # Calculate averages
+        # Calculate averages of the ratings
         for key in ratings:
             ratings[key] = round(ratings[key] / total_responses, 2)
 
     return render(request, 'events/view_feedback.html', {
         'event': event,
         'feedback_entries': feedback_entries,
-        'average_ratings': json.dumps(list(ratings.values())),  # Convert to JSON-safe format
+
+        # To convert avergae ratings to JSON safe format
+        'average_ratings': json.dumps(list(ratings.values())), 
     })
 
 
@@ -576,7 +463,8 @@ def view_feedback(request, event_id):
 @login_required
 def complete_feedback(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    feedback_form = event.feedback_form  # Get the feedback form
+    # To get the feedback form
+    feedback_form = event.feedback_form  
 
     if not feedback_form or not feedback_form.published:
         messages.error(request, "Feedback form is not available for this event.")
@@ -611,9 +499,10 @@ def feedback_hub(request):
 
 @login_required
 def volunteer_list(request, event_id):
-    """View to show all volunteers registered for a specific event."""
+    # volunteer_list: show all volunteers registered for specific event
     event = get_object_or_404(Event, id=event_id, organisation=request.user)
-    volunteers = VolunteerEvent.objects.filter(event=event)  # Get all volunteers for this event
+    # Get the list of volunteers for an event
+    volunteers = VolunteerEvent.objects.filter(event=event)  
 
     return render(request, "events/volunteer_list.html", {
         "event": event,
