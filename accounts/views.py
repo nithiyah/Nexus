@@ -1,10 +1,13 @@
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from .forms import VolunteerRegistrationForm, OrganisationRegistrationForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileUpdateForm
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
 
 
 def welcome(request):
@@ -64,3 +67,18 @@ def profile_view(request):
         form = ProfileUpdateForm(instance=user)
     
     return render(request, 'accounts/profile.html', {'form': form})
+
+# I was getting a reverse no match error 
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'accounts/password_reset_form.html'
+    email_template_name = 'accounts/password_reset_email.html'
+    success_url = reverse_lazy('accounts:password_reset_done') 
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'accounts/password_reset_confirm.html'
+
+    def form_valid(self, form):
+        # Log out the user before setting a new password
+        logout(self.request)
+        return super().form_valid(form)
