@@ -8,6 +8,12 @@ from .forms import ProfileUpdateForm
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.urls import reverse_lazy
+from django.core.mail import send_mail
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 
 
 def welcome(request):
@@ -34,6 +40,33 @@ def register_volunteer(request):
             user = form.save(commit=False)
             user.user_type = 'volunteer'
             user.save()
+
+            # Build context for the email template
+            context = {
+                'username': user.username,
+                'login_url': request.build_absolute_uri('/login/')  
+                  # or "https://yourdomain.com/login/"
+            }
+
+            # Render HTML & plain-text versions
+            html_message = render_to_string('accounts/welcome_email.html', context)
+            plain_message = strip_tags(html_message)
+
+            subject = "Welcome to Nexus!"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [user.email]
+
+            send_mail(
+                subject=subject,
+                message=plain_message,        # fallback if recipient can’t read HTML
+                from_email=from_email,
+                recipient_list=recipient_list,
+                html_message=html_message,    # our HTML version
+                fail_silently=False,
+            )
+
+
+
             login(request, user)
             return redirect('accounts:login')
     else:

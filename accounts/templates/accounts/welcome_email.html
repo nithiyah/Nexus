@@ -1,0 +1,19 @@
+{% autoescape off %}
+<html>
+<head>
+    <title>Welcome to Nexus</title>
+</head>
+<body>
+    <p>Hello {{ username }},</p>
+    <p>Thank you for signing up and joining the Nexus community!</p>
+
+    <p>
+      You can log in here: 
+      <a href="{{ login_url }}">Log In</a>
+    </p>
+    
+    <p>Cheers,<br>
+    The Nexus Team</p>
+</body>
+</html>
+{% endautoescape %}

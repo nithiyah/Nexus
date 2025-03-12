@@ -95,8 +95,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 
 # EMAIL 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' this is for sending real emails
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # this is sending the emails on console
+
+
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
