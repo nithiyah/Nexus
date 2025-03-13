@@ -55,31 +55,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         print(f" WebSocket Disconnected: {self.room_group_name}")
 
-    # async def receive(self, text_data):
-    #     """Handle incoming messages and save to database."""
-    #     data = json.loads(text_data)
-    #     sender = self.scope["user"]
-    #     message = data["message"]
-
-    #     print(f" Received Message: {message} from {sender}")
-
-    #     # Fetch the correct chatroom
-    #     chatroom = await sync_to_async(ChatRoom.objects.get)(event__id=self.event_id)
-    #     message_obj = await sync_to_async(Message.objects.create)(
-    #         chatroom=chatroom, sender=sender, content=message
-    #     )
-
-    #     # Send message to ALL clients in the chat room (real-time update)
-    #     await self.channel_layer.group_send(
-    #         self.room_group_name, {
-    #             "type": "chat.message",
-    #             "message": message_obj.content,
-    #             "sender": sender.username,
-    #             "timestamp": str(message_obj.timestamp),
-    #         }
-    #     )
-    #     print(f"Broadcasted Message: {message_obj.content}")
-
 
     async def receive(self, text_data):
         """Handle incoming messages including files and save to database."""
@@ -104,13 +79,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         print(f"Broadcasted Message: {message_obj.content}")
 
-
     async def chat_message(self, event):
-        """ Send messages to connected clients instantly."""
-        print(f" Sending Message to Clients: {event['message']}")
+        """Send messages and files to connected clients instantly."""
+        message = event.get("message", "")
+        file_url = event.get("file_url", "")
+        sender = event["sender"]
+        timestamp = event["timestamp"]
+
         await self.send(text_data=json.dumps({
-            "type": "chat_message",  # Ensure frontend can detect this type
-            "message": event["message"],
-            "sender": event["sender"],
-            "timestamp": event["timestamp"],
+            "type": "chat_message",
+            "message": message if message else "",  # Ensure it's not None
+            "file_url": file_url if file_url else "",
+            "sender": sender,
+            "timestamp": timestamp
         }))
+
+
