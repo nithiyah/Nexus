@@ -55,30 +55,55 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         print(f" WebSocket Disconnected: {self.room_group_name}")
 
+    # async def receive(self, text_data):
+    #     """Handle incoming messages and save to database."""
+    #     data = json.loads(text_data)
+    #     sender = self.scope["user"]
+    #     message = data["message"]
+
+    #     print(f" Received Message: {message} from {sender}")
+
+    #     # Fetch the correct chatroom
+    #     chatroom = await sync_to_async(ChatRoom.objects.get)(event__id=self.event_id)
+    #     message_obj = await sync_to_async(Message.objects.create)(
+    #         chatroom=chatroom, sender=sender, content=message
+    #     )
+
+    #     # Send message to ALL clients in the chat room (real-time update)
+    #     await self.channel_layer.group_send(
+    #         self.room_group_name, {
+    #             "type": "chat.message",
+    #             "message": message_obj.content,
+    #             "sender": sender.username,
+    #             "timestamp": str(message_obj.timestamp),
+    #         }
+    #     )
+    #     print(f"Broadcasted Message: {message_obj.content}")
+
+
     async def receive(self, text_data):
-        """Handle incoming messages and save to database."""
+        """Handle incoming messages including files and save to database."""
         data = json.loads(text_data)
         sender = self.scope["user"]
-        message = data["message"]
+        message = data.get("message", None)
+        file_url = data.get("file_url", None)
 
-        print(f" Received Message: {message} from {sender}")
-
-        # Fetch the correct chatroom
         chatroom = await sync_to_async(ChatRoom.objects.get)(event__id=self.event_id)
         message_obj = await sync_to_async(Message.objects.create)(
-            chatroom=chatroom, sender=sender, content=message
+            chatroom=chatroom, sender=sender, content=message, file=file_url
         )
 
-        # Send message to ALL clients in the chat room (real-time update)
         await self.channel_layer.group_send(
             self.room_group_name, {
-                "type": "chat.message",
-                "message": message_obj.content,
+                "type": "chat_message",
+                "message": message_obj.content if message_obj.content else "",
+                "file_url": message_obj.file.url if message_obj.file else "",
                 "sender": sender.username,
                 "timestamp": str(message_obj.timestamp),
             }
         )
         print(f"Broadcasted Message: {message_obj.content}")
+
 
     async def chat_message(self, event):
         """ Send messages to connected clients instantly."""

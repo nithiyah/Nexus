@@ -275,10 +275,52 @@ def chat_room(request, event_id):
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+# @csrf_exempt
+# def send_message(request, event_id):
+#     """Sends messages and updates WebSocket in real-time."""
+
+#     chatroom = get_object_or_404(ChatRoom, event__id=event_id)
+#     event = chatroom.event
+
+#     is_registered = VolunteerEvent.objects.filter(event=event, volunteer=request.user).exists()
+
+#     if request.user == event.organisation or is_registered:
+#         if request.method == "POST":
+#             data = json.loads(request.body)
+#             content = data.get("content", "").strip()
+
+#             if content:
+#                 message = Message.objects.create(
+#                     chatroom=chatroom,
+#                     sender=request.user,
+#                     content=content
+#                 )
+
+#                 # Send WebSocket update to get real time updates
+#                 channel_layer = get_channel_layer()
+#                 async_to_sync(channel_layer.group_send)(
+#                     f"chat_{event_id}",
+#                     {
+#                         "type": "chat_message",
+#                         "message": message.content,
+#                         "sender": message.sender.username,
+#                         "timestamp": message.timestamp.strftime("%H:%M"),
+#                     },
+#                 )
+
+#                 return JsonResponse({
+#                     "success": True,
+#                     "sender": message.sender.username,
+#                     "content": message.content,
+#                     "timestamp": message.timestamp.strftime("%H:%M"),
+#                 })
+
+#     return JsonResponse({"success": False, "error": "Unauthorized"})
+from django.core.files.storage import default_storage
+
 @csrf_exempt
 def send_message(request, event_id):
-    """Sends messages and updates WebSocket in real-time."""
-
+    """Handles text and file messages."""
     chatroom = get_object_or_404(ChatRoom, event__id=event_id)
     event = chatroom.event
 
@@ -286,34 +328,36 @@ def send_message(request, event_id):
 
     if request.user == event.organisation or is_registered:
         if request.method == "POST":
-            data = json.loads(request.body)
-            content = data.get("content", "").strip()
+            content = request.POST.get("content", "").strip()
+            file = request.FILES.get("file")
 
-            if content:
-                message = Message.objects.create(
-                    chatroom=chatroom,
-                    sender=request.user,
-                    content=content
-                )
+            message = Message.objects.create(
+                chatroom=chatroom,
+                sender=request.user,
+                content=content if content else None,  # Handle text messages
+                file=file if file else None,  # Handle file uploads
+            )
 
-                # Send WebSocket update
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    f"chat_{event_id}",
-                    {
-                        "type": "chat_message",
-                        "message": message.content,
-                        "sender": message.sender.username,
-                        "timestamp": message.timestamp.strftime("%H:%M"),
-                    },
-                )
-
-                return JsonResponse({
-                    "success": True,
+            # Send WebSocket update for real-time updates
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"chat_{event_id}",
+                {
+                    "type": "chat_message",
+                    "message": message.content if message.content else "",  # Include text message
+                    "file_url": message.file.url if message.file else "",  # Include file URL
                     "sender": message.sender.username,
-                    "content": message.content,
                     "timestamp": message.timestamp.strftime("%H:%M"),
-                })
+                },
+            )
+
+            return JsonResponse({
+                "success": True,
+                "sender": message.sender.username,
+                "content": message.content if message.content else "",
+                "file_url": message.file.url if message.file else "",
+                "timestamp": message.timestamp.strftime("%H:%M"),
+            })
 
     return JsonResponse({"success": False, "error": "Unauthorized"})
 
