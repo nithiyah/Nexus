@@ -13,6 +13,9 @@
                             <div class="card-body text-center">
                                 <h5 class="card-title">{{ room.event.name }}</h5>
                                 <p class="card-text text-muted">{{ room.participant_count }} Participants</p>
+                                {% if room.unread_messages > 0 %}
+                                <p class="text-danger"><strong>{{ room.unread_messages }} Unread Messages</strong></p>
+                                {% endif %}
                                 <a href="{% url 'chat:chat_room' room.event.id %}" class="btn btn-primary">Join Chat</a>
                             </div>
                         </div>

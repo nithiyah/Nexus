@@ -9,7 +9,7 @@
             <div class="card shadow-lg p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-center flex-grow-1">Profile</h2>
-                    <a href="{% url 'events:organisation_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                    <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}" class="btn btn-outline-secondary">Back to Dashboard</a>
                 </div>
                 
                 <div class="text-center mb-4">

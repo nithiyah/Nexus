@@ -72,9 +72,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">My Events</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="{% url 'chat:chat_home' %}">Chat</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chat:chat_home' %}">
+                        Chat
+                        <span id="chat-unread-count" class="badge bg-danger" style="display: none;">0</span>
+                    </a>
                 </li>
+                
                 {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
@@ -148,6 +155,32 @@
         });
     });
 </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function updateUnreadCount() {
+            fetch("{% url 'chat:unread_messages_count' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const unreadBadge = document.getElementById("chat-unread-count");
+                    if (data.unread_count > 0) {
+                        unreadBadge.textContent = data.unread_count;
+                        unreadBadge.style.display = "inline-block";
+                    } else {
+                        unreadBadge.style.display = "none";
+                    }
+                })
+                .catch(error => console.error("Error fetching unread count:", error));
+        }
+
+        // Fetch unread messages count every 5 seconds
+        setInterval(updateUnreadCount, 5000);
+
+        // Fetch unread messages count immediately on page load
+        updateUnreadCount();
+    });
+</script>
+
 
 
 </body>

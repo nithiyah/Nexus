@@ -31,3 +31,12 @@ class Message(models.Model):
         else:
             return f"{self.sender.username}: [Empty Message]"
 
+
+class UnreadMessage(models.Model):
+    # Tracks unread messages for each user in a chatroom
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {'Read' if self.is_read else 'Unread'}"
