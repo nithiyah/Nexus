@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">{{ profile_user.username }}'s Profile</h1>
+
+    <div class="card profile-card">
+        <div class="card-body text-center">
+            {% if profile_user.profile_picture %}
+                <img src="{{ profile_user.profile_picture.url }}" class="profile-pic rounded-circle mb-3" alt="Profile Picture">
+            {% else %}
+                <img src="https://via.placeholder.com/150" class="profile-pic rounded-circle mb-3" alt="Default Profile">
+            {% endif %}
+            <h5 class="card-title">@{{ profile_user.username }}</h5>
+            <p class="text-muted">Joined on {{ profile_user.date_joined|date:"F d, Y" }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-card {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid #4264c9;
+    }
+</style>
+{% endblock %}

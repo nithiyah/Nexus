@@ -1,5 +1,5 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from .forms import VolunteerRegistrationForm, OrganisationRegistrationForm
 from django.contrib.auth.views import LoginView
@@ -14,6 +14,10 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 
 def welcome(request):
@@ -115,3 +119,15 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         # Log out the user before setting a new password
         logout(self.request)
         return super().form_valid(form)
+    
+
+@login_required
+def public_profile_view(request, username):
+    # Fetch and display another user's public profile 
+    profile_user = get_object_or_404(User, username=username)
+
+    # Ensure users cannot access their own profile through this view
+    if profile_user == request.user:
+        return redirect('accounts:profile')  # Redirect them to their own profile
+
+    return render(request, 'accounts/public_profile.html', {'profile_user': profile_user})

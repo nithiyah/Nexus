@@ -12,7 +12,7 @@
             Chat Messages
         </div>
         <div id="chat-box" class="card-body chat-box">
-            {% for message in messages %}
+            <!-- {% for message in messages %}
                 <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
                     <p><strong>{{ message.sender.username }}</strong></p>
                     {% if message.content %}
@@ -23,7 +23,27 @@
                     {% endif %}
                     <span class="message-timestamp">{{ message.timestamp|date:"H:i" }}</span>
                 </div>
+            {% endfor %} -->
+
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <p>
+                        <strong>
+                            <a href="{% url 'accounts:public_profile' username=message.sender.username %}" class="user-link">
+                                {{ message.sender.username }}
+                            </a>
+                        </strong>
+                    </p>
+                    {% if message.content %}
+                        <p class="message-text">{{ message.content }}</p>
+                    {% endif %}
+                    {% if message.file %}
+                        <p><a href="{{ message.file.url }}" download class="file-link">📎 Download File</a></p>
+                    {% endif %}
+                    <span class="message-timestamp">{{ message.timestamp|date:"H:i" }}</span>
+                </div>
             {% endfor %}
+
         </div>
     </div>
 

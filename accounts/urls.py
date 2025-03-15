@@ -17,6 +17,7 @@ urlpatterns = [
     path('login/redirect/', views.login_redirect, name='login_redirect'),  # Custom redirect
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', profile_view, name='profile'),
+    path("profile/<str:username>/", views.public_profile_view, name="public_profile"),
     
     # Password Reset
     # path('password-reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset_form.html', email_template_name='accounts/password_reset_email.html'), 
