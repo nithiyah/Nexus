@@ -16,10 +16,10 @@ User = get_user_model()
 
 
 class ChatTests(TestCase):
-    """Tests for chat room API & WebSocket functionality."""
+   # Tests for chat room API & WebSocket functionality
 
     def setUp(self):
-        """Setup test data."""
+        # Setup test data
         # Create test users
         self.organisation = User.objects.create_user(
             username="org1",
@@ -58,17 +58,17 @@ class ChatTests(TestCase):
     ##  1. API TESTS ##
 
     def test_chatroom_creation(self):
-        """Ensure a chat room is automatically created for an event."""
+        # Ensure a chat room is automatically created for an event
         self.assertIsNotNone(self.chatroom)
         self.assertEqual(self.chatroom.event, self.event)
 
     def test_join_chatroom(self):
-        """Test if a volunteer can join a chatroom."""
+        # Test if a volunteer can join a chatroom
         response = self.client.get(reverse("chat:chat_room", args=[self.event.id]))
         self.assertEqual(response.status_code, 200)  # Should render chat room page
 
     def test_send_message(self):
-        """Test sending a message in the chat room."""
+        # Test sending a message in the chat room
         data = {"content": "Hello, this is a test message!"}
         response = self.client.post(reverse("chat:send_message", args=[self.event.id]), json.dumps(data), content_type="application/json")
         
@@ -76,7 +76,7 @@ class ChatTests(TestCase):
         self.assertTrue(Message.objects.filter(content="Hello, this is a test message!").exists())
 
     def test_fetch_messages(self):
-        """Test retrieving messages from a chat room."""
+        # Test retrieving messages from a chat room
         # Create a message
         Message.objects.create(chatroom=self.chatroom, sender=self.volunteer, content="Test message")
         
@@ -85,7 +85,7 @@ class ChatTests(TestCase):
         self.assertContains(response, "Test message")
 
     def test_unauthorized_user_cannot_join_chat(self):
-        """Test that unauthorized users cannot join chat rooms."""
+        # Test that unauthorized users cannot join chat rooms
         self.client.logout()  # Ensure the user is not logged in
         response = self.client.get(reverse("chat:chat_room", args=[self.event.id]))
         self.assertEqual(response.status_code, 302)  # Should redirect to login
@@ -93,7 +93,7 @@ class ChatTests(TestCase):
     ##  2. WEBSOCKET TESTS ##
 
     async def test_websocket_connection(self):
-        """Ensure users can establish a WebSocket connection."""
+        # Ensure users can establish a WebSocket connection
         communicator = WebsocketCommunicator(
             URLRouter(websocket_urlpatterns),
             f"/ws/chat/{self.event.id}/"
@@ -103,7 +103,7 @@ class ChatTests(TestCase):
         await communicator.disconnect()
 
     async def test_send_message_websocket(self):
-        """Test sending and receiving messages through WebSocket."""
+        # test sending and receiving messages through WebSocket
         
         # Authenticate user
         self.volunteer = await database_sync_to_async(User.objects.get)(username="volunteer1")
@@ -127,7 +127,7 @@ class ChatTests(TestCase):
         await communicator.disconnect()
 
     async def test_websocket_broadcast(self):
-        """Ensure a message sent by one user is received by another user in the chat."""
+        # Ensure a message sent by one user is received by another user in the chat
         # First user connects
         communicator1 = WebsocketCommunicator(
             URLRouter(websocket_urlpatterns),
@@ -156,7 +156,7 @@ class ChatTests(TestCase):
         await communicator2.disconnect()
 
     async def test_unauthorized_websocket_access(self):
-        """Test that unauthorized users cannot connect to a chat WebSocket."""
+        # Test that unauthorized users cannot connect to a chat WebSocket
         communicator = WebsocketCommunicator(
             URLRouter(websocket_urlpatterns),
             f"/ws/chat/9999/"  # Invalid event ID

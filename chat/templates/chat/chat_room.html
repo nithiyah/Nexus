@@ -38,7 +38,7 @@
                         <p class="message-text">{{ message.content }}</p>
                     {% endif %}
                     {% if message.file %}
-                        <p><a href="{{ message.file.url }}" download class="file-link">📎 Download File</a></p>
+                        <p><a href="{{ message.file.url }}" download class="file-link">Download File</a></p>
                     {% endif %}
                     <span class="message-timestamp">{{ message.timestamp|date:"H:i" }}</span>
                 </div>

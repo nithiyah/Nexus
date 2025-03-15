@@ -9,7 +9,7 @@ User = get_user_model()
 
 class AccountsTests(TestCase):
     def setUp(self):
-        """Setup test users before each test"""
+        # Setup test users before each test
         self.volunteer = User.objects.create_user(
             username="volunteer1",
             password="testpass123",
@@ -23,7 +23,7 @@ class AccountsTests(TestCase):
 
     ##  Volunteer Registration Tests
     def test_volunteer_registration(self):
-        """Test if a volunteer can register successfully"""
+        # Test if a volunteer can register successfully
         response = self.client.post(reverse("accounts:register_volunteer"), {
             "username": "newvolunteer",
             "email": "newvolunteer@example.com",
@@ -36,7 +36,7 @@ class AccountsTests(TestCase):
         self.assertTrue(User.objects.filter(username="newvolunteer").exists())
 
     def test_invalid_volunteer_registration(self):
-        """Ensure volunteer registration fails with mismatched passwords"""
+        # Ensure volunteer registration fails with mismatched passwords
         response = self.client.post(reverse("accounts:register_volunteer"), {
             "username": "volunteerX",
             "email": "volunteerX@example.com",
@@ -50,7 +50,7 @@ class AccountsTests(TestCase):
 
     ##  Organisation Registration Tests
     def test_organisation_registration(self):
-        """Test if an organisation can register successfully"""
+        # Test if an organisation can register successfully
         response = self.client.post(reverse("accounts:register_organisation"), {
             "username": "neworg",
             "email": "neworg@example.com",
@@ -65,7 +65,7 @@ class AccountsTests(TestCase):
 
     ##  Login Tests
     def test_login_volunteer(self):
-        """Test if a volunteer can log in"""
+        # Test if a volunteer can log in
         response = self.client.post(reverse("accounts:login"), {
             "username": "volunteer1",
             "password": "testpass123"
@@ -73,7 +73,7 @@ class AccountsTests(TestCase):
         self.assertEqual(response.status_code, 302)  # Should redirect to dashboard
 
     def test_login_organisation(self):
-        """Test if an organization can log in"""
+        # Test if an organization can log in
         response = self.client.post(reverse("accounts:login"), {
             "username": "org1",
             "password": "testpass123"
@@ -81,7 +81,7 @@ class AccountsTests(TestCase):
         self.assertEqual(response.status_code, 302)  # Should redirect to dashboard
 
     def test_invalid_login(self):
-        """Ensure invalid credentials prevent login"""
+        # Ensure invalid credentials prevent login
         response = self.client.post(reverse("accounts:login"), {
             "username": "wronguser",
             "password": "wrongpass"
@@ -91,32 +91,32 @@ class AccountsTests(TestCase):
 
     ##  Logout Test
     def test_logout(self):
-        """Ensure users can log out"""
+        # Ensure users can log out
         self.client.login(username="volunteer1", password="testpass123")
         response = self.client.post(reverse("accounts:logout"))
         self.assertEqual(response.status_code, 302)  # Should redirect after logout
 
     ##  Dashboard Redirection Tests
     def test_dashboard_redirection_volunteer(self):
-        """Test if a volunteer is redirected to the correct dashboard"""
+        # est if a volunteer is redirected to the correct dashboard
         self.client.login(username="volunteer1", password="testpass123")
         response = self.client.get(reverse("accounts:login_redirect"))
         self.assertRedirects(response, reverse("events:volunteer_dashboard"))
 
     def test_dashboard_redirection_organisation(self):
-        """Test if an organization is redirected to the correct dashboard"""
+        # Test if an organization is redirected to the correct dashboard
         self.client.login(username="org1", password="testpass123")
         response = self.client.get(reverse("accounts:login_redirect"))
         self.assertRedirects(response, reverse("events:organisation_dashboard"))
 
     ##  Unauthorized Access Tests
     def test_unauthorised_access_to_dashboard(self):
-        """Ensure unauthenticated users cannot access the dashboard"""
+        # Ensure unauthenticated users cannot access the dashboard
         response = self.client.get(reverse("accounts:login_redirect"))
         self.assertRedirects(response, reverse("accounts:login") + "?next=" + reverse("accounts:login_redirect"))
 
     def test_profile_update(self):
-        """Ensure profile updates correctly"""
+        # Ensure profile updates correctly
         self.client.login(username="volunteer1", password="testpass123")
         response = self.client.post(reverse("accounts:profile"), {
             "full_name": "Updated Name",
@@ -130,7 +130,7 @@ class AccountsTests(TestCase):
         self.assertEqual(self.volunteer.contact_number, "99999999")
 
     def test_profile_update_with_image(self):
-        """Ensure profile updates with an image upload"""
+        # Ensure profile updates with an image upload
         self.client.login(username="volunteer1", password="testpass123")
 
         image = SimpleUploadedFile(
@@ -148,7 +148,7 @@ class AccountsTests(TestCase):
 
     ##  User Type Enforcement Tests
     def test_invalid_user_type_creation(self):
-        """Ensure user cannot be created with an invalid user type"""
+        # Ensure user cannot be created with an invalid user type
         with self.assertRaises(ValidationError):  # Expecting ValidationError, not ValueError
             user = User(username="invaliduser", password="password123", user_type="invalid_type")
             user.full_clean()  # This manually triggers validation

@@ -112,7 +112,7 @@ class VolunteerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
 
     def get_permissions(self):
-        """Allow public access to list volunteers, but restrict create/update/delete"""
+        # Allow public access to list volunteers, but restrict create/update/delete
         if self.action == "list":
             return [AllowAny()]  # Allow anyone to list volunteers
         if self.action == "create":
@@ -121,7 +121,7 @@ class VolunteerViewSet(viewsets.ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        """Prevent volunteers from deleting themselves"""
+        # Prevent volunteers from deleting themselves
         user = self.get_object()
         if request.user == user:
             return Response({"error": "You cannot delete your own account."}, status=status.HTTP_403_FORBIDDEN)

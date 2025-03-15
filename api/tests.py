@@ -7,7 +7,7 @@ from events.models import Event
 
 class APITests(APITestCase):
     def setUp(self):
-        """Setup test users and sample data"""
+        # Setup test users and sample data
         self.organisation = CustomUser.objects.create_user(
             username="org1",
             password="testpass123",
@@ -41,19 +41,19 @@ class APITests(APITestCase):
 
     ##  TESTING EVENT API ##
     def test_list_events(self):
-        """Test retrieving a list of events"""
+        # Test retrieving a list of events
         response = self.client.get(reverse("events-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_retrieve_event(self):
-        """Test retrieving a specific event"""
+        # Test retrieving a specific event
         response = self.client.get(reverse("events-detail", args=[self.event.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], "Beach Cleanup")
 
     def test_create_event(self):
-        """Test event creation (allowed for organisations only)"""
+        # Test event creation (allowed for organisations only)
         self.client.force_authenticate(user=self.organisation)
         data = {
             "organisation_id": self.organisation.id,
@@ -72,7 +72,7 @@ class APITests(APITestCase):
 
 
     def test_update_event(self):
-        """Test updating an event (only by the organisation that created it)"""
+        # Test updating an event (only by the organisation that created it) 
         self.client.force_authenticate(user=self.organisation)
         data = {
             "name": "Updated Beach Cleanup",
@@ -83,7 +83,7 @@ class APITests(APITestCase):
         self.assertEqual(response.data["name"], "Updated Beach Cleanup")
 
     def test_delete_event(self):
-        """Test deleting an event (only by the organisation that created it)"""
+        # Test deleting an event (only by the organisation that created it)
         self.client.force_authenticate(user=self.organisation)
         response = self.client.delete(reverse("events-detail", args=[self.event.id]))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -91,13 +91,13 @@ class APITests(APITestCase):
 
     ##  TESTING ORGANIZATION API ##
     def test_list_organisations(self):
-        """Test retrieving all organisations"""
+        # Test retrieving all organisations
         response = self.client.get(reverse("organisations-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
         
     def test_create_organisation(self):
-        """Test creating a new organisation user"""
+        # Test creating a new organisation user
         self.client.force_authenticate(user=self.admin)  #Authenticate as admin
 
         data = {
@@ -113,13 +113,13 @@ class APITests(APITestCase):
 
     ##  TESTING VOLUNTEER API ##
     def test_list_volunteers(self):
-        """Test retrieving all volunteers"""
+        # Test retrieving all volunteers
         response = self.client.get(reverse("volunteers-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_create_volunteer(self):
-        """Test creating a new volunteer user"""
+        # Test creating a new volunteer user
         self.client.force_authenticate(user=self.admin)  #Authenticate as admin
 
         data = {
@@ -135,7 +135,7 @@ class APITests(APITestCase):
 
     ##  PERMISSIONS & AUTHENTICATION TESTS ##
     def test_unauthorised_create_event(self):
-        """Test that unauthenticated users cannot create events"""
+        # Test that unauthenticated users cannot create events
         data = {
             "organisation_id": self.organisation.id,
             "name": "Unauthorized Event",
@@ -152,7 +152,7 @@ class APITests(APITestCase):
 
 
     def test_volunteer_cannot_create_event(self):
-        """Test that volunteers cannot create events"""
+        # Test that volunteers cannot create events
         self.client.force_authenticate(user=self.volunteer)
         data = {
             "organisation_id": self.organisation.id,
@@ -168,7 +168,7 @@ class APITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthorized_event_delete(self):
-        """Test that volunteers cannot delete events"""
+        # Test that volunteers cannot delete events
         self.client.force_authenticate(user=self.volunteer)
         response = self.client.delete(reverse("events-detail", args=[self.event.id]))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
