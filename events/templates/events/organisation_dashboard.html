@@ -3,50 +3,106 @@
 {% block title %}My Dashboard{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="mb-4 text-center">My Dashboard</h1>
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">My Dashboard</h1>
 
-        <div class="row g-4">  <!-- Added g-4 for spacing between the cards -->
-            {% for event in events %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-lg border-0 h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">{{ event.name }}</h5>
-                            <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
-                            <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
-                            <p class="card-t ext"><strong>Location:</strong> {{ event.location }}</p>
-                            <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>
-                            <p class="card-text flex-grow-1">{{ event.description }}</p>
-                            
-                            <div class="d-grid gap-2 mt-auto">
-                                {% if event.registered_volunteers.exists %}
+    <div class="row g-4 align-items-start">
+        <!-- Sidebar Filter -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Filter Events</h4>
+                    <form method="get">
+                        <!-- Event Status -->
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status:</label>
+                            <select class="form-select" name="status" id="status">
+                                <option value="" selected>All</option>
+                                <option value="ongoing" {% if request.GET.status == "ongoing" %}selected{% endif %}>Ongoing</option>
+                                <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category:</label>
+                            <select class="form-select" name="category" id="category">
+                                <option value="" selected>All Categories</option>
+                                {% for key, label in category_labels.items %}
+                                    <option value="{{ key }}" {% if request.GET.category == key %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date:</label>
+                            <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date:</label>
+                            <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Column -->
+        <div class="col-md-9">
+            <div class="row g-4">
+                {% for event in events %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card shadow-lg border-0 h-100 pt-4 position-relative">
+                            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                                <h5 class="card-title text-primary m-0">{{ event.name }}</h5>
+                                <!-- Status Badge -->
+                                <span class="badge {% if event.date.date >= current_time.date %}bg-warning text-dark{% else %}bg-success{% endif %} 
+                                             p-2 rounded-pill">
+                                    {% if event.date.date >= current_time.date %}
+                                        Ongoing
+                                    {% else %}
+                                        Completed
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                                <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+                                <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                                <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>
+                                <p class="card-text flex-grow-1">{{ event.description }}</p>
+
+                                <div class="d-grid gap-2 mt-auto">
                                     <a href="{% url 'events:volunteer_list' event.id %}" class="btn btn-info w-100">
                                         View Volunteer List
                                     </a>
-                                {% else %}
-                                    <p class="text-danger">No volunteers have signed up yet.</p>
-                                {% endif %}
-                                
-                                <!-- <a href="{% url 'events:feedback_hub' %}" class="btn btn-dark w-100">
-                                    Go to Feedback Hub
-                                </a> -->
-                                <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-dark w-100">
-                                    Manage Feedback
-                                </a>
-                                
-                                
-                                <!-- <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-dark w-100">
-                                    View Event Feedback
-                                </a> -->
-                                
-                                <a href="{% url 'chat:chat_room' event.id %}" class="btn btn-warning w-100">
-                                    Open Chat Room
-                                </a>
+                                    <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-dark w-100">
+                                        Manage Feedback
+                                    </a>
+                                    <a href="{% url 'chat:chat_room' event.id %}" class="btn btn-warning w-100">
+                                        Open Chat Room
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+
+            {% if not events %}
+                <p class="text-center text-muted">No events found matching your filters.</p>
+            {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}

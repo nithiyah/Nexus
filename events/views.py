@@ -97,13 +97,48 @@ def volunteer_dashboard(request):
     return redirect('home')
 
 
+# @login_required
+# def organisation_dashboard(request):
+#     if request.user.user_type == 'organisation': 
+#         events = Event.objects.filter(organisation=request.user)
+#         return render(request, 'events/organisation_dashboard.html', {'events': events})
+#     return redirect('home')
+
 @login_required
 def organisation_dashboard(request):
     if request.user.user_type == 'organisation': 
         events = Event.objects.filter(organisation=request.user)
-        return render(request, 'events/organisation_dashboard.html', {'events': events})
-    return redirect('home')
+        
+        # Get filter parameters from request
+        status = request.GET.get('status')
+        category = request.GET.get('category')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
 
+        # Apply filtering logic
+        if status == 'ongoing':
+            events = events.filter(date__gte=now())
+        elif status == 'completed':
+            events = events.filter(date__lt=now())
+
+        if category:
+            events = events.filter(category=category)
+
+        if start_date:
+            events = events.filter(date__gte=start_date)
+        
+        if end_date:
+            events = events.filter(date__lte=end_date)
+
+        # Get distinct categories for filtering
+        category_choices = dict(Event.CATEGORY_CHOICES)
+
+        return render(request, 'events/organisation_dashboard.html', {
+            'events': events,
+            'category_labels': category_choices,
+            'current_time': now(),
+        })
+    return redirect('home')
 
 
 def complete_event( event_id):
