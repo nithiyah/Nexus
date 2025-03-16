@@ -8,44 +8,52 @@
     <p class="text-muted text-center">Manage feedback for your events below:</p>
 
     {% if events %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <!-- Match the organisation dashboard layout -->
+        <div class="row g-4">
             {% for event in events %}
-                <div class="col">
+                <div class="col-md-6 col-lg-4">
                     <div class="card shadow-lg border-0 h-100">
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
                             <!-- Event Title -->
-                            <h4 class="card-title text-primary fw-bold text-center">{{ event.name }}</h4>
-                            
-                            <hr class="my-3">
+                            <h5 class="card-title text-primary">{{ event.name }}</h5>
 
-                            <!-- Event Details -->
-                            <div class="mb-3">
-                                <p class="card-text"><i class="far fa-calendar-alt"></i> <strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
-                                <p class="card-text"><i class="far fa-clock"></i> <strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
-                                <p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ event.location }}</p>
-                            </div>
+                            <!-- Event Date/Time/Location -->
+                            <p class="card-text">
+                                <strong>Date:</strong>
+                                {{ event.date|date:"M d, Y" }}
+                            </p>
+                            <p class="card-text">
+                                <strong>Time:</strong>
+                                {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
+                            </p>
+                            <p class="card-text">
+                                <strong>Location:</strong>
+                                {{ event.location }}
+                            </p>
 
-                            <hr class="my-3">
+                            <!-- Spacer to push buttons to the bottom if you like that layout -->
+                            <div class="flex-grow-1"></div>
 
                             <!-- Feedback Management Buttons -->
-                            <div class="d-grid gap-3">
-                                <a href="{% url 'events:create_feedback_form' event.id %}" class="btn btn-success btn-lg">
+                            <div class="d-grid gap-2 mt-2">
+                                <a href="{% url 'events:create_feedback_form' event.id %}"
+                                   class="btn btn-success">
                                     <i class="fas fa-edit"></i> Create/Edit Feedback Form
                                 </a>
-
-                                <a href="{% url 'events:publish_feedback' event.id %}" class="btn btn-primary btn-lg">
+                                <a href="{% url 'events:publish_feedback' event.id %}"
+                                   class="btn btn-primary">
                                     <i class="fas fa-bullhorn"></i> Publish Feedback
                                 </a>
-
-                                <a href="{% url 'events:view_feedback' event.id %}" class="btn btn-dark btn-lg">
+                                <a href="{% url 'events:view_feedback' event.id %}"
+                                   class="btn btn-dark">
                                     <i class="fas fa-eye"></i> View Submitted Feedback
                                 </a>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </div><!-- /.card-body -->
+                    </div><!-- /.card -->
+                </div><!-- /.col-md-6 -->
             {% endfor %}
-        </div>
+        </div><!-- /.row -->
     {% else %}
         <p class="text-center text-muted">You have no events listed.</p>
     {% endif %}

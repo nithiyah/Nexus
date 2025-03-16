@@ -3,146 +3,64 @@
 {% block title %}Organisation My Events{% endblock %}
 
 {% block content %}
-    <style>
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .dashboard-header h1 {
-            margin: 0;
-        }
-
-        .btn-create {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .btn-create:hover {
-            background-color: #218838;
-        }
-
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            position: relative;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h3 {
-            font-size: 1.3em;
-            margin-bottom: 5px;
-        }
-
-        .card p {
-            font-size: 0.95em;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            font-size: 0.85em;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-
-        .upcoming { background-color: #007bff; color: white; }
-        .completed { background-color: #28a745; color: white; }
-
-        .card-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-
-        .btn {
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            color: white;
-            font-size: 0.9em;
-            transition: background 0.2s ease-in-out;
-        }
-
-        .btn-edit { background-color: #007bff; }
-        .btn-edit:hover { background-color: #0056b3; }
-
-        .btn-delete { background-color: #dc3545; }
-        .btn-delete:hover { background-color: #b21f2d; }
-
-
-        .ongoing { background-color: #f39c12; color: white; }  /* Orange for ongoing */
-        .completed { background-color: #28a745; color: white; }  /* Green for completed */
-
-    </style>
-
-    <div class="dashboard-header">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Your Events</h1>
-        <a href="{% url 'events:create_event' %}" class="btn btn-create">+ Create New Event</a>
+        <a href="{% url 'events:create_event' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Event
+        </a>
     </div>
-    
-    
-    
 
-    <div class="dashboard-container">
-        {% if events %}
+    {% if events %}
+        <div class="row g-4">
             {% for event in events %}
-                <div class="card">
-                    <span class="status-badge {% if event.date.date >= current_time.date %}ongoing{% else %}completed{% endif %}">
-                        {% if event.date.date >= current_time.date %}
-                            Ongoing
-                        {% else %}
-                            Completed
-                        {% endif %}
-                    </span>
-                    
-                    <h3>{{ event.name }}</h3>
-                    <!-- <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p> -->
-                    <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
-                    <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>                    
-                    <p><strong>Location:</strong> {{ event.location }}</p>
-                    <p><strong>Category:</strong> {{ event.get_category_display }}</p>
-                    <p><strong>Volunteers Needed:</strong> {{ event.volunteers_needed }}</p>
-                    <p>{{ event.description }}</p>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-lg border-0 h-100">
+                        <div class="card-body d-flex flex-column">
+                            <!-- Event Status Badge -->
+                            <!-- <span class="badge {% if event.date.date >= current_time.date %}bg-warning{% else %}bg-success{% endif %} position-absolute top-0 end-0 m-2">
+                                {% if event.date.date >= current_time.date %}
+                                    Ongoing
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </span> -->
+                            <span class="badge {% if event.date.date >= current_time.date %}bg-warning text-dark{% else %}bg-primary{% endif %} 
+                                position-absolute top-0 end-0 m-2 p-2 rounded-pill">
+                                {% if event.date.date >= current_time.date %}
+                                    Ongoing
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </span>
+                            <!-- Event Title -->
+                            <h5 class="card-title text-primary">{{ event.name }}</h5>
 
-                    <div class="card-buttons">
-                        <a href="{% url 'events:edit_event' event.id %}" class="btn btn-edit">Edit</a>
-                        <!-- <a href="{% url 'events:delete_event' event.id %}" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this event?');">
-                            Delete
-                        </a> -->
-                        <a href="{% url 'events:delete_event' event.id %}" class="btn btn-delete" >
-                            Delete
-                        </a>
-                    </div>
-                </div>
+                            <!-- Event Details -->
+                            <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                            <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+                            <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                            <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>
+                            <p class="card-text"><strong>Volunteers Needed:</strong> {{ event.volunteers_needed }}</p>
+                            <p class="card-text flex-grow-1">{{ event.description }}</p>
+
+                            <!-- Event Management Buttons -->
+                            <div class="d-grid gap-2 mt-auto">
+                                <a href="{% url 'events:edit_event' event.id %}" class="btn btn-warning w-100">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'events:delete_event' event.id %}" class="btn btn-danger w-100"
+                                   onclick="return confirm('Are you sure you want to delete this event?');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div><!-- /.card-body -->
+                    </div><!-- /.card -->
+                </div><!-- /.col-md-6 -->
             {% endfor %}
-        {% else %}
-            <p>No events found. Create your first event!</p>
-        {% endif %}
-    </div>
-
+        </div><!-- /.row -->
+    {% else %}
+        <p class="text-center text-muted">No events found. Create your first event!</p>
+    {% endif %}
+</div>
 {% endblock %}
