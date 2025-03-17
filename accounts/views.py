@@ -15,9 +15,12 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from .forms import ProfileUpdateForm 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
 
 User = get_user_model()
-
 
 
 def welcome(request):
@@ -104,6 +107,21 @@ def profile_view(request):
         form = ProfileUpdateForm(instance=user)
     
     return render(request, 'accounts/profile.html', {'form': form})
+
+@login_required
+def update_profile(request):
+    if request.method == "POST":
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect("update_profile")  
+        else:
+            messages.error(request, "There was an error updating your profile. Please try again.")
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+
+    return render(request, "profile.html", {"form": form})
 
 # I was getting a reverse no match error 
 class CustomPasswordResetView(PasswordResetView):

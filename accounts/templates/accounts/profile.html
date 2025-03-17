@@ -6,38 +6,163 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-lg p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="text-center flex-grow-1">Profile</h2>
+            <div class="card shadow-lg p-4 rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-center flex-grow-1 mb-0">Profile</h2>
                     <a href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}" class="btn btn-outline-secondary">Back to Dashboard</a>
                 </div>
                 
+                <!-- Profile Picture -->
                 <div class="text-center mb-4">
                     {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle shadow" width="150" height="150">
+                        <img id="profile-preview" src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle shadow-lg border border-3 border-primary" width="160" height="160">
                     {% else %}
-                        <img src="/static/default_profile.png" alt="Default Profile Picture" class="rounded-circle shadow" width="150" height="150">
+                        <img id="profile-preview" src="/static/default_profile.png" alt="Default Profile Picture" class="rounded-circle shadow-lg border border-3 border-secondary" width="160" height="160">
                     {% endif %}
                 </div>
-                
+
+                <!-- Profile Picture Upload (Inside Form) -->
                 <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    
+
+                    <div class="mb-4 text-center">
+                        <label for="profile-picture-upload" class="form-label fw-bold d-block">Change Profile Picture</label>
+                        <div class="custom-file-upload">
+                            <input type="file" id="profile-picture-upload" name="profile_picture" accept="image/*" class="form-control-file d-none" onchange="previewProfilePicture(event)">
+                            <label for="profile-picture-upload" id="choose-file-btn" class="btn btn-outline-primary">Choose File</label>
+                            <span id="file-name-display" class="text-muted">No file chosen</span>
+                        </div>
+                    </div>
+
                     {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            <div>
+                        {% if field.widget.input_type == "checkbox" %}
+                            <div class="form-check mb-3">
+                                {{ field }}
+                                <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            </div>
+                        {% elif field.name == "profile_picture" %}
+                            <!-- Skip because we handle it above -->
+                        {% else %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
                                 {{ field }}
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
-                    
+
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Update Profile</button>
+                        <button type="submit" class="btn btn-primary btn-lg">Update Profile</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Custom Styling -->
+<style>
+    .card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .rounded-circle {
+        object-fit: cover;
+    }
+
+    .form-label {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .input-group input,
+    .input-group textarea {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-outline-secondary {
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    /* Custom File Upload UI */
+    .custom-file-upload {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .custom-file-upload input {
+        display: none;
+    }
+
+    .custom-file-upload label {
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        border: 1px solid #007bff;
+        color: #007bff;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .custom-file-upload label:hover {
+        background: #007bff;
+        color: white;
+    }
+
+    #file-name-display {
+        font-size: 14px;
+        color: #555;
+    }
+</style>
+
+<!-- JavaScript for Image Preview -->
+<script>
+    function previewProfilePicture(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("profile-preview").src = e.target.result;
+                document.getElementById("file-name-display").textContent = file.name;
+                document.getElementById("choose-file-btn").textContent = "Selected: " + file.name;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById("file-name-display").textContent = "No file chosen";
+            document.getElementById("choose-file-btn").textContent = "Choose File";
+        }
+    }
+</script>
 {% endblock %}
