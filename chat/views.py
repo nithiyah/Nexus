@@ -142,9 +142,6 @@ def send_message(request, event_id):
 
     return JsonResponse({"success": False, "error": "Unauthorized"})
 
-
-
-
 @login_required
 def create_event(request):
     if request.method == 'POST':
