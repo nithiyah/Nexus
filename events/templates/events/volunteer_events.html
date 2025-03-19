@@ -25,13 +25,24 @@
                                     <i class="fas fa-comments"></i> Join Chat Room
                                 </a>
                         
-                                <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
+                                <!-- <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger w-100">
                                         <i class="fas fa-times"></i> Cancel Registration
                                     </button>
-                                </form>
-                        
+                                </form> -->
+                                {% if registration.event.date >= today %}
+                                    <form action="{% url 'events:cancel_registration' registration.event.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger w-100">
+                                            <i class="fas fa-times"></i> Cancel Registration
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        Event Completed
+                                    </button>
+                                {% endif %}
                                 {% if registration.event.feedback_form %}
                                     {% if registration.event.feedback_form.published %}
                                         {% if registration.has_submitted_feedback %}

@@ -13,6 +13,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.core.files.storage import default_storage
 from chat.models import ChatRoom
+from events.forms import EventForm
+
 
 @login_required
 def chat_home(request):
