@@ -32,6 +32,7 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("announcements/", include("announcements.urls",namespace='announcements')),
 
     #had to delete a url because i got the namespace error
     # path('accounts/', include('accounts.urls')),  # Ensure namespace is set

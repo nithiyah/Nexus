@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}My Event Announcements{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Announcements for My Events</h1>
+
+    <div class="announcement-feed">
+        {% for announcement in announcements %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ announcement.organisation.username }}</h5>
+                    <p class="text-muted small">{{ announcement.created_at|date:"F d, Y H:i" }}</p>
+                    <p>{{ announcement.content }}</p>
+
+                    <div class="d-flex">
+                        <form action="{% url 'announcements:like_announcement' announcement.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary btn-sm me-2">
+                                Like ({{ announcement.likes.count }})
+                            </button>
+                        </form>
+                        <a href="{% url 'announcements:announcement_detail' announcement.id %}" class="btn btn-outline-secondary btn-sm">
+                            Comment ({{ announcement.comments.count }})
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No event-related announcements yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

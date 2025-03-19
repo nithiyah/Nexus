@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Announcements{% endblock %}
+
+{% block content %}
+<h1>Announcements</h1>
+
+<!-- Show "Create New Announcement" button for organizations -->
+{% if request.user.is_authenticated and request.user.user_type == "organisation" %}
+    <a href="{% url 'announcements:create_announcement' %}" class="btn btn-primary mb-3">Create New Announcement</a>
+{% endif %}
+
+{% for announcement in announcements %}
+    <div class="card">
+        <div class="card-body">
+            <h3>{{ announcement.title }}</h3>
+            <p>{{ announcement.content }}</p>
+            <a href="{% url 'announcements:announcement_detail' announcement.id %}" class="btn btn-outline-primary">View</a>
+        </div>
+    </div>
+{% empty %}
+    <p>No announcements yet.</p>
+{% endfor %}
+{% endblock %}

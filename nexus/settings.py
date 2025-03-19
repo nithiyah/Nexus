@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'channels',
     'chat',
+    'announcements',
    
 ]
 REST_FRAMEWORK = {

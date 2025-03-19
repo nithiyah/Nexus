@@ -13,7 +13,7 @@ class AccountsTests(TestCase):
         self.volunteer = User.objects.create_user(
             username="volunteer1",
             password="testpass123",
-            user_type="volunteer"
+            user_type="volunteer" 
         )
         self.organization = User.objects.create_user(
             username="org1",

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}All Organization Announcements{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>All Organization Announcements</h1>
+
+    <!-- Create New Announcement Button -->
+    {% if request.user.user_type == "organisation" %}
+        <a href="{% url 'announcements:create_announcement' %}" class="btn btn-primary mb-3">New Post</a>
+    {% endif %}
+
+    <!-- Announcement Feed -->
+    <div class="announcement-feed">
+        {% for announcement in announcements %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        {% if announcement.organisation.profile_picture %}
+                            <img src="{{ announcement.organisation.profile_picture.url }}" class="rounded-circle me-2" width="40" height="40">
+                        {% else %}
+                            <img src="https://via.placeholder.com/40" class="rounded-circle me-2">
+                        {% endif %}
+                        <h5 class="card-title mb-0">{{ announcement.organisation.username }}</h5>
+                    </div>
+                    <p class="text-muted small">{{ announcement.created_at|date:"F d, Y H:i" }}</p>
+                    <p>{{ announcement.content }}</p>
+
+                    <div class="d-flex">
+                        <form action="{% url 'announcements:like_announcement' announcement.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary btn-sm me-2">
+                                Like ({{ announcement.likes.count }})
+                            </button>
+                        </form>
+                        <a href="{% url 'announcements:announcement_detail' announcement.id %}" class="btn btn-outline-secondary btn-sm">
+                            💬 Comment ({{ announcement.comments.count }})
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No announcements yet. Be the first to post!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

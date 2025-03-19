@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ announcement.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ announcement.title }}</h2>
+    <p><strong>Posted by:</strong> {{ announcement.organisation.username }}</p>
+    {% if announcement.event %}
+    <p><strong>Related Event:</strong> <a href="{% url 'events:event_detail' announcement.event.id %}">{{ announcement.event.name }}</a></p>
+    {% endif %}
+    <p class="mt-3">{{ announcement.content }}</p>
+    <p class="text-muted">Posted on: {{ announcement.created_at|date:"F d, Y H:i" }}</p>
+
+    <!-- Like Button -->
+    <form action="{% url 'announcements:like_announcement' announcement.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary">
+            Like ({{ announcement.likes.count }})
+        </button>
+    </form>
+
+    <hr>
+
+    <!-- Comments Section -->
+    <h4>Comments</h4>
+    <ul class="list-group mb-3">
+        {% for comment in comments %}
+            <li class="list-group-item">
+                <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}
+                <br>
+                <small class="text-muted">{{ comment.created_at|date:"F d, Y H:i" }}</small>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No comments yet. Be the first to comment!</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Add Comment Form -->
+    <form action="{% url 'announcements:add_comment' announcement.id %}" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="comment" class="form-label">Add a Comment</label>
+            {{ comment_form.comment }}
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+</div>
+{% endblock %}
