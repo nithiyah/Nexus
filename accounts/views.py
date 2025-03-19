@@ -18,8 +18,9 @@ from django.contrib.auth import get_user_model
 from .forms import ProfileUpdateForm 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
-
+from events.models import Event, VolunteerEvent, VolunteerParticipation
+from announcements.models import Announcement
+from django.db import models
 User = get_user_model()
 
 
@@ -139,13 +140,46 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         return super().form_valid(form)
     
 
+# @login_required
+# def public_profile_view(request, username):
+#     # Fetch and display another user's public profile 
+#     profile_user = get_object_or_404(User, username=username)
+
+#     # Ensure users cannot access their own profile through this view
+#     if profile_user == request.user:
+#         return redirect('accounts:profile')  # Redirect them to their own profile
+
+#     return render(request, 'accounts/public_profile.html', {'profile_user': profile_user})
 @login_required
 def public_profile_view(request, username):
-    # Fetch and display another user's public profile 
+    # View another user's public profile, showing different details for volunteers and organizations
     profile_user = get_object_or_404(User, username=username)
 
     # Ensure users cannot access their own profile through this view
     if profile_user == request.user:
         return redirect('accounts:profile')  # Redirect them to their own profile
 
-    return render(request, 'accounts/public_profile.html', {'profile_user': profile_user})
+    events = None
+    announcements = None
+    registered_events = None
+    total_hours = 0
+
+    if profile_user.user_type == "organisation":
+        # Fetch events created by the organization
+        events = Event.objects.filter(organisation=profile_user)
+        # Fetch announcements made by the organization
+        announcements = Announcement.objects.filter(organisation=profile_user)
+
+    elif profile_user.user_type == "volunteer":
+        # Fetch events the volunteer has registered for
+        registered_events = VolunteerEvent.objects.filter(volunteer=profile_user).select_related('event')
+        # Calculate total hours contributed
+        total_hours = VolunteerParticipation.objects.filter(volunteer=profile_user).aggregate(total_hours=models.Sum('hours_contributed'))['total_hours'] or 0
+
+    return render(request, "accounts/public_profile.html", {
+        "profile_user": profile_user,
+        "events": events,
+        "announcements": announcements,
+        "registered_events": registered_events,
+        "total_hours": round(total_hours, 2),  # Rounded for cleaner display
+    })
