@@ -133,6 +133,7 @@ class CustomPasswordResetView(PasswordResetView):
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'accounts/password_reset_confirm.html'
+    success_url = reverse_lazy("password_reset_complete")
 
     def form_valid(self, form):
         # Log out the user before setting a new password

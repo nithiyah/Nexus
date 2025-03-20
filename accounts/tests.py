@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
-
+from django.core.mail import outbox
 
 User = get_user_model()
 
@@ -20,6 +20,26 @@ class AccountsTests(TestCase):
             password="testpass123",
             user_type="organisation"
         )
+
+    def test_password_reset_request(self):
+        """Ensure users can request a password reset."""
+        response = self.client.post(reverse("password_reset"), {"email": "testuser@example.com"})
+        print(f"Test Response: {response.status_code}")  # Debugging output
+        self.assertRedirects(response, reverse("password_reset_done"), status_code=302, target_status_code=200)
+
+    def test_password_reset_complete(self):
+        """Ensure users can reset their password successfully."""
+        response = self.client.get(reverse("password_reset_complete"))
+        print(f"Test Response: {response.status_code}")  # Debugging output
+        self.assertEqual(response.status_code, 200) 
+
+    ## User Type Enforcement Test
+    def test_invalid_user_type_creation(self):
+        """Ensure user cannot be created with an invalid user type"""
+        with self.assertRaises(ValidationError):  # Expecting ValidationError
+            user = User(username="invaliduser", password="password123", user_type="invalid_type")
+            user.full_clean()  # This manually triggers validation
+            user.save()
 
     ##  Volunteer Registration Tests
     def test_volunteer_registration(self):
