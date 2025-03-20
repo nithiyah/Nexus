@@ -6,6 +6,14 @@
 <div class="container mt-4">
     <h1 class="text-center mb-4">My Registered Events</h1>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>My Events</h1>
+        <a href="{% url 'accounts:volunteer_event_report' %}" class="btn btn-info">
+            <i class="fas fa-list"></i> View My Event Report
+        </a>
+    </div>
+    
+
     {% if registered_events %}
         <div class="row g-4">  <!-- Added g-4 for spacing between cards -->
             {% for registration in registered_events %}
