@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from events.models import Event
 from accounts.models import CustomUser
+from announcements.models import Announcement, AnnouncementComment, AnnouncementLike
 
 
 # Serializer for the CustomUser model
@@ -40,3 +41,34 @@ class EventSerializer(serializers.ModelSerializer):
         organisation = validated_data.pop("organisation_id")
         event = Event.objects.create(organisation=organisation, **validated_data)
         return event
+
+from rest_framework import serializers
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = "__all__"
+
+class AnnouncementCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnnouncementComment
+        fields = "__all__"
+
+class AnnouncementLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnnouncementLike
+        fields = "__all__"
+from rest_framework import serializers
+from chat.models import ChatRoom, Message
+
+class ChatRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatRoom
+        fields = "__all__"
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.StringRelatedField()  # Show sender's username instead of ID
+
+    class Meta:
+        model = Message
+        fields = ["id", "chatroom", "sender", "content", "file", "timestamp"]

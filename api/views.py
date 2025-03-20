@@ -9,6 +9,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAdminUser
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import viewsets, permissions
+from announcements.models import Announcement, AnnouncementComment, AnnouncementLike
+from chat.models import ChatRoom, Message
+from .serializers import (
+    AnnouncementSerializer, AnnouncementCommentSerializer, AnnouncementLikeSerializer,
+    ChatRoomSerializer, MessageSerializer
+)
 
 
 
@@ -126,3 +134,57 @@ class VolunteerViewSet(viewsets.ModelViewSet):
         if request.user == user:
             return Response({"error": "You cannot delete your own account."}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
+    
+
+
+# ANNOUNCEMENTS API GROUP
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all announcements", tags=["Announcements"]),
+    retrieve=extend_schema(summary="Retrieve a specific announcement", tags=["Announcements"]),
+    create=extend_schema(summary="Create an announcement", tags=["Announcements"]),
+    update=extend_schema(summary="Update an announcement", tags=["Announcements"]),
+    partial_update=extend_schema(summary="Partially update an announcement", tags=["Announcements"]),
+    destroy=extend_schema(summary="Delete an announcement", tags=["Announcements"]),
+)
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all().order_by("-created_at")
+    serializer_class = AnnouncementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all announcement comments", tags=["Announcements"]),
+    create=extend_schema(summary="Add a comment to an announcement", tags=["Announcements"]),
+)
+class AnnouncementCommentViewSet(viewsets.ModelViewSet):
+    queryset = AnnouncementComment.objects.all()
+    serializer_class = AnnouncementCommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all announcement likes", tags=["Announcements"]),
+    create=extend_schema(summary="Like an announcement", tags=["Announcements"]),
+)
+class AnnouncementLikeViewSet(viewsets.ModelViewSet):
+    queryset = AnnouncementLike.objects.all()
+    serializer_class = AnnouncementLikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+#CHAT API GROUP
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all chat rooms", tags=["Chat"]),
+    retrieve=extend_schema(summary="Retrieve a specific chat room", tags=["Chat"]),
+)
+class ChatRoomViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ChatRoom.objects.all()
+    serializer_class = ChatRoomSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all messages in a chat room", tags=["Chat"]),
+    create=extend_schema(summary="Send a message in a chat room", tags=["Chat"]),
+)
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all().order_by("timestamp")
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
