@@ -21,11 +21,14 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', profile_view, name='profile'),
     path("profile/update/", update_profile, name="update_profile"),
+    path("profile/event-report/", views.volunteer_event_report, name="volunteer_event_report"),
+
     path("profile/<str:username>/", views.public_profile_view, name="public_profile"),
     path('password-reset/', CustomPasswordResetView.as_view(), name='password_reset'),
     path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
     path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    # path("profile/event-report/", views.volunteer_event_report, name="volunteer_event_report"),
 
 
 ]

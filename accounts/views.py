@@ -183,3 +183,14 @@ def public_profile_view(request, username):
         "registered_events": registered_events,
         "total_hours": round(total_hours, 2),  # Rounded for cleaner display
     })
+
+
+@login_required
+def volunteer_event_report(request):
+    print("DEBUG: volunteer_event_report function executed")  # Debugging print statement
+
+    volunteer_events = VolunteerParticipation.objects.filter(volunteer=request.user)
+
+    return render(request, "accounts/volunteer_event_report.html", {
+        "volunteer_events": volunteer_events,
+    })

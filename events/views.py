@@ -141,37 +141,52 @@ def organisation_dashboard(request):
     return redirect('home')
 
 
-def complete_event( event_id):
+# def complete_event( event_id):
+#     event = get_object_or_404(Event, id=event_id)
+
+#     # Ensure event duration is calculated correctly
+#     duration_hours = event.get_duration_hours()
+#     print(f"DEBUG: Calculated event duration: {duration_hours} hours for event {event.name}")
+
+
+#     # Log hours for all volunteers who participated
+#     participants = VolunteerParticipation.objects.filter(event=event)
+#     if not participants.exists():
+#         print(f"DEBUG: No volunteers found for event {event.name}")
+
+#     for participant in participants:
+#         participant.hours_contributed = duration_hours
+#         participant.save()
+#         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+
+#     print(f"DEBUG: Total volunteers updated: {participants.count()}")
+    
+#     return redirect('events:organisation_events')
+
+@login_required
+def complete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
-    # Ensure event duration is calculated correctly
-    # duration_hours = event.get_duration_hours()
-
-    # Log hours for all volunteers who participated
-    # participants = VolunteerParticipation.objects.filter(event=event)
-    # for participant in participants:
-    #     participant.hours_contributed = duration_hours
-    #     participant.save()
-    #     print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
-    # Ensure event duration is calculated correctly
+    # Calculate event duration
     duration_hours = event.get_duration_hours()
     print(f"DEBUG: Calculated event duration: {duration_hours} hours for event {event.name}")
 
+    # Ensure all registered volunteers have their hours logged
+    registered_volunteers = VolunteerEvent.objects.filter(event=event, status='Registered')
 
-    # Log hours for all volunteers who participated
-    participants = VolunteerParticipation.objects.filter(event=event)
-    if not participants.exists():
-        print(f"DEBUG: No volunteers found for event {event.name}")
+    for registration in registered_volunteers:
+        vp, created = VolunteerParticipation.objects.get_or_create(
+            volunteer=registration.volunteer,
+            event=event
+        )
+        vp.hours_contributed = duration_hours
+        vp.save()
+        print(f"DEBUG: Updated {registration.volunteer.username} with {vp.hours_contributed} hours")
 
-    for participant in participants:
-        participant.hours_contributed = duration_hours
-        participant.save()
-        print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
+    print(f"DEBUG: Total volunteers updated: {registered_volunteers.count()}")
 
-    print(f"DEBUG: Total volunteers updated: {participants.count()}")
-    
+    messages.success(request, f"Event {event.name} marked as completed, and hours logged.")
     return redirect('events:organisation_events')
-
 
 @login_required
 def volunteer_events(request):

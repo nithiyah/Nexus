@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Event Report{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Event Report</h1>
+
+    {% if volunteer_events %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Hours Earned</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in volunteer_events %}
+                    <tr>
+                        <td>{{ event.event.name }}</td>
+                        <td>{{ event.event.date|date:"M d, Y" }}</td>
+                        <td>{{ event.hours_contributed }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No attended events found.</p>
+    {% endif %}
+</div>
+{% endblock %}
