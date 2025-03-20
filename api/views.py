@@ -18,6 +18,19 @@ from .serializers import (
     ChatRoomSerializer, MessageSerializer
 )
 
+from rest_framework.permissions import BasePermission
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+from rest_framework import status
+from announcements.models import Announcement
+from .serializers import AnnouncementSerializer
+
+
+# Custom permission: Allow authenticated users to comment
+class CanCommentOnAnnouncement(BasePermission):
+    """Allow authenticated users (volunteers & organizations) to comment on announcements."""
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated
 
 
 class IsOrganisation(BasePermission):
@@ -139,27 +152,45 @@ class VolunteerViewSet(viewsets.ModelViewSet):
 
 # ANNOUNCEMENTS API GROUP
 @extend_schema_view(
-    list=extend_schema(summary="Retrieve all announcements", tags=["Announcements"]),
-    retrieve=extend_schema(summary="Retrieve a specific announcement", tags=["Announcements"]),
-    create=extend_schema(summary="Create an announcement", tags=["Announcements"]),
-    update=extend_schema(summary="Update an announcement", tags=["Announcements"]),
-    partial_update=extend_schema(summary="Partially update an announcement", tags=["Announcements"]),
-    destroy=extend_schema(summary="Delete an announcement", tags=["Announcements"]),
+    list=extend_schema(summary="List Announcements"),
+    create=extend_schema(summary="Create Announcement"),
+    retrieve=extend_schema(summary="Retrieve Announcement"),
 )
-class AnnouncementViewSet(viewsets.ModelViewSet):
-    queryset = Announcement.objects.all().order_by("-created_at")
-    serializer_class = AnnouncementSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-@extend_schema_view(
-    list=extend_schema(summary="Retrieve all announcement comments", tags=["Announcements"]),
-    create=extend_schema(summary="Add a comment to an announcement", tags=["Announcements"]),
-)
+# Announcements API
 class AnnouncementCommentViewSet(viewsets.ModelViewSet):
     queryset = AnnouncementComment.objects.all()
     serializer_class = AnnouncementCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        """Allow `POST` requests explicitly for adding comments."""
+        print(f"Request Method: {request.method}")  # Debugging
+        return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        """Ensure the comment is associated with the authenticated user."""
+        serializer.save(user=self.request.user)
+
+
+@extend_schema_view(
+    list=extend_schema(summary="Retrieve all announcement comments", tags=["Announcements"]),
+    create=extend_schema(summary="Add a comment to an announcement", tags=["Announcements"]),
+)
+
+
+# Announcement Comments API
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+    permission_classes = [permissions.AllowAny]  # Allow anyone to view announcements
+
+    def create(self, request, *args, **kwargs):
+        """Ensure only organisations can create announcements."""
+        if request.user.is_authenticated and request.user.user_type != "organisation":
+            return Response({"detail": "Only organisations can create announcements."}, status=status.HTTP_403_FORBIDDEN)
+        return super().create(request, *args, **kwargs)
+
+    
 @extend_schema_view(
     list=extend_schema(summary="Retrieve all announcement likes", tags=["Announcements"]),
     create=extend_schema(summary="Like an announcement", tags=["Announcements"]),
@@ -175,16 +206,38 @@ class AnnouncementLikeViewSet(viewsets.ModelViewSet):
     list=extend_schema(summary="Retrieve all chat rooms", tags=["Chat"]),
     retrieve=extend_schema(summary="Retrieve a specific chat room", tags=["Chat"]),
 )
+
 class ChatRoomViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ChatRoom.objects.all()
     serializer_class = ChatRoomSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to return 403 instead of 404 for unauthorized users"""
+        chatroom = self.get_object()
+        user = request.user
+        if user.user_type == "organisation" and chatroom.event.organisation == user:
+            return super().retrieve(request, *args, **kwargs)
+        elif user.user_type == "volunteer" and chatroom.event.id in user.registered_events.values_list("event_id", flat=True):
+            return super().retrieve(request, *args, **kwargs)
+        return Response({"detail": "You do not have permission to access this chatroom."}, status=status.HTTP_403_FORBIDDEN)
+
 @extend_schema_view(
     list=extend_schema(summary="Retrieve all messages in a chat room", tags=["Chat"]),
     create=extend_schema(summary="Send a message in a chat room", tags=["Chat"]),
 )
+
+# Messages API
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by("timestamp")
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        """Allow `POST` requests explicitly for sending messages."""
+        print(f"Request Method: {request.method}")  # Debugging
+        return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        """Ensure the sender is properly assigned to the logged-in user."""
+        serializer.save(sender=self.request.user)

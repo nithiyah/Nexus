@@ -6,6 +6,8 @@ from .views import (
     AnnouncementViewSet, AnnouncementCommentViewSet, AnnouncementLikeViewSet,
     ChatRoomViewSet, MessageViewSet
 )
+from .views import AnnouncementViewSet
+
 
 router = DefaultRouter()
 router.register(r"events", EventViewSet, basename="events")
