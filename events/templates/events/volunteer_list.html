@@ -4,22 +4,16 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">Volunteer List for {{ event.name }}</h1>
-        <a href="{% url 'events:organisation_events' %}" class="btn btn-secondary">Back to My Events</a>
-    </div>
-     -->
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="mb-0">Volunteer List for {{ event.name }}</h1>
-            <div>
-                <button onclick="window.print()" class="btn btn-primary me-2">
-                    <i class="fas fa-print"></i> Print Volunteer List
-                </button>
-                <a href="{% url 'events:organisation_events' %}" class="btn btn-secondary">Back to My Events</a>
-            </div>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary me-2">
+                <i class="fas fa-print"></i> Print Volunteer List
+            </button>
+            <a href="{% url 'events:organisation_events' %}" class="btn btn-secondary">Back to My Events</a>
         </div>
-    
+    </div>
+
     <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
     <p><strong>Location:</strong> {{ event.location }}</p>
     <p><strong>Category:</strong> {{ event.get_category_display }}</p>
@@ -30,6 +24,7 @@
             <table class="table table-bordered border-dark">
                 <thead class="bg-primary text-white">
                     <tr>
+                        <th class="border-dark">Volunteer</th> <!-- Changed column name -->
                         <th class="border-dark">Full Name</th>
                         <th class="border-dark">Email</th>
                         <th class="border-dark">Mobile Number</th>
@@ -39,11 +34,23 @@
                 <tbody>
                     {% for registration in volunteers %}
                         <tr>
+                            <td class="border-dark d-flex align-items-center">
+                                <!-- Display Profile Picture -->
+                                {% if registration.volunteer.profile_picture %}
+                                    <img src="{{ registration.volunteer.profile_picture.url }}" alt="Profile Picture" class="rounded-circle me-2" width="40" height="40">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/40" alt="Default Profile" class="rounded-circle me-2">
+                                {% endif %}
+                                
+                                <!-- Clickable Username -->
+                                <a href="{% url 'accounts:public_profile' registration.volunteer.username %}" class="text-primary">
+                                    {{ registration.volunteer.username }}
+                                </a>
+                            </td>
                             <td class="border-dark">{{ registration.volunteer.full_name }}</td>
                             <td class="border-dark">{{ registration.volunteer.email }}</td>
                             <td class="border-dark">{{ registration.volunteer.contact_number }}</td>
                             <td class="border-dark">
-                                <!-- Button to Open Modal -->
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmRemoveModal" onclick="setVolunteerToRemove('{{ registration.id }}', '{{ registration.volunteer.full_name }}')">
                                     Remove
                                 </button>
