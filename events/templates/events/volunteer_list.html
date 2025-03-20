@@ -4,10 +4,21 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">Volunteer List for {{ event.name }}</h1>
         <a href="{% url 'events:organisation_events' %}" class="btn btn-secondary">Back to My Events</a>
     </div>
+     -->
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-0">Volunteer List for {{ event.name }}</h1>
+            <div>
+                <button onclick="window.print()" class="btn btn-primary me-2">
+                    <i class="fas fa-print"></i> Print Volunteer List
+                </button>
+                <a href="{% url 'events:organisation_events' %}" class="btn btn-secondary">Back to My Events</a>
+            </div>
+        </div>
     
     <p><strong>Date:</strong> {{ event.date|date:"M d, Y H:i" }}</p>
     <p><strong>Location:</strong> {{ event.location }}</p>
