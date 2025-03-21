@@ -2,117 +2,158 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Dashboard{% endblock %}</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Dashboard{% endblock %}</title>
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+        <!-- Google Font: Inter -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #4264c9;
-            padding: 10px 20px;
-        }
-        .navbar img {
-            height: 40px;
-            cursor: pointer;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 8px 12px;
-            border-radius: 5px;
-        }
-        .navbar a:hover {
-            background-color: #a6a2a2;
-        }
-        .navbar-right {
-            display: flex;
-            align-items: center;
-        }
-        .content {
-            padding: 20px;
-        }
-    </style>
-</head>
+        <style>
+            :root {
+                --brand-teal: #2b9faa;
+                --brand-hover: #1B6165;
+            }
 
-<body>
+            body {
+                margin: 0;
+                font-family: 'Inter', sans-serif;
+            }
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
-            <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" height="40">
-        </a>
+            .navbar {
+                background-color: var(--brand-teal);
+            }
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            .navbar .navbar-nav {
+                display: flex;
+                gap: 0.75rem; /* space between nav items */
+            }
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">Dashboard</a>
-                </li>
+            .navbar .nav-link, .navbar-brand {
+                color: #fff !important;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            }
 
-                {% if request.user.is_authenticated %}
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="{% url 'announcements:announcement_list' %}">Announcements</a>
-                </li> -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Announcements
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{% url 'announcements:all_announcements' %}">All Organization Announcements</a></li>
-                        <li><a class="dropdown-item" href="{% url 'announcements:volunteer_announcements' %}">My Event Announcements</a></li>
-                    </ul>
-                </li>
-                
-                {% endif %}
-                {% if request.user.user_type == 'organisation' %}
+            .navbar .nav-link:hover {
+                background-color: var(--brand-hover);
+                box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+            }
+
+            .navbar .bi {
+                margin-right: 6px;
+            }
+
+
+            /* Style for dropdown to match navbar color scheme */
+            .dropdown-menu {
+                background-color: var(--brand-teal);
+                border: none;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .dropdown-menu .dropdown-item {
+                color: #fff;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                transition: background-color 0.2s ease;
+            }
+
+            .dropdown-menu .dropdown-item:hover,
+            .dropdown-menu .dropdown-item:focus {
+                background-color: var(--brand-hover); /* #1B6165 */
+                color: #fff;
+            }
+
+
+        </style>
+
+        
+    </head>
+    
+    <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
+                <img src="{% static 'images/Nexus_logo.png' %}" alt="Logo" height="40">
+            </a>
+    
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'events:feedback_hub' %}">Feedback Hub</a>
+                        <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_dashboard' %}{% else %}{% url 'events:volunteer_dashboard' %}{% endif %}">
+                            <i class="bi bi-house"></i>Dashboard
+                        </a>
                     </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">My Events</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="{% url 'chat:chat_home' %}">Chat</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'chat:chat_home' %}">
-                        Chat
-                        <span id="chat-unread-count" class="badge bg-danger" style="display: none;">0</span>
-                    </a>
-                </li>
-                
-                {% if request.user.is_authenticated %}
+    
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-megaphone"></i>Announcements
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'announcements:all_announcements' %}">All Announcements</a></li>
+                            <li><a class="dropdown-item" href="{% url 'announcements:volunteer_announcements' %}">My Event</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+    
+                    {% if request.user.user_type == 'organisation' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:feedback_hub' %}">
+                                <i class="bi bi-chat-dots"></i>Feedback Hub
+                            </a>
+                        </li>
+                    {% endif %}
+    
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
+                        <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">
+                            <i class="bi bi-bookmark-fill"></i>My Events
+                        </a>
                     </li>
+    
                     <li class="nav-item">
-                        <form action="{% url 'accounts:logout' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
-                        </form>
+                        <a class="nav-link" href="{% url 'chat:chat_home' %}">
+                            <i class="bi bi-chat-right"></i>Chat
+                            <span id="chat-unread-count" class="badge bg-danger ms-1" style="display: none;">0</span>
+                        </a>
                     </li>
-                {% endif %}
-            </ul>
+    
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                                <i class="bi bi-person-fill"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{% url 'accounts:logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link">
+                                    <i class="bi bi-box-arrow-right"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+    
 
 <!-- Page Content -->
 <div class="container mt-4">
