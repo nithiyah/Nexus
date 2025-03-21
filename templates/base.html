@@ -108,8 +108,14 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'announcements:all_announcements' %}">All Announcements</a></li>
-                            <li><a class="dropdown-item" href="{% url 'announcements:volunteer_announcements' %}">My Event</a></li>
-                        </ul>
+                          
+                            {% if request.user.user_type == "volunteer" %}
+                              <li><a class="dropdown-item" href="{% url 'announcements:volunteer_announcements' %}">My Event Announcements</a></li>
+                            {% else %}
+                              <li><a class="dropdown-item" href="{% url 'announcements:announcement_list' %}">My Announcements</a></li>
+                            {% endif %}
+                          </ul>
+                          
                     </li>
                     {% endif %}
     

@@ -1,49 +1,122 @@
 {% extends "base.html" %}
-
 {% block title %}{{ announcement.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ announcement.title }}</h2>
-    <p><strong>Posted by:</strong> {{ announcement.organisation.username }}</p>
-    {% if announcement.event %}
-    <p><strong>Related Event:</strong> <a href="{% url 'events:event_detail' announcement.event.id %}">{{ announcement.event.name }}</a></p>
-    {% endif %}
-    <p class="mt-3">{{ announcement.content }}</p>
-    <p class="text-muted">Posted on: {{ announcement.created_at|date:"F d, Y H:i" }}</p>
+<style>
+  .announcement-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    padding: 30px;
+  }
+  .comment-list .list-group-item {
+    border-radius: 8px;
+  }
+  .announcement-actions .btn {
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .announcement-actions .btn i {
+    margin-right: 4px;
+  }
+  .card-title {
+    font-weight: 600;
+    color: #2b9faa;
+  }
 
-    <!-- Like Button -->
-    <form action="{% url 'announcements:like_announcement' announcement.id %}" method="post">
+  .form-floating textarea {
+    height: 100px;
+    resize: vertical;
+  }
+
+
+  .comment-textarea {
+    border-radius: 15px;
+    border: 1px solid #ced4da;
+    padding: 12px 16px;
+    min-height: 120px;
+    resize: vertical;
+    background-color: #f8f9fa;
+    font-size: 15px;
+    transition: border-color 0.2s ease;
+  }
+
+  .comment-textarea:focus {
+    border-color: #2b9faa;
+    outline: none;
+    box-shadow: 0 0 0 0.1rem rgba(43, 159, 170, 0.25);
+    background-color: white;
+  }
+
+  .btn-brand-outline {
+    background-color: #2b9faa;
+    color: #fff;
+    border: 2px solid #2b9faa;
+    border-radius: 15px;
+    padding: 10px 24px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-brand-outline:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="announcement-card bg-white">
+
+    <div class="d-flex align-items-center mb-2">
+      {% if announcement.organisation.profile_picture %}
+        <img src="{{ announcement.organisation.profile_picture.url }}" class="rounded-circle me-2" width="40" height="40">
+      {% else %}
+        <img src="https://via.placeholder.com/40" class="rounded-circle me-2">
+      {% endif %}
+      <h5 class="card-title mb-0">{{ announcement.organisation.username }}</h5>
+    </div>
+
+    {% if announcement.event %}
+      <p class="mb-1"><strong>Event:</strong>
+        <a href="{% url 'events:event_detail' announcement.event.id %}">{{ announcement.event.name }}</a>
+      </p>
+    {% endif %}
+
+    <p class="text-muted small mb-2">Posted on: {{ announcement.created_at|date:"F d, Y H:i" }}</p>
+    <p>{{ announcement.content }}</p>
+
+    <div class="announcement-actions d-flex mb-3">
+      <form action="{% url 'announcements:like_announcement' announcement.id %}" method="post" class="me-2">
         {% csrf_token %}
-        <button type="submit" class="btn btn-outline-primary">
-            Like ({{ announcement.likes.count }})
+        <button type="submit" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-hand-thumbs-up-fill"></i> {{ announcement.likes.count }}
         </button>
-    </form>
+      </form>
+    </div>
 
     <hr>
 
-    <!-- Comments Section -->
-    <h4>Comments</h4>
-    <ul class="list-group mb-3">
-        {% for comment in comments %}
-            <li class="list-group-item">
-                <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}
-                <br>
-                <small class="text-muted">{{ comment.created_at|date:"F d, Y H:i" }}</small>
-            </li>
-        {% empty %}
-            <li class="list-group-item">No comments yet. Be the first to comment!</li>
-        {% endfor %}
+    <h5 class="mb-3">Comments</h5>
+    <ul class="list-group comment-list mb-4">
+      {% for comment in comments %}
+        <li class="list-group-item">
+          <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}<br>
+          <small class="text-muted">{{ comment.created_at|date:"F d, Y H:i" }}</small>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No comments yet. Be the first to comment!</li>
+      {% endfor %}
     </ul>
 
-    <!-- Add Comment Form -->
-    <form action="{% url 'announcements:add_comment' announcement.id %}" method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="comment" class="form-label">Add a Comment</label>
-            {{ comment_form.comment }}
-        </div>
-        <button type="submit" class="btn btn-primary">Post Comment</button>
-    </form>
+<!-- Add Comment -->
+<h6 class="mb-3">Add a Comment</h6>
+<form action="{% url 'announcements:add_comment' announcement.id %}" method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    {{ comment_form.comment }}
+  </div>
+  <button type="submit" class="btn btn-brand-outline">Post Comment</button>
+</form>
+
+  </div>
 </div>
 {% endblock %}
