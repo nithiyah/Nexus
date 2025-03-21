@@ -63,7 +63,7 @@ def register_volunteer(request):
             subject = "Welcome to Nexus!"
             from_email = settings.DEFAULT_FROM_EMAIL
             recipient_list = [user.email]
-
+            print("EMAIL LOGIC TRIGGERED")
             send_mail(
                 subject=subject,
                 message=plain_message,        # fallback if recipient can’t read HTML

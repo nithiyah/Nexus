@@ -332,10 +332,10 @@ def register_for_event(request, event_id):
             VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
 
             messages.success(request, "You have successfully registered for the event.")
-        else:
+        # else:
             # Event is full, add to waiting list
-            VolunteerEvent.objects.create(event=event, volunteer=request.user, status="waiting_list")
-            messages.info(request, "The event is full. You have been added to the waiting list.")
+            # VolunteerEvent.objects.create(event=event, volunteer=request.user, status="waiting_list")
+            # messages.info(request, "The event is full. You have been added to the waiting list.")
 
     return redirect("events:volunteer_dashboard")
 
@@ -407,12 +407,12 @@ def cancel_registration(request, event_id):
         messages.success(request, "You have successfully canceled your registration.")
 
         # Move the first waitlisted volunteer to "registered" if a spot opens
-        waitlisted_volunteers = VolunteerEvent.objects.filter(event=event, status="waiting_list").order_by("id")
-        if waitlisted_volunteers.exists():
-            next_volunteer = waitlisted_volunteers.first()
-            next_volunteer.status = "registered"
-            next_volunteer.save()
-            messages.info(request, f"{next_volunteer.volunteer.username} has been moved from the waitlist to registered.")
+        # waitlisted_volunteers = VolunteerEvent.objects.filter(event=event, status="waiting_list").order_by("id")
+        # if waitlisted_volunteers.exists():
+        #     next_volunteer = waitlisted_volunteers.first()
+        #     next_volunteer.status = "registered"
+        #     next_volunteer.save()
+        #     messages.info(request, f"{next_volunteer.volunteer.username} has been moved from the waitlist to registered.")
 
     return redirect("events:volunteer_events")
 

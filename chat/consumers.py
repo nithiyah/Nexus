@@ -6,6 +6,10 @@ from .models import ChatRoom, Message
 from datetime import datetime, timedelta
 from django.utils.timezone import now
 
+
+from channels.sessions import SessionMiddlewareStack
+from channels.auth import AuthMiddlewareStack
+
 async def receive(self, text_data):
     """Handle incoming messages and save to database."""
     data = json.loads(text_data)
@@ -39,7 +43,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
  ###############################################################################
 
         # Ensure user authentication for WebSocket
-        self.scope["user"] = await sync_to_async(get_user)(self.scope)
+        # self.scope["user"] = await sync_to_async(get_user)(self.scope)
+        # self.scope["user"] = await get_user(self.scope)
+        if "user" not in self.scope or self.scope["user"] is None:
+            self.scope["user"] = await get_user(self.scope)
+
         
         if self.scope["user"] is None or isinstance(self.scope["user"], AnonymousUser):
             await self.close()  # Close connection if user is not authenticated

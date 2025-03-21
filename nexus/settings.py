@@ -55,20 +55,22 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,  # 10 results per page
+
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Volunteer Management API",
-    "DESCRIPTION": "API for managing volunteers, organisations, and events.",
+    "TITLE": "Nexus API",
+    "DESCRIPTION": "REST API for Nexus - Volunteer & Organisation Platform",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
-    "TAGS": [
-        {"name": "Events", "description": "Operations related to volunteer events"},
-        {"name": "Organisations", "description": "Operations related to organisations"},
-        {"name": "Volunteers", "description": "Operations related to volunteers"},
-    ],
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX_TRIM": "/api",
+        "TAGS": [
+        {"name": "Users", "description": "User accounts and roles"},
+        {"name": "Events", "description": "Volunteer event listings"},
+        {"name": "Announcements", "description": "Organisation announcements and feedback"},
+        {"name": "Chat", "description": "Event chatrooms and messages"},
+    ]
 }
 
 AUTH_USER_MODEL = 'accounts.CustomUser'

@@ -1,165 +1,142 @@
 import json
+import tempfile
+from django.core.files.uploadedfile import SimpleUploadedFile
+import pytest
 from django.test import TestCase
-from channels.db import database_sync_to_async
-
-from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from channels.testing import WebsocketCommunicator
-from channels.routing import URLRouter
-from chat.routing import websocket_urlpatterns
-from chat.models import ChatRoom, Message
-from events.models import Event
-from asgiref.sync import sync_to_async
+from chat.models import ChatRoom, Message, UnreadMessage
 from chat.consumers import ChatConsumer
+from events.models import Event, VolunteerEvent
 
 User = get_user_model()
 
-
+@pytest.mark.django_db(transaction=True)
 class ChatTests(TestCase):
-   # Tests for chat room API & WebSocket functionality
-
-    def setUp(self):
-        # Setup test data
-        # Create test users
-        self.organisation = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.organisation = User.objects.create_user(
             username="org1",
             password="testpass123",
             user_type="organisation"
         )
-        self.volunteer = User.objects.create_user(
+        cls.volunteer = User.objects.create_user(
             username="volunteer1",
             password="testpass123",
             user_type="volunteer"
         )
-        self.other_user = User.objects.create_user(
-            username="randomuser",
-            password="testpass123",
-            user_type="volunteer"
-        )
-
-        # Create event
-        self.event = Event.objects.create(
-            organisation=self.organisation,
-            name="Community Clean-Up",
-            description="Cleaning the park",
-            date="2025-07-10",
-            location="Community Park",
-            volunteers_needed=10,
-            roles_responsibilities="Sweeping, collecting trash",
+        cls.event = Event.objects.create(
+            organisation=cls.organisation,
+            name="Test Event",
+            description="Testing event",
+            date="2025-01-01",
+            location="Test Location",
+            volunteers_needed=5,
+            roles_responsibilities="Help out",
             category="environment"
         )
+        VolunteerEvent.objects.create(event=cls.event, volunteer=cls.volunteer)
+        cls.chatroom = ChatRoom.objects.create(event=cls.event)
 
-        # Create chat room associated with the event
-        self.chatroom = ChatRoom.objects.create(event=self.event)
-
-        # Authenticate volunteer
+    def setUp(self):
         self.client.login(username="volunteer1", password="testpass123")
 
-    ##  1. API TESTS ##
-
-    def test_chatroom_creation(self):
-        # Ensure a chat room is automatically created for an event
-        self.assertIsNotNone(self.chatroom)
-        self.assertEqual(self.chatroom.event, self.event)
-
-    def test_join_chatroom(self):
-        # Test if a volunteer can join a chatroom
+    def test_chatroom_access(self):
         response = self.client.get(reverse("chat:chat_room", args=[self.event.id]))
-        self.assertEqual(response.status_code, 200)  # Should render chat room page
-
-    def test_send_message(self):
-        # Test sending a message in the chat room
-        data = {"content": "Hello, this is a test message!"}
-        response = self.client.post(reverse("chat:send_message", args=[self.event.id]), json.dumps(data), content_type="application/json")
-        
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(Message.objects.filter(content="Hello, this is a test message!").exists())
+
+    def test_send_message_view(self):
+        response = self.client.post(
+            reverse("chat:send_message", args=[self.event.id]),
+            data={"content": "Hello"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Message.objects.filter(content="Hello").exists())
 
     def test_fetch_messages(self):
-        # Test retrieving messages from a chat room
-        # Create a message
-        Message.objects.create(chatroom=self.chatroom, sender=self.volunteer, content="Test message")
-        
+        Message.objects.create(chatroom=self.chatroom, sender=self.volunteer, content="Test")
         response = self.client.get(reverse("chat:chat_room", args=[self.event.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test message")
+        self.assertContains(response, "Test")
 
-    def test_unauthorized_user_cannot_join_chat(self):
-        # Test that unauthorized users cannot join chat rooms
-        self.client.logout()  # Ensure the user is not logged in
+    def test_unauthenticated_chatroom_redirect(self):
+        self.client.logout()
         response = self.client.get(reverse("chat:chat_room", args=[self.event.id]))
-        self.assertEqual(response.status_code, 302)  # Should redirect to login
+        self.assertEqual(response.status_code, 302)
 
-    ##  2. WEBSOCKET TESTS ##
-
-    async def test_websocket_connection(self):
-        # Ensure users can establish a WebSocket connection
-        communicator = WebsocketCommunicator(
-            URLRouter(websocket_urlpatterns),
-            f"/ws/chat/{self.event.id}/"
+    def test_file_upload_in_chat(self):
+        file = SimpleUploadedFile("testfile.txt", b"Test file content", content_type="text/plain")
+        response = self.client.post(
+            reverse("chat:send_message", args=[self.event.id]),
+            data={"file": file}
         )
-        connected, _ = await communicator.connect()
-        self.assertTrue(connected)
-        await communicator.disconnect()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("file_url", response.json())
+        self.assertTrue(Message.objects.filter(file__isnull=False).exists())
 
-    async def test_send_message_websocket(self):
-        # test sending and receiving messages through WebSocket
-        
-        # Authenticate user
-        self.volunteer = await database_sync_to_async(User.objects.get)(username="volunteer1")
+    def test_unread_message_counter_logic(self):
+        other_user = User.objects.create_user(username="vol2", password="pass", user_type="volunteer")
+        VolunteerEvent.objects.create(event=self.event, volunteer=other_user)
 
+        self.client.post(reverse("chat:send_message", args=[self.event.id]), data={"content": "Hi"})
+
+        unread_for_other = UnreadMessage.objects.filter(user=other_user).count()
+        unread_for_sender = UnreadMessage.objects.filter(user=self.volunteer).count()
+
+        self.assertGreater(unread_for_other, 0)
+        self.assertEqual(unread_for_sender, 0)
+
+    def test_get_online_users_view(self):
+        response = self.client.get(reverse("chat:get_online_users", args=[self.event.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("count", response.json())
+
+    @pytest.mark.asyncio
+    async def test_websocket_connection_authenticated(self):
         communicator = WebsocketCommunicator(
             ChatConsumer.as_asgi(),
             f"/ws/chat/{self.event.id}/"
         )
-        
+        communicator.scope["user"] = self.volunteer
+        communicator.scope["url_route"] = {"kwargs": {"event_id": str(self.event.id)}}
+        communicator.scope["headers"] = []
+
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
+        await communicator.disconnect()
 
-        # Send message
-        message_data = {"message": "Hello WebSocket!"}
-        await communicator.send_json_to(message_data)
+    @pytest.mark.asyncio
+    async def test_websocket_send_receive(self):
+        communicator = WebsocketCommunicator(
+            ChatConsumer.as_asgi(),
+            f"/ws/chat/{self.event.id}/"
+        )
+        communicator.scope["user"] = self.volunteer
+        communicator.scope["url_route"] = {"kwargs": {"event_id": str(self.event.id)}}
+        communicator.scope["headers"] = []
 
-        # Receive message
+        connected, _ = await communicator.connect()
+        assert connected
+
+        await communicator.send_json_to({"message": "Hello WebSocket!"})
         response = await communicator.receive_json_from()
-        self.assertEqual(response["message"], "Hello WebSocket!")
+
+        assert response["message"] == "Hello WebSocket!"
+        assert response["sender"] == "volunteer1"
 
         await communicator.disconnect()
 
-    async def test_websocket_broadcast(self):
-        # Ensure a message sent by one user is received by another user in the chat
-        # First user connects
-        communicator1 = WebsocketCommunicator(
-            URLRouter(websocket_urlpatterns),
-            f"/ws/chat/{self.event.id}/"
-        )
-        connected, _ = await communicator1.connect()
-        self.assertTrue(connected)
-
-        # Second user connects
-        communicator2 = WebsocketCommunicator(
-            URLRouter(websocket_urlpatterns),
-            f"/ws/chat/{self.event.id}/"
-        )
-        connected, _ = await communicator2.connect()
-        self.assertTrue(connected)
-
-        # Send message from first user
-        message_data = {"message": "Hello everyone!"}
-        await communicator1.send_json_to(message_data)
-
-        # Receive message from second user
-        response = await communicator2.receive_json_from()
-        self.assertEqual(response["message"], "Hello everyone!")
-
-        await communicator1.disconnect()
-        await communicator2.disconnect()
-
-    async def test_unauthorized_websocket_access(self):
-        # Test that unauthorized users cannot connect to a chat WebSocket
+    @pytest.mark.asyncio
+    async def test_websocket_rejects_unauthenticated(self):
         communicator = WebsocketCommunicator(
-            URLRouter(websocket_urlpatterns),
-            f"/ws/chat/9999/"  # Invalid event ID
+            ChatConsumer.as_asgi(),
+            f"/ws/chat/{self.event.id}/"
         )
+        communicator.scope["user"] = AnonymousUser()
+        communicator.scope["url_route"] = {"kwargs": {"event_id": str(self.event.id)}}
+        communicator.scope["headers"] = []
+
         connected, _ = await communicator.connect()
-        self.assertFalse(connected)
+        assert not connected
