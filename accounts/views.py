@@ -39,7 +39,6 @@ def login_redirect(request):
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
-
 # Registration Views
 def register_volunteer(request):
     if request.method == 'POST':
@@ -52,8 +51,7 @@ def register_volunteer(request):
             # Build context for the email template
             context = {
                 'username': user.username,
-                'login_url': request.build_absolute_uri('/login/')  
-                  # or "https://yourdomain.com/login/"
+                'login_url': request.build_absolute_uri('/login/')
             }
 
             # Render HTML & plain-text versions
@@ -66,22 +64,79 @@ def register_volunteer(request):
             print("EMAIL LOGIC TRIGGERED")
             send_mail(
                 subject=subject,
-                message=plain_message,        # fallback if recipient can’t read HTML
+                message=plain_message,
                 from_email=from_email,
                 recipient_list=recipient_list,
-                html_message=html_message,    # our HTML version
+                html_message=html_message,
                 fail_silently=False,
             )
 
+            # messages.success(request, "Your volunteer account has been created. Please log in.")
+            # login(request, user)
+            # return redirect('accounts:login')
+            return render(request, 'accounts/registration_success.html')
 
-
-            login(request, user)
-            return redirect('accounts:login')
+        else:
+            messages.error(request, "There were errors. Please correct them below.")
     else:
         form = VolunteerRegistrationForm()
+
     return render(request, 'accounts/register_volunteer.html', {'form': form})
 
+# Registration Views
+# def register_volunteer(request):
+#     if request.method == 'POST':
+#         form = VolunteerRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.user_type = 'volunteer'
+#             user.save()
 
+#             # Build context for the email template
+#             context = {
+#                 'username': user.username,
+#                 'login_url': request.build_absolute_uri('/login/')  
+#                   # or "https://yourdomain.com/login/"
+#             }
+
+#             # Render HTML & plain-text versions
+#             html_message = render_to_string('accounts/welcome_email.html', context)
+#             plain_message = strip_tags(html_message)
+
+#             subject = "Welcome to Nexus!"
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             recipient_list = [user.email]
+#             print("EMAIL LOGIC TRIGGERED")
+#             send_mail(
+#                 subject=subject,
+#                 message=plain_message,        # fallback if recipient can’t read HTML
+#                 from_email=from_email,
+#                 recipient_list=recipient_list,
+#                 html_message=html_message,    # our HTML version
+#                 fail_silently=False,
+#             )
+
+
+
+#             login(request, user)
+#             return redirect('accounts:login')
+#     else:
+#         form = VolunteerRegistrationForm()
+#     return render(request, 'accounts/register_volunteer.html', {'form': form})
+
+
+# def register_organisation(request):
+#     if request.method == 'POST':
+#         form = OrganisationRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.user_type = 'organisation'
+#             user.save()
+#             login(request, user)
+#             return redirect('accounts:login')
+#     else:
+#         form = OrganisationRegistrationForm()
+#     return render(request, 'accounts/register_organisation.html', {'form': form})
 def register_organisation(request):
     if request.method == 'POST':
         form = OrganisationRegistrationForm(request.POST)
@@ -89,12 +144,41 @@ def register_organisation(request):
             user = form.save(commit=False)
             user.user_type = 'organisation'
             user.save()
-            login(request, user)
-            return redirect('accounts:login')
+
+            # Build context for the email template
+            context = {
+                'username': user.username,
+                'login_url': request.build_absolute_uri('/login/')
+            }
+
+            # Render HTML & plain-text versions
+            html_message = render_to_string('accounts/welcome_email.html', context)
+            plain_message = strip_tags(html_message)
+
+            subject = "Welcome to Nexus (Organisation)!"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [user.email]
+            print("EMAIL LOGIC TRIGGERED (ORG)")
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=from_email,
+                recipient_list=recipient_list,
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            # messages.success(request, "Your organisation account has been created. Please log in.")
+            # login(request, user)
+            # return redirect('accounts:login')
+            return render(request, 'accounts/registration_success.html')
+
+        else:
+            messages.error(request, "There were errors. Please correct them below.")
     else:
         form = OrganisationRegistrationForm()
+    
     return render(request, 'accounts/register_organisation.html', {'form': form})
-
 
 @login_required
 def profile_view(request):

@@ -4,133 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Nexus</title>
-    
-    <!-- jQuery (Required for SGDS) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- SGDS CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds/css/sgds.css">
-    <script src="https://cdn.jsdelivr.net/npm/@govtechsg/sgds/js/sgds.js"></script>
-    
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background-color: #bacddf; /* Light blue background */
+        :root {
+            --brand-teal: #2b9faa;
+            --brand-hover: #1B6165;
         }
+
+        body {
+            background-color: #eaf3f5;
+            font-family: 'Inter', sans-serif;
+        }
+
         .login-container {
             max-width: 400px;
             margin: 5% auto;
             padding: 30px;
-        }
-        .sgds-card {
-            padding: 2rem;
+            background-color: #fff;
             border-radius: 12px;
-            background-color: white;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
-        .sgds-btn-login {
+
+        h2 {
+            color: var(--brand-teal);
+            font-weight: 600;
+        }
+
+        .btn-brand {
+            background-color: var(--brand-teal);
+            color: white;
             width: 100%;
-            background-color: var(--sgds-secondary);
-            color: white !important;
             border-radius: 25px;
-            border: none;
             padding: 12px;
             font-size: 16px;
-            transition: all 0.3s ease-in-out;
+            border: none;
         }
-        .sgds-btn-login:hover {
-            background-color: #0056b3;
-            color: white !important;
+
+        .btn-brand:hover {
+            background-color: var(--brand-hover);
+            color: white;
         }
+
         .password-container {
             position: relative;
         }
+
         .toggle-password {
             position: absolute;
-            right: 10px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 18px;
             color: #6c757d;
         }
+
         .toggle-password:hover {
             color: #495057;
+        }
+
+        .form-text-link a {
+            color: var(--brand-teal);
+            text-decoration: none;
+        }
+
+        .form-text-link a:hover {
+            color: var(--brand-hover);
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <div class="sgds-container d-flex justify-content-center align-items-center vh-100">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="login-container">
-            <div class="sgds-card shadow">
-                <h2 class="text-center sgds-text-primary">Nexus Login</h2>
-                <p class="text-center text-muted">Sign in to access your dashboard</p>
+            <h2 class="text-center mb-2">Nexus Login</h2>
+            <p class="text-center text-muted mb-4">Sign in to access your dashboard</p>
 
-                <!-- Error Message -->
-                {% if form.errors %}
-                <div class="sgds-alert sgds-alert-danger">Invalid username or password. Please try again.</div>
-                {% endif %}
+            {% if form.errors %}
+            <div class="alert alert-danger text-center">Invalid username or password. Please try again.</div>
+            {% endif %}
 
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-                        <label for="username">Username</label>
-                    </div>
-
-                    <div class="form-floating mb-3 password-container">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                        <label for="password">Password</label>
-                        <i class="bi bi-eye-slash-fill toggle-password" id="togglePassword"></i>
-                    </div>
-
-                    <!-- Login Button -->
-                    <button type="submit" class="sgds-btn sgds-btn-login">Login</button>
-                    
-                    <!-- Forgot Password Link -->
-                    <div class="text-center mt-2">
-                        <a href="{% url 'accounts:password_reset' %}" class="sgds-text-primary">Forgot Password?</a>
-                    </div>
-                            
-                </form>
-
-                <div class="text-center mt-3">
-                    <p>Join as a Volunteer <a href="{% url 'accounts:register_volunteer' %}" class="sgds-text-primary">Sign up</a></p>
-                    <p>Join as an Organisation <a href="{% url 'accounts:register_organisation' %}" class="sgds-text-primary">Sign up</a></p>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    <label for="username">Username</label>
                 </div>
+
+                <div class="form-floating mb-3 password-container">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                    <i class="bi bi-eye-slash-fill toggle-password" id="togglePassword"></i>
+                </div>
+
+                <button type="submit" class="btn btn-brand mt-2">Login</button>
+
+                <div class="form-text-link text-center mt-3">
+                    <a href="{% url 'accounts:password_reset' %}">Forgot Password?</a>
+                </div>
+            </form>
+
+            <div class="form-text-link text-center mt-4">
+                <p>Join as a Volunteer <a href="{% url 'accounts:register_volunteer' %}">Sign up</a></p>
+                <p>Join as an Organisation <a href="{% url 'accounts:register_organisation' %}">Sign up</a></p>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript for Show/Hide Password -->
+    <!-- Show/Hide Password Toggle -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            var passwordField = document.getElementById("password");
-            var toggleIcon = document.getElementById("togglePassword");
+            const passwordField = document.getElementById("password");
+            const toggleIcon = document.getElementById("togglePassword");
 
             toggleIcon.addEventListener("click", function () {
-                if (passwordField.type === "password") {
-                    passwordField.type = "text";
-                    toggleIcon.classList.remove("bi-eye-slash-fill");
-                    toggleIcon.classList.add("bi-eye-fill");
-                } else {
-                    passwordField.type = "password";
-                    toggleIcon.classList.remove("bi-eye-fill");
-                    toggleIcon.classList.add("bi-eye-slash-fill");
-                }
+                const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+                passwordField.setAttribute("type", type);
+                toggleIcon.classList.toggle("bi-eye-fill");
+                toggleIcon.classList.toggle("bi-eye-slash-fill");
             });
         });
     </script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
- 
