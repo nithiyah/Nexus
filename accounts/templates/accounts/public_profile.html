@@ -1,93 +1,184 @@
-
 {% extends "base.html" %}
-
 {% block title %}{{ profile_user.username }}'s Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="text-center">{{ profile_user.username }}'s Profile</h1>
+<style>
+  .profile-card {
+    max-width: 500px;
+    margin: 0 auto 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
 
-    <div class="card profile-card">
-        <div class="card-body text-center">
-            {% if profile_user.profile_picture %}
-                <img src="{{ profile_user.profile_picture.url }}" class="profile-pic rounded-circle mb-3" alt="Profile Picture">
-            {% else %}
-                <img src="https://via.placeholder.com/150" class="profile-pic rounded-circle mb-3" alt="Default Profile">
-            {% endif %}
-            <h5 class="card-title">@{{ profile_user.username }}</h5>
-            <p class="text-muted">Joined on {{ profile_user.date_joined|date:"F d, Y" }}</p>
+  .profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #2b9faa;
+    box-shadow: 0 0 0 4px rgba(43, 159, 170, 0.15);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2b9faa;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+
+  .custom-card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+    height: 100%;
+  }
+
+  .list-group-item {
+    border: none;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .btn-link {
+    font-weight: 500;
+    color: #2b9faa;
+  }
+
+  .btn-link:hover {
+    color: #1B6165;
+    text-decoration: underline;
+  }
+  .btn-brand {
+  background-color: #2b9faa;
+  color: white;
+  border: 2px solid #2b9faa;
+  border-radius: 12px; /* More rounded */
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-brand:hover {
+  background-color: #1B6165;
+  border-color: #1B6165;
+  color: white;
+}
+
+
+  .announcement-meta {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+
+  .icon-info {
+    font-size: 0.85rem;
+    margin-right: 10px;
+  }
+</style>
+
+<div class="container mt-5">
+  <!-- Profile Card -->
+  <div class="profile-card">
+    {% if profile_user.profile_picture %}
+      <img src="{{ profile_user.profile_picture.url }}" class="profile-pic mb-3" alt="Profile Picture">
+    {% else %}
+      <img src="https://via.placeholder.com/150" class="profile-pic mb-3" alt="Default Profile">
+    {% endif %}
+    <h2 class="mb-0">@{{ profile_user.username }}</h2>
+    <p class="text-muted">Joined on {{ profile_user.date_joined|date:"F d, Y" }}</p>
+
+    {% if profile_user.user_type == "volunteer" %}
+      <div class="mt-4">
+        <i class="bi bi-clock-fill" style="font-size: 1.5rem; color: #2b9faa;"></i>
+        <p class="mb-0 mt-2" style="font-size: 1.25rem; font-weight: 600;">
+          {{ total_hours }} hours contributed
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if profile_user.user_type == "organisation" %}
+    <!-- Announcements -->
+    <h3 class="section-title text-center">Announcements</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for announcement in announcements %}
+        <div class="col">
+          <div class="card custom-card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex align-items-center mb-2">
+                  {% if profile_user.profile_picture %}
+                    <img src="{{ profile_user.profile_picture.url }}" class="rounded-circle me-2" width="40" height="40">
+                  {% else %}
+                    <img src="https://via.placeholder.com/40" class="rounded-circle me-2" width="40" height="40">
+                  {% endif %}
+                  <h6 class="mb-0">@{{ profile_user.username }}</h6>
+                </div>
+                <p class="text-muted small mb-1">Posted on {{ announcement.created_at|date:"F d, Y" }}</p>
+                <p>{{ announcement.content|truncatewords:20 }}</p>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="announcement-meta">
+                  <span class="icon-info"><i class="bi bi-hand-thumbs-up-fill"></i> {{ announcement.likes.count }}</span>
+                  <span class="icon-info"><i class="bi bi-chat-fill"></i> {{ announcement.comments.count }}</span>
+                </div>
+                <a href="{% url 'announcements:announcement_detail' announcement.id %}" class="btn btn-brand btn-sm">Read More</a>
+              </div>
+            </div>
+          </div>
         </div>
+      {% empty %}
+        <p class="text-muted text-center">No announcements yet.</p>
+      {% endfor %}
     </div>
 
-    <!-- Organization Profile View -->
-    {% if profile_user.user_type == "organisation" %}
-        <h3 class="mt-4">Current Events</h3>
-        <div class="row">
-            {% for event in events %}
-                <div class="col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ event.name }}</h5>
-                            <p class="text-muted small">{{ event.date|date:"F d, Y" }} at {{ event.location }}</p>
-                            <p>{{ event.description|truncatewords:20 }}</p>
-                            <a href="{% url 'events:event_detail' event.id %}" class="btn btn-outline-primary btn-sm">View Event</a>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <p>No current events.</p>
-            {% endfor %}
+    <!-- Current Events -->
+    <h3 class="section-title text-center">Current Events</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 ">
+      {% for event in events %}
+        <div class="col">
+          <div class="card custom-card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title">{{ event.name }}</h5>
+                <p class="text-muted small">{{ event.date|date:"F d, Y" }} at {{ event.location }}</p>
+                <p>{{ event.description|truncatewords:20 }}</p>
+              </div>
+              <a href="{% url 'events:event_detail' event.id %}" class="btn btn-brand btn-sm mt-3">View Event</a>
+            </div>
+          </div>
         </div>
+      {% empty %}
+        <p class="text-muted text-center">No current events.</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-        <h3 class="mt-4">Announcements</h3>
-        <ul class="list-group">
-            {% for announcement in announcements %}
-                <li class="list-group-item">
-                    <strong>{{ announcement.title }}</strong><br>
-                    {{ announcement.content|truncatewords:20 }}
-                    <a href="{% url 'announcements:announcement_detail' announcement.id %}" class="btn btn-link btn-sm">Read More</a>
-                </li>
-            {% empty %}
-                <li class="list-group-item">No announcements yet.</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <!-- Volunteer Profile View -->
-    {% if profile_user.user_type == "volunteer" %}
-        <h3 class="mt-4">Total Contributed Hours</h3>
-        <p class="lead">{{ total_hours }} hours</p>
-
-        <h3 class="mt-4">Registered Events</h3>
-        <ul class="list-group">
-            {% for registration in registered_events %}
-                <li class="list-group-item">
-                    <a href="{% url 'events:event_detail' registration.event.id %}">{{ registration.event.name }}</a>
-                    - {{ registration.event.date|date:"F d, Y" }}
-                </li>
-            {% empty %}
-                <li class="list-group-item">No registered events yet.</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+  {% if profile_user.user_type == "volunteer" %}
+    <!-- Registered Events -->
+    <h3 class="section-title">Registered Events</h3>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      {% for registration in registered_events %}
+        <div class="col">
+          <div class="card custom-card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title">{{ registration.event.name }}</h5>
+                <p class="text-muted small">{{ registration.event.date|date:"F d, Y" }}</p>
+              </div>
+              <a href="{% url 'events:event_detail' registration.event.id %}" class="btn btn-brand btn-sm mt-3">View Event</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No registered events yet.</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
-
-<style>
-    .profile-card {
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .profile-pic {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border: 3px solid #4264c9;
-    }
-
-    .card {
-        border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
-</style>
 {% endblock %}

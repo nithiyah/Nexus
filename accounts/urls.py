@@ -13,25 +13,21 @@ from django.conf.urls.static import static
 
 app_name = 'accounts'  # Ensures 'accounts:profile' works
 urlpatterns = [
-    path('', welcome, name='home'),  # Root URL for welcome page
+    path('', welcome, name='home'),
     path('login/', CustomLoginView.as_view(), name='login'), 
     path('register/volunteer/', views.register_volunteer, name='register_volunteer'),
     path('register/organisation/', views.register_organisation, name='register_organisation'),
-    path('login/redirect/', views.login_redirect, name='login_redirect'),  # Custom redirect
+    path('login/redirect/', views.login_redirect, name='login_redirect'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', profile_view, name='profile'),
-    path("profile/update/", update_profile, name="update_profile"),
-    path("profile/event-report/", views.volunteer_event_report, name="volunteer_event_report"),
+    path('profile/update/', update_profile, name='update_profile'),
+    path('profile/event-report/', views.volunteer_event_report, name='volunteer_event_report'),  # keep this OR the line below
+    # path('report/', views.volunteer_event_report, name='volunteer_event_report'),
 
-    path("profile/<str:username>/", views.public_profile_view, name="public_profile"),
+    path('profile/<str:username>/', views.public_profile_view, name='public_profile'),
+
     path('password-reset/', CustomPasswordResetView.as_view(), name='password_reset'),
     path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-
     path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
-
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
-    # path("profile/event-report/", views.volunteer_event_report, name="volunteer_event_report"),
-
-
 ]
-

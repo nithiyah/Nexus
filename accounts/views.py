@@ -21,6 +21,8 @@ from django.contrib import messages
 from events.models import Event, VolunteerEvent, VolunteerParticipation
 from announcements.models import Announcement
 from django.db import models
+from django.db.models import Sum
+
 User = get_user_model()
 
 
@@ -180,17 +182,44 @@ def register_organisation(request):
     
     return render(request, 'accounts/register_organisation.html', {'form': form})
 
+# @login_required
+# def profile_view(request):
+#     user = request.user  # Get logged-in user
+#     if request.method == 'POST':
+#         form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('accounts:profile')  # Redirect to profile page after saving
+#     else:
+#         form = ProfileUpdateForm(instance=user)
+    
+#     return render(request, 'accounts/profile.html', {'form': form})
+# @login_required
+# def profile_view(request):
+#     if request.method == 'POST':
+#         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, "Profile has been successfully updated!")
+#             return redirect('accounts:profile')
+#     else:
+#         form = ProfileUpdateForm(instance=request.user)
+
+#     return render(request, 'accounts/profile.html', {'form': form})
+
 @login_required
 def profile_view(request):
-    user = request.user  # Get logged-in user
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('accounts:profile')  # Redirect to profile page after saving
+            messages.success(request, "Profile has been successfully updated!")
+            return redirect('accounts:profile')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = ProfileUpdateForm(instance=user)
-    
+        form = ProfileUpdateForm(instance=request.user)
+
     return render(request, 'accounts/profile.html', {'form': form})
 
 @login_required
@@ -269,13 +298,31 @@ def public_profile_view(request, username):
         "total_hours": round(total_hours, 2),  # Rounded for cleaner display
     })
 
+# @login_required
+# def volunteer_event_report(request):
+#     # Get the events the user participated in
+#     volunteer_events = VolunteerEvent.objects.filter(volunteer=request.user)
 
+#     # Calculate total hours from VolunteerParticipation model
+#     total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
+#         total=Sum('hours_contributed')
+#     )['total'] or 0
+
+#     return render(request, 'accounts/volunteer_event_report.html', {
+#         'volunteer_events': volunteer_events,
+#         'total_hours': round(total_hours, 2),
+#     })
 @login_required
 def volunteer_event_report(request):
-    print("DEBUG: volunteer_event_report function executed")  # Debugging print statement
+    # Use VolunteerParticipation to access both event and hours
+    volunteer_events = VolunteerParticipation.objects.filter(volunteer=request.user).select_related('event')
 
-    volunteer_events = VolunteerParticipation.objects.filter(volunteer=request.user)
+    total_hours = volunteer_events.aggregate(
+        total=Sum('hours_contributed')
+    )['total'] or 0
 
-    return render(request, "accounts/volunteer_event_report.html", {
-        "volunteer_events": volunteer_events,
+    return render(request, 'accounts/volunteer_event_report.html', {
+        'volunteer_events': volunteer_events,
+        'total_hours': round(total_hours, 2),
     })
+

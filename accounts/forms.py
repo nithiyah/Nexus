@@ -22,10 +22,29 @@ class OrganisationRegistrationForm(UserCreationForm):
                   'email', 'contact_number', 'password1', 'password2']
 
 
+# class ProfileUpdateForm(forms.ModelForm):
+#     class Meta:
+#         model = CustomUser
+#         fields = ['profile_picture', 'full_name', 'email', 'contact_number']
+#         widgets = {
+#             'email': forms.EmailInput(attrs={'readonly': 'readonly'}),
+#         }
+
+# class ProfileUpdateForm(forms.ModelForm):
+#     class Meta:
+#         model = CustomUser
+#         fields = ['profile_picture', 'full_name', 'email', 'contact_number']
+#         widgets = {
+#             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+#             'email': forms.EmailInput(attrs={'readonly': 'readonly', 'class': 'form-control'}),
+#             'contact_number': forms.TextInput(attrs={'class': 'form-control'}),
+#         }
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['profile_picture', 'full_name', 'email', 'contact_number']
         widgets = {
-            'email': forms.EmailInput(attrs={'readonly': 'readonly'}),
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'readonly': 'readonly', 'class': 'form-control'}),
+            'contact_number': forms.TextInput(attrs={'class': 'form-control'}),
         }

@@ -1,36 +1,106 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Nexus</title>
-    <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to Nexus</title>
+
+  <!-- Google Font: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+        :root {
+        --brand-teal: #2b9faa;
+        --brand-hover: #1B6165;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 100px;
+        font-family: 'Inter', sans-serif;
+        background-color: #f5fafd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
         }
+
+        .welcome-container {
+        background-color: #ffffff;
+        padding: 50px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        max-width: 700px;
+        width: 100%;
+        }
+
+        .logo {
+        height: 90px;
+        margin-bottom: 30px;
+        }
+
+        h1 {
+        color: var(--brand-teal);
+        font-weight: 600;
+        font-size: 2.5rem; /* Increased from ~2rem */
+        margin-bottom: 15px;
+        }
+
+        p {
+        color: #555;
+        font-size: 1.125rem; /* Slightly larger body text */
+        margin-bottom: 30px;
+        }
+
         .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            margin: 10px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
+        display: inline-block;
+        padding: 16px 32px;
+        margin: 12px;
+        font-size: 1.1rem;
+        color: #fff;
+        background-color: var(--brand-teal);
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
         }
+
         .btn:hover {
-            background-color: #0056b3;
+        background-color: var(--brand-hover);
         }
-    </style>
+
+        .login-link {
+        font-size: 1rem;
+        margin-top: 25px;
+        color: #2b9faa;
+        font-weight: 500;
+        text-decoration: none;
+        }
+
+        .login-link:hover {
+        color: #1B6165;
+        text-decoration: underline;
+        }
+
+  </style>
 </head>
 <body>
+  <div class="welcome-container">
+    <img src="{% static 'images/Nexus_logo.png' %}" alt="Nexus Logo" class="logo" />
     <h1>Welcome to Nexus</h1>
-    <p>Connecting volunteers with organizations to make an impact.</p>
-    <a href="{% url 'accounts:register_volunteer' %}"class="btn">Sign Up As A Volunteer</a>
-    <a href="{% url 'accounts:register_organisation' %}" class="btn">Sign Up As an Organisation</a>
-    <p>Already Have An Account with us? <a href="{% url 'accounts:login' %}">Log In</a></p>
+    <p>Connecting volunteers with organisations to make an impact.</p>
+
+    <a href="{% url 'accounts:register_volunteer' %}" class="btn">Sign Up as a Volunteer</a>
+    <a href="{% url 'accounts:register_organisation' %}" class="btn">Sign Up as an Organisation</a>
+
+    <p class="mt-3">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}" class="login-link">Log In</a>
+    </p>
+  </div>
 </body>
 </html>
