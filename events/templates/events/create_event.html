@@ -4,70 +4,113 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg p-4 mb-5">
-                <h2 class="text-center mb-4">Create an Event</h2>
-                <a href="{% url 'events:organisation_dashboard' %}" class="btn btn-outline-primary mb-3">Return to Dashboard</a>
-                
-                <form method="post" class="needs-validation" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label for="id_name" class="form-label">Event Name:</label>
-                        <input type="text" id="id_name" name="name" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_description" class="form-label">Description:</label>
-                        <textarea id="id_description" name="description" class="form-control" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_date" class="form-label">Event Date:</label>
-                        <input type="date" id="id_date" name="date" class="form-control" required>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="id_start_time" class="form-label">Start Time:</label>
-                            <input type="time" id="id_start_time" name="start_time" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="id_end_time" class="form-label">End Time:</label>
-                            <input type="time" id="id_end_time" name="end_time" class="form-control" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_location" class="form-label">Location:</label>
-                        <input type="text" id="id_location" name="location" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_volunteers_needed" class="form-label">Number of Volunteers Needed:</label>
-                        <input type="number" id="id_volunteers_needed" name="volunteers_needed" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="id_roles_responsibilities" class="form-label">Roles & Responsibilities:</label>
-                        <textarea id="id_roles_responsibilities" name="roles_responsibilities" class="form-control" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Select Event Category:</label>
-                        <div class="form-check">
-                            {{ form.category }}
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg p-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="mb-0">Create an Event</h2>
+          <a href="{% url 'events:organisation_events' %}" class="btn btn-dashboard">
+            <i class="bi bi-arrow-left"></i> Return to Event Page
+          </a>
         </div>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="id_name" class="form-label">Event Name:</label>
+            <input type="text" id="id_name" name="name" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_description" class="form-label">Description:</label>
+            <textarea id="id_description" name="description" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_date" class="form-label">Event Date:</label>
+            <input type="date" id="id_date" name="date" class="form-control" required>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="id_start_time" class="form-label">Start Time:</label>
+              <input type="time" id="id_start_time" name="start_time" class="form-control" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="id_end_time" class="form-label">End Time:</label>
+              <input type="time" id="id_end_time" name="end_time" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_location" class="form-label">Location:</label>
+            <input type="text" id="id_location" name="location" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_volunteers_needed" class="form-label">Number of Volunteers Needed:</label>
+            <input type="number" id="id_volunteers_needed" name="volunteers_needed" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_roles_responsibilities" class="form-label">Roles & Responsibilities:</label>
+            <textarea id="id_roles_responsibilities" name="roles_responsibilities" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Select Event Category:</label>
+            <div class="form-check">
+              {{ form.category }}
+            </div>
+          </div>
+
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-submit">
+                <i class="bi bi-send-check"></i> Submit
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Styles -->
+<style>
+  .btn-submit {
+    background-color: #2b9faa;
+    color: white;
+    border: 2px solid #2b9faa;
+    border-radius: 15px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-submit:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .btn-dashboard {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-dashboard:hover {
+    background-color: #e0e0e0;
+    color: #000;
+    border-color: #bbb;
+  }
+
+  .btn i {
+    margin-right: 6px;
+  }
+</style>
 {% endblock %}

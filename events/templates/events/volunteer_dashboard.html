@@ -1,133 +1,151 @@
 {% extends 'base.html' %}
-
 {% block title %}Volunteer Dashboard{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">Welcome, Volunteer!</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold">Welcome, Volunteer!</h1>
+  </div>
+
+  <p class="text-muted">Explore upcoming events, track your hours, and connect with organisations.</p>
+
+  <!-- Summary Cards -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card text-white h-100 border-0" style="background-color: #6a4c93;">
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-white"><i class="bi bi-clock-fill me-2 text-white"></i>Total Hours Volunteered</h5>
+
+          <p class="display-4 flex-grow-1">{{ total_hours|floatformat:2|default:"0.00" }} hours</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card text-white h-100 border-0" style="background-color: #ee6c4d;">
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-white"><i class="bi bi-list-ul me-2 text-white"></i>Total Events Participated</h5>
+          <p class="display-4 flex-grow-1">{{ total_events }} events</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Filters + Cards -->
+  <div class="row g-4 align-items-start mt-4">
+    <!-- Filter Column -->
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title text-center"><i class="bi bi-funnel me-1"></i>Filter Events</h4>
+          <form method="get">
+            <div class="mb-3">
+              <fieldset>
+                <legend>Categories:</legend>
+                {% for category in categories %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="category" value="{{ category }}"
+                      {% if category in selected_categories %}checked{% endif %}>
+                    <label class="form-check-label">{{ category }}</label>
+                  </div>
+                {% endfor %}
+              </fieldset>
+            </div>
+
+            <div class="mb-3">
+              <label for="start_date" class="form-label">Start Date:</label>
+              <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="end_date" class="form-label">End Date:</label>
+              <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
+            </div>
+
+            <div class="text-center mt-3">
+              <button type="submit" class="btn btn-filter w-100">
+                <i class="bi bi-funnel"></i> Apply Filters
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <p class="text-muted">Explore upcoming events, track your hours, and connect with organisations.</p>
-    
-    <!-- Total Hours Contributed Volunteer Dashboard -->
-    <div class="row">
-        <div class="col-md-6 g-4">
-            <div class="card text-white bg-success mb-3 h-100">
+    <!-- Events Column -->
+    <div class="col-md-9">
+      {% if events %}
+        <div class="row g-4">
+          {% for event in events %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card shadow-sm h-100 border border-secondary-subtle">
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Total Hours Volunteered</h5>
-                    <p class="display-4 flex-grow-1">{{ total_hours|floatformat:2|default:"0.00" }} hours</p>
+                  <h5 class="card-title fw-semibold text-dark">{{ event.name }}</h5>
+                  <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                  <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+                  <p><strong>Location:</strong> {{ event.location }}</p>
+                  <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+                  <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
+                  <p class="text-muted flex-grow-1">{{ event.description }}</p>
+
+                  <div class="d-grid gap-2 mt-auto">
+                    {% if event.id in registered_event_ids %}
+                      <button class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-check2-square"></i> Registered
+                      </button>
+                    {% elif event.date.date >= today and event.open_spots > 0 %}
+                      <form action="{% url 'events:register_for_event' event.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">
+                          <i class="bi bi-check2-square"></i> Register
+                        </button>
+                      </form>
+                    {% else %}
+                      <button class="btn btn-danger w-100" disabled>
+                        <i class="bi bi-x-square"></i> Registration Closed
+                      </button>
+                    {% endif %}
+                  </div>
+                  
                 </div>
+              </div>
             </div>
+          {% endfor %}
         </div>
-        <div class="col-md-6 g-4">
-            <div class="card text-white bg-info mb-3 h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Total Events Participated</h5>
-                    <p class="display-4 flex-grow-1">{{ total_events }} events</p>
-                </div>
-            </div>
+      {% else %}
+        <div class="alert alert-info text-center">
+          <p>No events found matching your criteria.</p>
         </div>
+      {% endif %}
     </div>
-
-    <div class="row g-4 align-items-start mt-4"> <!-- Ensuring filter and events start on the same row -->
-        <!-- Filter Column -->
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title text-center">Filter Events</h4>
-                    <form method="get">
-                        <div class="mb-3">
-                            <fieldset>
-                                <legend>Categories:</legend>
-                                {% for category in categories %}
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="category" value="{{ category }}"
-                                               {% if category in selected_categories %}checked{% endif %}>
-                                        <label class="form-check-label">{{ category }}</label>
-                                    </div>
-                                {% endfor %}
-                            </fieldset>
-                        </div>
-
-                        <!-- Date Range Filter -->
-                        <div class="mb-3">
-                            <label for="start_date" class="form-label">Start Date:</label>
-                            <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="end_date" class="form-label">End Date:</label>
-                            <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter"></i> Apply Filters</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Events Column -->
-        <div class="col-md-9">
-            {% if events %}
-                <div class="row g-4"> <!-- Added g-4 for spacing between cards -->
-                    {% for event in events %}
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title">{{ event.name }}</h5>
-                                    <p><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
-                                    <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
-                                    <p><strong>Location:</strong> {{ event.location }}</p>
-                                    <p><strong>Category:</strong> {{ event.get_category_display }}</p>
-                                    <p><strong>Organisation:</strong> {{ event.organisation.username }}</p>
-                                    <p class="text-muted flex-grow-1">{{ event.description }}</p>
-
-                                    <div class="d-grid gap-2 mt-auto">
-                                        <!-- {% if event.id in registered_event_ids %}
-                                            <button class="btn btn-secondary w-100" disabled>
-                                                <i class="fas fa-check-circle"></i> Registered
-                                            </button>
-                                        {% elif event.open_spots > 0 %}
-                                            <form action="{% url 'events:register_for_event' event.id %}" method="post">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success w-100">
-                                                    <i class="fas fa-user-plus"></i> Register
-                                                </button>
-                                            </form>
-                                        {% endif %} -->
-
-                                        {% if event.id in registered_event_ids %}
-                                            <button class="btn btn-secondary w-100" disabled>
-                                                <i class="fas fa-check-circle"></i> Registered
-                                            </button>
-                                        {% elif event.date >= today and event.open_spots > 0 %}
-                                            <form action="{% url 'events:register_for_event' event.id %}" method="post">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success w-100">
-                                                    <i class="fas fa-user-plus"></i> Register
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            <button class="btn btn-danger w-100" disabled>
-                                                Registration Closed
-                                            </button>
-                                        {% endif %}
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center">
-                    <p>No events found matching your criteria.</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
+  </div>
 </div>
+
+<!-- Custom Styling -->
+<style>
+
+.btn {
+  border-radius: 15px;
+}
+
+  .btn-filter {
+    background-color: #2b9faa;
+    color: white;
+    border-radius: 15px;
+    border: 2px solid #2b9faa;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-filter:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .card-title {
+  color: #333; /* Dark gray, WCAG compliant */
+  font-weight: 600;
+}
+
+</style>
 {% endblock %}

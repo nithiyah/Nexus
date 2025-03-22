@@ -3,67 +3,140 @@
 {% block title %}Feedback for {{ event.name }}{% endblock %}
 
 {% block content %}
-    <h1>Feedback for {{ event.name }}</h1>
-    <h2>Feedback Summary</h2>
-    <canvas id="feedbackChart" width="400" height="200"></canvas>
-    
-        <!-- Load Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-        <script>
-            // Get the average ratings from Django context
-            var averageRatings = JSON.parse('{{ average_ratings|escapejs }}');
-    
-            var ctx = document.getElementById('feedbackChart').getContext('2d');
-            var feedbackChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Overall Experience', 'Registration', 'Venue', 'Schedule', 'Communication'],
-                    datasets: [{
-                        label: 'Average Ratings',
-                        data: averageRatings,
-                        backgroundColor: ['blue', 'green', 'purple', 'orange', 'red']
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: { beginAtZero: true, max: 5 }
-                    }
-                }
-            });
-        </script>
-    
-    {% if feedback_entries %}
-        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-            {% for feedback in feedback_entries %}
-                <div style="border: 1px solid #ddd; padding: 15px; width: 350px; border-radius: 8px;">
-                    <h3>{{ feedback.volunteer.full_name }}</h3>
-                    <p><strong>Overall Event Experience:</strong> {{ feedback.rating_1 }}</p>
-                    <p><strong>Registration Process:</strong> {{ feedback.rating_2 }}</p>
-                    <p><strong>Event Location/Venue:</strong> {{ feedback.rating_3 }}</p>
-                    <p><strong>Event Schedule and Timing:</strong> {{ feedback.rating_4 }}</p>
-                    <p><strong>Communication:</strong> {{ feedback.rating_5 }}</p>
+<div class="container mt-5">
 
-                    {% if feedback.additional_answer_1 %}
-                        <p><strong>What did you like most?</strong> {{ feedback.additional_answer_1 }}</p>
-                    {% endif %}
-                    
-                    {% if feedback.additional_answer_2 %}
-                        <p><strong>What did you like least?</strong> {{ feedback.additional_answer_2 }}</p>
-                    {% endif %}
+  <!-- Back Button -->
+  <div class="mb-4">
+    <a href="{% url 'events:feedback_hub' %}" class="btn btn-back">
+      <i class="bi bi-arrow-left"></i> Back to Feedback Hub
+    </a>
+  </div>
 
-                    <p><strong>Notify about future events?</strong> 
-                        {{ feedback.notify_future_events|yesno:"Yes,No" }}
-                    </p>
-                    <p><strong>Follow-up contact allowed?</strong> 
-                        {{ feedback.allow_follow_up_contact|yesno:"Yes,No" }}
-                    </p>
-                </div>
-            {% endfor %}
+  <!-- Feedback Summary -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header brand-header text-white">
+      <h2 class="mb-0">Feedback Summary for {{ event.name }}</h2>
+    </div>
+    <div class="card-body">
+      <canvas id="feedbackChart" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Individual Feedback Cards -->
+  {% if feedback_entries %}
+    <div class="row g-4">
+      {% for feedback in feedback_entries %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card feedback-card h-100 shadow-sm border border-secondary-subtle">
+            <div class="card-body">
+              <h5 class="card-title">{{ feedback.volunteer.full_name }}</h5>
+              <p><strong>Overall Event Experience:</strong> {{ feedback.rating_1 }}</p>
+              <p><strong>Registration Process:</strong> {{ feedback.rating_2 }}</p>
+              <p><strong>Event Location/Venue:</strong> {{ feedback.rating_3 }}</p>
+              <p><strong>Event Schedule and Timing:</strong> {{ feedback.rating_4 }}</p>
+              <p><strong>Communication:</strong> {{ feedback.rating_5 }}</p>
+
+              {% if feedback.additional_answer_1 %}
+                <p><strong>What did you like most?</strong><br>{{ feedback.additional_answer_1 }}</p>
+              {% endif %}
+
+              {% if feedback.additional_answer_2 %}
+                <p><strong>What did you like least?</strong><br>{{ feedback.additional_answer_2 }}</p>
+              {% endif %}
+
+              <p><strong>Notify about future events?</strong> {{ feedback.notify_future_events|yesno:"Yes,No" }}</p>
+              <p><strong>Follow-up contact allowed?</strong> {{ feedback.allow_follow_up_contact|yesno:"Yes,No" }}</p>
+            </div>
+          </div>
         </div>
-    {% else %}
-        <p>No feedback has been submitted yet.</p>
-    {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center mt-4">
+      <i class="bi bi-emoji-frown"></i> No feedback has been submitted yet.
+    </div>
+  {% endif %}
+</div>
 
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var averageRatings = JSON.parse('{{ average_ratings|escapejs }}');
 
+  const ctx = document.getElementById('feedbackChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Overall Experience', 'Registration', 'Venue', 'Schedule', 'Communication'],
+      datasets: [{
+        label: 'Average Ratings',
+        data: averageRatings,
+        backgroundColor: [
+          '#2b9faa',
+          '#f4a261',
+          '#5e60ce',
+          '#e76f51',
+          '#1B6165'
+        ],
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 5,
+          ticks: { stepSize: 1 }
+        }
+      }
+    }
+  });
+</script>
+
+<!-- Nexus Styling -->
+<style>
+  .brand-header {
+    background-color: #2b9faa;
+    padding: 1rem 1.25rem;
+  }
+
+  .btn-back {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-back:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+    color: #000;
+  }
+
+  .feedback-card {
+    border-radius: 15px;
+    padding: 1rem;
+  }
+
+  .feedback-card .card-body p {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: #2b9faa;
+    margin-bottom: 1rem;
+  }
+
+  canvas {
+    max-width: 100%;
+  }
+</style>
 {% endblock %}

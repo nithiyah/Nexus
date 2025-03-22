@@ -85,9 +85,22 @@ def add_comment(request, announcement_id):
     
     return redirect("announcements:announcement_detail", announcement_id=announcement_id)
 
+# @login_required
+# def like_announcement(request, announcement_id):
+#     # Allow users to like/unlike an announcement
+#     announcement = get_object_or_404(Announcement, id=announcement_id)
+#     like, created = AnnouncementLike.objects.get_or_create(announcement=announcement, user=request.user)
+
+# # NEED TO CHECK WHERE THIS GOES
+#     if not created:
+#         like.delete()
+#         messages.info(request, "You unliked this announcement.")
+#     else:
+#         messages.success(request, "You liked this announcement!")
+
+#     return redirect("announcements:announcement_list")
 @login_required
 def like_announcement(request, announcement_id):
-    # Allow users to like/unlike an announcement
     announcement = get_object_or_404(Announcement, id=announcement_id)
     like, created = AnnouncementLike.objects.get_or_create(announcement=announcement, user=request.user)
 
@@ -97,4 +110,5 @@ def like_announcement(request, announcement_id):
     else:
         messages.success(request, "You liked this announcement!")
 
-    return redirect("announcements:announcement_list")
+    # Redirect back to where the user came from
+    return redirect(request.META.get("HTTP_REFERER", "announcements:announcement_list"))

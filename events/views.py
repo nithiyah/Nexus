@@ -93,6 +93,7 @@ def volunteer_dashboard(request):
             'registered_event_ids': registered_event_ids,
             'total_hours': round(total_hours, 2),
             'total_events': total_events,
+            'today': now().date(),
         })
     return redirect('home')
 
@@ -188,22 +189,23 @@ def complete_event(request, event_id):
     messages.success(request, f"Event {event.name} marked as completed, and hours logged.")
     return redirect('events:organisation_events')
 
-@login_required
-def volunteer_events(request):
-    # Get all the events that volunteer particpate in
-    registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
+# @login_required
+# def volunteer_events(request):
+#     # Get all the events that volunteer particpate in
+#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
     
-    feedback_forms = {
-        event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
-        for event in registered_events
-    }
+#     feedback_forms = {
+#         event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
+#         for event in registered_events
+#     }
 
 
-    return render(request, 'events/volunteer_events.html', {
-        'registered_events': registered_events,
-        # pass the mapping to the template
-        'feedback_forms': feedback_forms,  
-    })
+#     return render(request, 'events/volunteer_events.html', {
+#         'registered_events': registered_events,
+#         # pass the mapping to the template
+#         'feedback_forms': feedback_forms,  
+#         'today': now().date(),
+#     })
 
 
 # Edit Event View
@@ -252,7 +254,7 @@ def create_event(request):
 
             # Create a chat room when an event is created
             ChatRoom.objects.create(event=event)
-            
+            messages.success(request, 'Event has been successfully created!')
             return redirect('events:organisation_events')
     else:
         form = EventForm()
@@ -417,28 +419,67 @@ def cancel_registration(request, event_id):
     return redirect("events:volunteer_events")
 
 
+# @login_required
+# def volunteer_events(request):
+#     # Get all the events that volunteer particpate in
+#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
+    
+#     feedback_forms = {
+#         event.event.id: event.event.feedback_form if hasattr(event.event, "feedback_form") else None
+#         for event in registered_events
+#     }
+
+
+#     return render(request, 'events/volunteer_events.html', {
+#         'registered_events': registered_events,
+#         # pass the mapping to the template
+#         'feedback_forms': feedback_forms,  
+#         'today': now().date(),
+#     })
+
+# @login_required
+# def volunteer_events(request):
+#     # Get all events the volunteer has registered for
+#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
+
+#     for registration in registered_events:
+#         # Check if event has a feedback form
+#         feedback_form = getattr(registration.event, "feedback_form", None)
+#         if feedback_form:
+#             feedback_exists = FeedbackResponse.objects.filter(
+#                 feedback_form=feedback_form, 
+#                 volunteer=request.user
+#             ).exists()
+#             registration.has_submitted_feedback = feedback_exists
+#         else:
+#             # feedback form doesnt exist
+#             registration.has_submitted_feedback = None  
+
+#     return render(request, 'events/volunteer_events.html', {
+#         'registered_events': registered_events,
+#     })
+
+from django.utils.timezone import now
+
 @login_required
 def volunteer_events(request):
-    # Get all events the volunteer has registered for
     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
 
     for registration in registered_events:
-        # Check if event has a feedback form
         feedback_form = getattr(registration.event, "feedback_form", None)
         if feedback_form:
             feedback_exists = FeedbackResponse.objects.filter(
-                feedback_form=feedback_form, 
+                feedback_form=feedback_form,
                 volunteer=request.user
             ).exists()
             registration.has_submitted_feedback = feedback_exists
         else:
-            # feedback form doesnt exist
             registration.has_submitted_feedback = None  
 
     return render(request, 'events/volunteer_events.html', {
         'registered_events': registered_events,
+        'today': now().date(),  # Add this line
     })
-
 
 
 from django.utils.timezone import now, localtime, is_naive, make_aware
@@ -447,29 +488,71 @@ from django.utils.timezone import now, localtime, is_naive, make_aware
 # Converts event.date to timezone-aware before passing it to the template.
 # Ensures localtime() does not throw an error.
 
-from django.utils.timezone import now, localtime, is_naive, make_aware
+# from django.utils.timezone import now, localtime, is_naive, make_aware
+
+# @login_required
+# def organisation_events(request):
+#     events = Event.objects.filter(organisation=request.user)
+    
+#     # Convert all the event dates to timezone-aware before it is rendered
+#     for event in events:
+#         if is_naive(event.date):  
+#             # If it is naive, make it timezone-aware
+#             event.date = make_aware(event.date)
+
+#         event.volunteers = VolunteerEvent.objects.filter(event=event)
+
+#     # Ensure the current time is timezone-aware
+#     # now() will return a timezone-aware datetime
+#     current_time = now()  
+
+#     return render(request, 'events/organisation_events.html', {
+#         'events': events,
+#         'current_time': current_time,
+#     })
+
+from django.utils.timezone import now, is_naive, make_aware
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Event, VolunteerEvent
 
 @login_required
 def organisation_events(request):
     events = Event.objects.filter(organisation=request.user)
-    
-    # Convert all the event dates to timezone-aware before it is rendered
-    for event in events:
-        if is_naive(event.date):  
-            # If it is naive, make it timezone-aware
-            event.date = make_aware(event.date)
 
+    # Filters
+    status = request.GET.get('status')
+    category = request.GET.get('category')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if status == 'ongoing':
+        events = events.filter(date__gte=now())
+    elif status == 'completed':
+        events = events.filter(date__lt=now())
+
+    if category:
+        events = events.filter(category=category)
+
+    if start_date:
+        events = events.filter(date__gte=start_date)
+
+    if end_date:
+        events = events.filter(date__lte=end_date)
+
+    # Attach volunteer data & make datetime aware
+    for event in events:
+        if is_naive(event.date):
+            event.date = make_aware(event.date)
         event.volunteers = VolunteerEvent.objects.filter(event=event)
 
-    # Ensure the current time is timezone-aware
-    # now() will return a timezone-aware datetime
-    current_time = now()  
+    category_labels = dict(Event.CATEGORY_CHOICES)
 
     return render(request, 'events/organisation_events.html', {
         'events': events,
-        'current_time': current_time,
+        'current_time': now(),
+        'category_labels': category_labels,
     })
-
 
 
 
@@ -636,12 +719,52 @@ def complete_feedback(request, event_id):
 
 
 
+# @login_required
+# def feedback_hub(request):
+#     """Render the Feedback Hub page where organizations manage feedback."""
+#     events = Event.objects.filter(organisation=request.user)  # Get all events for this organization
+#     return render(request, "events/feedback_hub.html", {"events": events})
+
+from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Event
+
 @login_required
 def feedback_hub(request):
-    """Render the Feedback Hub page where organizations manage feedback."""
-    events = Event.objects.filter(organisation=request.user)  # Get all events for this organization
-    return render(request, "events/feedback_hub.html", {"events": events})
+    if request.user.user_type == 'organisation':
+        events = Event.objects.filter(organisation=request.user)
 
+        # Get filter parameters from request
+        status = request.GET.get('status')
+        category = request.GET.get('category')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        # Apply filtering
+        if status == 'ongoing':
+            events = events.filter(date__gte=now())
+        elif status == 'completed':
+            events = events.filter(date__lt=now())
+
+        if category:
+            events = events.filter(category=category)
+
+        if start_date:
+            events = events.filter(date__gte=start_date)
+
+        if end_date:
+            events = events.filter(date__lte=end_date)
+
+        # Provide category labels for template
+        category_choices = dict(Event.CATEGORY_CHOICES)
+
+        return render(request, "events/feedback_hub.html", {
+            "events": events,
+            "category_labels": category_choices,
+            "current_time": now(),
+        })
+    return redirect("home")
 
 @login_required
 def volunteer_list(request, event_id):

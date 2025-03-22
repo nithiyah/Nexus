@@ -5,7 +5,9 @@
 {% block content %}
 <div class="container mt-5 mb-5">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+
+        <div class="card-header text-white" style="background-color: #2b9faa;">
+
             <h2 class="mb-0">Feedback for {{ event.name }}</h2>
         </div>
         <div class="card-body">
@@ -171,11 +173,33 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-success w-100">
-                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                <button type="submit" class="btn btn-submit w-100">
+                    <i class="bi bi-send-check"></i>  Submit Feedback
                 </button>
             </form>
         </div>
     </div>
 </div>
+<style>
+    body, .card-body, .form-check-label, .form-label, .card-header h2, .card-title {
+    font-family: 'Inter', sans-serif;
+    }
+
+    /* Brand button styling */
+    .btn-submit {
+      background-color: #2b9faa;
+      border-color: #2b9faa;
+      border-radius: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease-in-out;
+    }
+  
+    .btn-submit:hover {
+      background-color: #1B6165;
+      border-color: #1B6165;
+      color: white;
+    }
+  </style>
+  
 {% endblock %}

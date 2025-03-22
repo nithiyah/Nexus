@@ -3,20 +3,65 @@
 {% block title %}Delete Event{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg p-4 text-center">
-                <h2 class="text-danger">Delete Event</h2>
-                <p class="lead">Are you sure you want to delete <strong>{{ event.name }}</strong>?</p>
-                
-                <form method="POST" class="mb-3">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    <a href="{% url 'events:organisation_dashboard' %}" class="btn btn-secondary">Cancel</a>
-                </form>
-            </div>
-        </div>
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg p-4 text-center border border-danger-subtle">
+        <h2 class="text-danger mb-3">Delete Event</h2>
+        <p class="lead mb-4">
+          Are you sure you want to delete <strong>{{ event.name }}</strong>?<br>
+          <span class="text-muted small">This action cannot be undone.</span>
+        </p>
+
+        <form method="POST" class="d-flex flex-column flex-md-row justify-content-center gap-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger px-4">
+            <i class="bi bi-trash"></i> Yes, Delete
+          </button>
+          <a href="{% url 'events:organisation_events' %}" class="btn btn-cancel px-4"> Cancel</a>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Styles -->
+<style>
+  .btn {
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-cancel {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 2px solid #ccc;
+  }
+
+  .btn-cancel:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+    color: #000;
+  }
+
+  .btn-danger {
+    border-radius: 15px;
+    font-weight: 600;
+    border: 2px solid #dc3545;
+  }
+
+  .btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #bb2d3b;
+  }
+
+  .card h2 {
+    font-weight: 700;
+  }
+
+  .card {
+    font-family: 'Inter', sans-serif;
+  }
+</style>
 {% endblock %}

@@ -1,61 +1,189 @@
 {% extends "base.html" %}
-
 {% block title %}Feedback Hub{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4 text-center">Feedback Hub</h1>
-    <p class="text-muted text-center">Manage feedback for your events below:</p>
+  <h1 class="mb-4 text-center">Feedback Hub</h1>
+  <p class="text-muted text-center">Manage feedback for your events below:</p>
 
-    {% if events %}
-        <!-- Match the organisation dashboard layout -->
+  <div class="row g-4 align-items-start">
+    <!-- Filter Sidebar -->
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title text-center">
+            <i class="bi bi-funnel me-1"></i>Filter Events
+          </h4>
+          <form method="get">
+            <!-- Status Filter -->
+            <div class="mb-3">
+              <label for="status" class="form-label">Status:</label>
+              <select class="form-select" name="status" id="status">
+                <option value="" selected>All</option>
+                <option value="ongoing" {% if request.GET.status == "ongoing" %}selected{% endif %}>Ongoing</option>
+                <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Completed</option>
+              </select>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="mb-3">
+              <label for="category" class="form-label">Category:</label>
+              <select class="form-select" name="category" id="category">
+                <option value="" selected>All Categories</option>
+                {% for key, label in category_labels.items %}
+                  <option value="{{ key }}" {% if request.GET.category == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Date Range -->
+            <div class="mb-3">
+              <label for="start_date" class="form-label">Start Date:</label>
+              <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="end_date" class="form-label">End Date:</label>
+              <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn btn-filter w-100">
+                <i class="bi bi-funnel"></i> Apply Filters
+              </button>
+            </div>
+            <a href="{% url 'events:feedback_hub' %}" class="btn btn-outline-secondary w-100 mt-2" style="border-radius: 15px;">
+                <i class="bi bi-x-circle"></i> Reset Filters
+            </a>
+              
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Feedback Cards -->
+    <div class="col-md-9">
+      {% if events %}
         <div class="row g-4">
-            {% for event in events %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-lg border-0 h-100">
-                        <div class="card-body d-flex flex-column">
-                            <!-- Event Title -->
-                            <h5 class="card-title text-primary">{{ event.name }}</h5>
+          {% for event in events %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card shadow-sm border border-secondary-subtle h-100 pt-4 position-relative">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                  <h5 class="card-title m-0">{{ event.name }}</h5>
+                  <span class="badge {% if event.date.date >= current_time.date %}bg-warning text-dark{% else %}bg-success text-white{% endif %}
+                            p-2 rounded-pill">
+                    {% if event.date.date >= current_time.date %}
+                      Ongoing
+                    {% else %}
+                      Completed
+                    {% endif %}
+                  </span>
+                </div>
 
-                            <!-- Event Date/Time/Location -->
-                            <p class="card-text">
-                                <strong>Date:</strong>
-                                {{ event.date|date:"M d, Y" }}
-                            </p>
-                            <p class="card-text">
-                                <strong>Time:</strong>
-                                {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}
-                            </p>
-                            <p class="card-text">
-                                <strong>Location:</strong>
-                                {{ event.location }}
-                            </p>
+                <div class="card-body d-flex flex-column">
+                  <p class="card-text"><strong>Date:</strong> {{ event.date|date:"M d, Y" }}</p>
+                  <p class="card-text"><strong>Time:</strong> {{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</p>
+                  <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                  <p class="card-text"><strong>Category:</strong> {{ event.get_category_display }}</p>
+                  <p class="card-text flex-grow-1">{{ event.description }}</p>
 
-                            <!-- Spacer to push buttons to the bottom if you like that layout -->
-                            <div class="flex-grow-1"></div>
-
-                            <!-- Feedback Management Buttons -->
-                            <div class="d-grid gap-2 mt-2">
-                                <a href="{% url 'events:create_feedback_form' event.id %}"
-                                   class="btn btn-success">
-                                    <i class="fas fa-edit"></i> Create/Edit Feedback Form
-                                </a>
-                                <a href="{% url 'events:publish_feedback' event.id %}"
-                                   class="btn btn-primary">
-                                    <i class="fas fa-bullhorn"></i> Publish Feedback
-                                </a>
-                                <a href="{% url 'events:view_feedback' event.id %}"
-                                   class="btn btn-dark">
-                                    <i class="fas fa-eye"></i> View Submitted Feedback
-                                </a>
-                            </div>
-                        </div><!-- /.card-body -->
-                    </div><!-- /.card -->
-                </div><!-- /.col-md-6 -->
-            {% endfor %}
-        </div><!-- /.row -->
-    {% else %}
-        <p class="text-center text-muted">You have no events listed.</p>
-    {% endif %}
+                  <div class="d-grid gap-2 mt-auto">
+                    <a href="{% url 'events:create_feedback_form' event.id %}" class="btn btn-feedback w-100">
+                      <i class="bi bi-file-text"></i> Create/Edit Feedback Form
+                    </a>
+                    <a href="{% url 'events:publish_feedback' event.id %}" class="btn btn-publish w-100">
+                      <i class="bi bi-bullhorn"></i> Publish Feedback
+                    </a>
+                    <a href="{% url 'events:view_feedback' event.id %}" class="btn btn-view-feedback w-100">
+                      <i class="bi bi-eye"></i> View Submitted Feedback
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- <p class="text-center text-muted">No events found matching your filters.</p> -->
+        <div class="card shadow-sm p-4 text-center border border-secondary-subtle">
+            <h4 class="text-muted mb-2">
+              No Results Found
+            </h4>
+            <p class="mb-0">No events matched your selected filters.<br>
+            Try adjusting your search criteria or clearing the filters.</p>
+          </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
+
+<!-- Styling -->
+<style>
+  .btn {
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-filter {
+    background-color: #2b9faa;
+    color: white;
+    border: 2px solid #2b9faa;
+  }
+
+  .btn-filter:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .btn-feedback {
+    background-color: #f4a261;
+    color: white;
+    border: 2px solid #f4a261;
+  }
+
+  .btn-feedback:hover {
+    background-color: #e76f51;
+    border-color: #e76f51;
+    color: white;
+  }
+
+  .btn-publish {
+    background-color: #2b9faa;
+    color: white;
+    border: 2px solid #2b9faa;
+  }
+
+  .btn-publish:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .btn-view-feedback {
+    background-color: #5e60ce;
+    color: white;
+    border: 2px solid #5e60ce;
+  }
+
+  .btn-view-feedback:hover {
+    background-color: #4a4db4;
+    border-color: #4a4db4;
+    color: white;
+  }
+
+  .btn i {
+    margin-right: 6px;
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .badge {
+    font-size: 0.85rem;
+  }
+</style>
 {% endblock %}

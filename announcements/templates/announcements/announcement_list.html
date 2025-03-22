@@ -35,7 +35,7 @@
     background-color: #2b9faa;
     color: white;
     border: 2px solid #2b9faa;
-    border-radius: 25px;
+    border-radius: 15px;
     padding: 10px 20px;
     font-weight: 500;
     transition: all 0.2s ease-in-out;
@@ -55,7 +55,7 @@
     border: 2px solid #2b9faa;
     color: #2b9faa;
     background-color: transparent;
-    border-radius: 25px;
+    border-radius: 15px;
     padding: 10px 20px;
     font-weight: 500;
     transition: all 0.2s ease-in-out;
@@ -76,7 +76,7 @@
     {% if request.user.user_type == "organisation" %}
     
         <a href="{% url 'announcements:create_announcement' %}" class="btn btn-new-announcement">
-            <i class="bi bi-plus"></i> New Announcement
+          <i class="bi bi-plus-circle"></i> New Announcement
         </a>
         <a href="{% url 'announcements:all_announcements' %}" class="btn btn-outline-brand">
             <i class="bi bi-view-stacked"></i></i> View All Announcements
