@@ -131,6 +131,10 @@ def organisation_dashboard(request):
         if end_date:
             events = events.filter(date__lte=end_date)
 
+        # Attach feedback form to each event
+        for event in events:
+            event.feedback_form = FeedbackForm.objects.filter(event=event).first()
+       
         # Get distinct categories for filtering
         category_choices = dict(Event.CATEGORY_CHOICES)
 
@@ -573,52 +577,126 @@ def remove_volunteer(request, registration_id):
 
 
 # organisation to create and edit feedback form
+# @login_required
+# def create_feedback_form(request, event_id):
+#     event = get_object_or_404(Event, id=event_id, organisation=request.user)
+
+#     feedback_form, created = FeedbackForm.objects.get_or_create(event=event, created_by=request.user)
+    
+#     if request.method == "POST":
+#         form = FeedbackFormForm(request.POST, instance=feedback_form)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, "Feedback form updated successfully!")
+
+#             return redirect("events:organisation_dashboard")
+#     else:
+#         form = FeedbackFormForm(instance=feedback_form)
+
+#     return render(request, "events/create_feedback_form.html", {"form": form, "event": event})
 @login_required
 def create_feedback_form(request, event_id):
     event = get_object_or_404(Event, id=event_id, organisation=request.user)
 
-    feedback_form, created = FeedbackForm.objects.get_or_create(event=event, created_by=request.user)
-    
-    if request.method == "POST":
+    # Check if a feedback form already exists for this event
+    feedback_form = getattr(event, 'feedback_form', None)
+
+    if request.method == 'POST':
         form = FeedbackFormForm(request.POST, instance=feedback_form)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Feedback form updated successfully!")
-
-            return redirect("events:organisation_dashboard")
+            feedback = form.save(commit=False)
+            feedback.event = event  # Assign the event
+            feedback.created_by = request.user  #Assign the organisation user
+            feedback.save()
+            messages.success(request, "Feedback form saved successfully.")
+            return redirect('events:organisation_dashboard')
     else:
         form = FeedbackFormForm(instance=feedback_form)
 
-    return render(request, "events/create_feedback_form.html", {"form": form, "event": event})
+    return render(request, 'events/create_feedback_form.html', {
+        'form': form,
+        'event': event,
+    })
 
 # organisation to publish feedback form view
+# @login_required
+# def publish_feedback(request, event_id):
+#     event = get_object_or_404(Event, id=event_id, organisation=request.user)
+
+#     # Fetch the feedback form or return 404 if it doesn't exist
+#     # feedback_form = get_object_or_404(FeedbackForm, event=event)
+#     feedback_form = FeedbackForm.objects.filter(event=event).first()
+
+
+
+#     if not feedback_form:
+#         messages.error(request, "No feedback form exists for this event.")
+#         #return redirect("events:feedback_event_page", event_id=event.id)  # Redirect back to event page
+#         return redirect("events:organisation_dashboard", event_id=event.id)  # Redirect back to event page
+
+#     # To publish the feedback form
+#     feedback_form.published = True  
+#     feedback_form.save()
+#     messages.success(request, "Feedback form has been succesfully published")
+
+#     return redirect("events:organisation_dashboard")
+# @login_required
+# def publish_feedback(request, event_id):
+#     event = get_object_or_404(Event, id=event_id, organisation=request.user)
+#     feedback_form = getattr(event, 'feedback_form', None)
+
+#     if feedback_form:
+#         feedback_form.published = True
+#         feedback_form.save()
+#         messages.success(request, "Feedback form published successfully!")
+#     else:
+#         messages.error(request, "Feedback form not found for this event.")
+
+#     return redirect('events:organisation_dashboard')  #fixed redirect
 @login_required
 def publish_feedback(request, event_id):
     event = get_object_or_404(Event, id=event_id, organisation=request.user)
+    
+    try:
+        feedback_form = event.feedback_form
+        feedback_form.published = True
+        feedback_form.save()
+        messages.success(request, "Feedback form published successfully!")
+    except FeedbackForm.DoesNotExist:
+        messages.error(request, "No feedback form has been created for this event.")
 
-    # Fetch the feedback form or return 404 if it doesn't exist
-    # feedback_form = get_object_or_404(FeedbackForm, event=event)
-    feedback_form = FeedbackForm.objects.filter(event=event).first()
-
-
-
-    if not feedback_form:
-        messages.error(request, "No feedback form exists for this event.")
-        return redirect("events:feedback_event_page", event_id=event.id)  # Redirect back to event page
-
-    # To publish the feedback form
-    feedback_form.published = True  
-    feedback_form.save()
-    messages.success(request, "Feedback form has been succesfully published")
-
-    return redirect("events:organisation_dashboard")
+    return redirect('events:organisation_dashboard')
 
 
 # volunteers to complete the feedback form
+# @login_required
+# def complete_feedback(request, event_id):
+#     feedback_form = get_object_or_404(FeedbackForm, event_id=event_id, published=True)
+    
+#     if request.method == "POST":
+#         form = FeedbackResponseForm(request.POST)
+#         if form.is_valid():
+#             feedback = form.save(commit=False)
+#             feedback.feedback_form = feedback_form
+#             feedback.volunteer = request.user
+#             feedback.save()
+#             messages.success(request, "Feedback submitted successfully!")
+#             return redirect("events:volunteer_events")
+#     else:
+#         # form = FeedbackResponse()
+#         form = FeedbackResponseForm()
+#     return render(request, "events/complete_feedback.html", {"form": form, "feedback_form": feedback_form})
 @login_required
 def complete_feedback(request, event_id):
     feedback_form = get_object_or_404(FeedbackForm, event_id=event_id, published=True)
-    
+
+    # Collect only non-empty questions
+    questions = [
+        (f"rating_{i}", getattr(feedback_form, f"question_{i}"))
+        for i in range(1, 6)
+        if getattr(feedback_form, f"question_{i}")
+    ]
+
     if request.method == "POST":
         form = FeedbackResponseForm(request.POST)
         if form.is_valid():
@@ -629,9 +707,13 @@ def complete_feedback(request, event_id):
             messages.success(request, "Feedback submitted successfully!")
             return redirect("events:volunteer_events")
     else:
-        form = FeedbackResponse()
+        form = FeedbackResponseForm()
 
-    return render(request, "events/complete_feedback.html", {"form": form, "feedback_form": feedback_form})
+    return render(request, "events/complete_feedback_form.html", {
+        "form": form,
+        "feedback_form": feedback_form,
+        "questions": questions,  # Pass the filtered list
+    })
 
 # volunteers to submit feedback form
 # @login_required

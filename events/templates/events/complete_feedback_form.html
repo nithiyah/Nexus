@@ -1,175 +1,162 @@
 {% extends 'base.html' %}
-{% block title %}Complete Feedback{% endblock %}
+{% block title %}Complete Feedback Form{% endblock %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
-  <div class="card shadow-sm border">
-    <div class="card-header text-white brand-header">
-      <h2 class="mb-0">Feedback for {{ feedback_form.event.name }}</h2>
-      <a href="{% url 'events:volunteer_events' %}" class="btn btn-report">
-        <i class="bi bi-arrow-left"></i> Back to My Events
-      </a>
+
+  <!-- Back Button -->
+  <a href="{% url 'events:volunteer_events' %}" class="btn btn-outline-secondary mb-3" style="border-radius: 15px;">
+    <i class="bi bi-arrow-left me-1"></i> Back to My Events
+  </a>
+
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header bg-brand text-white rounded-top-4">
+      <h2 class="mb-0">Feedback for {{ event.name }}</h2>
     </div>
 
-
     <div class="card-body">
-
-      <p class="text-muted">Please rate the event and share any additional comments.</p>
-
-      <!-- Show form errors if any -->
-      {% if form.errors %}
-        <div class="alert alert-danger">
-          <strong>There were errors in your submission:</strong>
-          <ul class="mb-0">
-            {% for field in form %}
-              {% for error in field.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
+      <p class="text-muted">Please fill out this form to share your feedback on the event.</p>
 
       <form method="post">
         {% csrf_token %}
 
         <!-- Question 1 -->
         <div class="mb-4">
-          <label class="form-label"><strong>{{ feedback_form.question_1 }}</strong></label>
-          <select name="rating_1" class="form-select" required>
-            <option value="">Select a rating</option>
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-          </select>
+          <p class="fw-semibold">{{ feedback_form.question_1 }}</p>
+          {% for i in "12345" %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating_1" value="{{ i }}" id="rating_1_{{ i }}">
+              <label class="form-check-label" for="rating_1_{{ i }}">{{ i }}</label>
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Question 2 -->
         <div class="mb-4">
-          <label class="form-label"><strong>{{ feedback_form.question_2 }}</strong></label>
-          <select name="rating_2" class="form-select" required>
-            <option value="">Select a rating</option>
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-          </select>
+          <p class="fw-semibold">{{ feedback_form.question_2 }}</p>
+          {% for i in "12345" %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating_2" value="{{ i }}" id="rating_2_{{ i }}">
+              <label class="form-check-label" for="rating_2_{{ i }}">{{ i }}</label>
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Question 3 -->
         <div class="mb-4">
-          <label class="form-label"><strong>{{ feedback_form.question_3 }}</strong></label>
-          <select name="rating_3" class="form-select" required>
-            <option value="">Select a rating</option>
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-          </select>
+          <p class="fw-semibold">{{ feedback_form.question_3 }}</p>
+          {% for i in "12345" %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating_3" value="{{ i }}" id="rating_3_{{ i }}">
+              <label class="form-check-label" for="rating_3_{{ i }}">{{ i }}</label>
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Question 4 -->
         <div class="mb-4">
-          <label class="form-label"><strong>{{ feedback_form.question_4 }}</strong></label>
-          <select name="rating_4" class="form-select" required>
-            <option value="">Select a rating</option>
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-          </select>
+          <p class="fw-semibold">{{ feedback_form.question_4 }}</p>
+          {% for i in "12345" %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating_4" value="{{ i }}" id="rating_4_{{ i }}">
+              <label class="form-check-label" for="rating_4_{{ i }}">{{ i }}</label>
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Question 5 -->
         <div class="mb-4">
-          <label class="form-label"><strong>{{ feedback_form.question_5 }}</strong></label>
-          <select name="rating_5" class="form-select" required>
-            <option value="">Select a rating</option>
-            <option value="1">1 - Very Poor</option>
-            <option value="2">2 - Poor</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Good</option>
-            <option value="5">5 - Excellent</option>
-          </select>
+          <p class="fw-semibold">{{ feedback_form.question_5 }}</p>
+          {% for i in "12345" %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating_5" value="{{ i }}" id="rating_5_{{ i }}">
+              <label class="form-check-label" for="rating_5_{{ i }}">{{ i }}</label>
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Additional Questions -->
+        {% if feedback_form.additional_question_1 %}
         <div class="mb-4">
-          <label class="form-label"><strong>What did you like most about the event?</strong></label>
+          <label class="form-label fw-semibold">{{ feedback_form.additional_question_1 }}</label>
           <textarea name="additional_answer_1" class="form-control" rows="3"></textarea>
         </div>
+        {% endif %}
 
+        {% if feedback_form.additional_question_2 %}
         <div class="mb-4">
-          <label class="form-label"><strong>What could be improved?</strong></label>
+          <label class="form-label fw-semibold">{{ feedback_form.additional_question_2 }}</label>
           <textarea name="additional_answer_2" class="form-control" rows="3"></textarea>
         </div>
+        {% endif %}
 
-        <!-- Boolean Fields -->
-        <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" name="notify_future_events" id="notifyFutureEvents">
-          <label class="form-check-label" for="notifyFutureEvents">
-            Notify me about future events
-          </label>
+        <!-- Preferences -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Would you like to be notified about future events?</label>
+          <select name="notify_future_events" class="form-select">
+            <option value="True">Yes</option>
+            <option value="False">No</option>
+          </select>
         </div>
 
-        <div class="form-check mb-4">
-          <input class="form-check-input" type="checkbox" name="allow_follow_up_contact" id="allowFollowUp">
-          <label class="form-check-label" for="allowFollowUp">
-            I agree to be contacted for follow-up
-          </label>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Can we contact you for follow-up?</label>
+          <select name="allow_follow_up_contact" class="form-select">
+            <option value="True">Yes</option>
+            <option value="False">No</option>
+          </select>
         </div>
 
-        <!-- Submit Button -->
-        <div class="d-grid">
-          <button type="submit" class="btn btn-brand">
-            <i class="bi bi-send"></i> Submit Feedback
-          </button>
-        </div>
+        <!-- Submit -->
+        <button type="submit" class="btn btn-brand w-100">
+          <i class="bi bi-send-fill me-1"></i> Submit Feedback
+        </button>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Styles -->
+<!-- Styling -->
 <style>
-  .brand-header {
+  .bg-brand {
     background-color: #2b9faa;
-    padding: 1rem 1.25rem;
-  }
-
-  .btn {
-    border-radius: 15px;
-    font-weight: 500;
-    transition: all 0.2s ease-in-out;
   }
 
   .btn-brand {
     background-color: #2b9faa;
     color: white;
-    border: 2px solid #2b9faa;
+    font-weight: 500;
+    border-radius: 15px;
+    padding: 10px 18px;
+    transition: 0.3s ease;
   }
 
   .btn-brand:hover {
     background-color: #1B6165;
-    border-color: #1B6165;
     color: white;
+  }
+
+  .card {
+    border: none;
+    border-radius: 15px;
+  }
+
+  .form-check-input {
+    border-radius: 50%;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 10px;
+    padding: 10px;
   }
 
   .form-label {
     font-weight: 500;
-    color: #333;
   }
 
-  .form-select,
-  .form-control {
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    padding: 10px;
+  .fw-semibold {
+    font-weight: 600;
   }
 </style>
 {% endblock %}

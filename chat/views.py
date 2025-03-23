@@ -87,6 +87,14 @@ def chat_room(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     chatroom, created = ChatRoom.objects.get_or_create(event=event)
 
+
+    # Mark all unread messages as read because the unread message remained even when they are read
+    # this fixed the unread messages error
+    UnreadMessage.objects.filter(
+        message__chatroom=chatroom, user=request.user, is_read=False
+    ).update(is_read=True)
+
+
     # Use a unique name to avoid conflict with Django's messages framework
     chat_messages = chatroom.messages.order_by("timestamp")
 

@@ -112,15 +112,15 @@
                         </li>
                         <li>
                           {% if event.feedback_form and event.feedback_form.published %}
-                            <button class="dropdown-item text-dark" disabled>
-                              <i class="bi bi-check2-circle me-1"></i> Feedback Published
+                            <button class="dropdown-item text-muted" disabled>
+                              <i class="bi bi-check-circle me-1 text-success"></i> Feedback Published
                             </button>
                           {% else %}
                             <a class="dropdown-item" href="{% url 'events:publish_feedback' event.id %}">
                               <i class="bi bi-bullhorn me-1"></i> Publish Feedback
                             </a>
                           {% endif %}
-                        </li>
+                        </li>                        
                         <li>
                           <a class="dropdown-item" href="{% url 'events:view_feedback' event.id %}">
                             <i class="bi bi-eye me-1"></i> View Submitted Feedback
