@@ -4,15 +4,22 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-center">{{ chatroom.event.name }} - Chat Room</h1>
+    <h1 class="text-center">{{ chatroom.event.name }} Chat Room</h1>
+    <div class="text-start mb-3">
+        <a href="{% url 'chat:chat_home' %}" class="btn btn-outline-secondary" style="border-radius: 15px;">
+          <i class="bi bi-arrow-left"></i> Back to Chat Home
+        </a>
+      </div>
+      
 
     <!-- Chat Messages Box -->
     <div class="card chat-container">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-brand text-white">
             Chat Messages
         </div>
         <div id="chat-box" class="card-body chat-box">
-            {% for message in messages %}
+          
+            {% for message in chat_messages %}
             <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
                 <div class="chat-message">
                     <a href="{% url 'accounts:public_profile' username=message.sender.username %}" class="chat-profile-link">
@@ -49,8 +56,19 @@
         {% csrf_token %}
         <div class="input-group">
             <input type="text" id="chat-message" class="form-control" placeholder="Type a message...">
-            <input type="file" id="chat-file" class="form-control-file">
-            <button type="submit" class="btn btn-primary">Send</button>
+            <!-- <input type="file" id="chat-file" class="form-control-file"> -->
+            <div class="custom-file-wrapper">
+                <label for="chat-file" class="btn btn-outline-brand mb-0">
+                  <i class="bi bi-paperclip me-1"></i> Choose File
+                </label>
+                <input type="file" id="chat-file" class="d-none">
+                <span id="file-name" class="file-name text-muted ms-2">No file chosen</span>
+            </div>
+              
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-send me-1"></i> Send
+            </button>
+              
         </div>
     </form>
 
@@ -60,108 +78,159 @@
 </div>
 
 <!-- Custom Chat Styles -->
-<style>
-    .chat-container {
-        border-radius: 10px;
-        overflow: hidden;
-    }
+    <style>
 
-    .chat-box {
-        height: 400px;
-        overflow-y: auto;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 5px;
-    }
+        .bg-brand {
+        background-color: #2b9faa !important;
+        }
 
-    .message {
-        max-width: 80%;
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        display: inline-block;
-        clear: both;
-    }
 
-    .sent {
-        background: #d1e7ff;
-        color: #000;
-        float: right;
-        text-align: right;
-    }
+        .chat-container {
+          border-radius: 15px;
+          overflow: hidden;
+          border: 2px solid #2b9faa;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+      
+        .chat-box {
+          height: 450px;
+          overflow-y: auto;
+          padding: 20px;
+          background: #f9fafa;
+          border-radius: 0 0 15px 15px;
+        }
+      
+        .chat-message {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 5px;
+        }
+      
+        .chat-profile-pic {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #2b9faa;
+        }
+      
+        .user-link {
+          font-weight: 600;
+          color: #2b9faa;
+          text-decoration: none;
+        }
+      
+        .user-link:hover {
+          text-decoration: underline;
+          color: #1B6165;
+        }
+      
+        .message {
+          max-width: 75%;
+          padding: 12px 16px;
+          border-radius: 15px;
+          margin-bottom: 15px;
+          display: inline-block;
+          clear: both;
+        }
+      
+        .sent {
+          background: #e1f2f3;
+          color: #000;
+          float: right;
+          text-align: right;
+        }
+      
+        .received {
+          background: #ececec;
+          color: #000;
+          float: left;
+          text-align: left;
+        }
+      
+        .message-timestamp {
+          font-size: 0.75rem;
+          color: gray;
+          display: block;
+          margin-top: 4px;
+        }
+      
+        .file-link {
+          font-weight: 500;
+          color: #3c959d;
+          text-decoration: none;
+        }
+      
+        .file-link:hover {
+          color: #1B6165;
+          text-decoration: underline;
+        }
+      
+        /* Input styling */
+        #chat-form .form-control,
+        #chat-form .form-control-file,
+        #chat-form .btn {
+          border-radius: 15px;
+        }
+      
+        #chat-message {
+          flex: 1;
+        }
+      
+        #chat-form .btn {
+          background-color: #2b9faa;
+          color: white;
+          font-weight: 500;
+          border: none;
+          padding: 8px 16px;
+        }
+      
+        #chat-form .btn:hover {
+          background-color: #1B6165;
+          color: white;
+        }
+      
+        #online-users {
+          font-size: 0.95rem;
+          font-weight: 500;
+          color: #2b9faa;
+        }
 
-    .received {
-        background: #e9ecef;
-        color: #000;
-        float: left;
-        text-align: left;
-    }
 
-    .message p {
-        margin: 5px 0;
-    }
 
-    .message-timestamp {
-        font-size: 12px;
-        color: gray;
-        display: block;
-    }
+        .custom-file-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .file-link {
-        font-weight: bold;
-        color: #007bff;
-        text-decoration: none;
-    }
+        .btn-outline-brand {
+        border: 2px solid #2b9faa;
+        color: #2b9faa;
+        font-weight: 500;
+        border-radius: 15px;
+        transition: all 0.2s ease-in-out;
+        padding: 8px 16px;
+        background-color: transparent;
+        }
 
-    .file-link:hover {
-        text-decoration: underline;
-    }
+        .btn-outline-brand:hover {
+        background-color: #2b9faa;
+        color: white;
+        }
 
-    .input-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+        .file-name {
+        font-size: 0.9rem;
+        color: #666;
+        margin-right: 10px; /* Add this line */
+        }
 
-    .form-control-file {
-        margin-left: 10px;
-    }
-</style>
-<style>
-    .chat-message {
-        display: flex;
-        align-items: center;
-        gap: 8px;  /* Adjust space between profile pic and username */
-        margin-bottom: 5px;
-    }
 
-    .chat-profile-pic {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #4264c9;
-    }
 
-    /* .chat-text {
-        background: #f1f1f1;
-        padding: 8px 12px;
-        border-radius: 8px;
-        max-width: 70%;
-    } */
 
-    .message-timestamp {
-        font-size: 12px;
-        color: gray;
-    }
-
-    .user-link {
-        text-decoration: none;
-        font-weight: bold;
-        color: #4264c9;
-    }
-</style>
-
+      </style>
+      
 
 
 <!-- Chat WebSocket & JavaScript -->
@@ -180,24 +249,71 @@
         };
 
         function appendMessage(sender, message, fileUrl, timestamp) {
-            let chatBox = document.getElementById("chat-box");
-            let messageContainer = document.createElement("div");
+            const chatBox = document.getElementById("chat-box");
+            const messageContainer = document.createElement("div");
 
-            messageContainer.classList.add("message");
-            messageContainer.classList.add(sender === "{{ request.user.username }}" ? "sent" : "received");
+            const isSent = sender === "{{ request.user.username }}";
+            messageContainer.classList.add("message", isSent ? "sent" : "received");
 
-            messageContainer.innerHTML = `<p><strong>${sender}</strong></p>`;
+            // Build profile picture + username block
+            const chatMessage = document.createElement("div");
+            chatMessage.classList.add("chat-message");
+
+            const profilePic = document.createElement("img");
+            profilePic.className = "chat-profile-pic";
+            profilePic.src = isSent
+                ? "{{ request.user.profile_picture.url|default_if_none:'https://via.placeholder.com/40' }}"
+                : "https://via.placeholder.com/40"; // You can’t get other users' pics unless fetched via AJAX
+            profilePic.alt = sender;
+
+            const profileLink = document.createElement("a");
+            profileLink.href = `/accounts/profile/${sender}/`;
+            profileLink.className = "chat-profile-link";
+            profileLink.appendChild(profilePic);
+
+            const usernameLink = document.createElement("a");
+            usernameLink.href = `/accounts/profile/${sender}/`;
+            usernameLink.className = "user-link";
+            usernameLink.innerText = sender;
+
+            const strongTag = document.createElement("strong");
+            strongTag.appendChild(usernameLink);
+
+            chatMessage.appendChild(profileLink);
+            chatMessage.appendChild(strongTag);
+
+            messageContainer.appendChild(chatMessage);
+
+            // Chat content
+            const chatText = document.createElement("div");
+            chatText.classList.add("chat-text");
+
             if (message) {
-                messageContainer.innerHTML += `<p class="message-text">${message}</p>`;
+                const messageText = document.createElement("p");
+                messageText.className = "message-text";
+                messageText.textContent = message;
+                chatText.appendChild(messageText);
             }
-            if (fileUrl) {
-                messageContainer.innerHTML += `<p><a href="${fileUrl}" download class="file-link">Download File</a></p>`;
-            }
-            messageContainer.innerHTML += `<span class="message-timestamp">${timestamp}</span>`;
 
+            if (fileUrl) {
+                const fileLink = document.createElement("a");
+                fileLink.href = fileUrl;
+                fileLink.download = "";
+                fileLink.className = "file-link";
+                fileLink.textContent = "Download File";
+                chatText.appendChild(fileLink);
+            }
+
+            const timestampSpan = document.createElement("span");
+            timestampSpan.className = "message-timestamp";
+            timestampSpan.textContent = timestamp;
+            chatText.appendChild(timestampSpan);
+
+            messageContainer.appendChild(chatText);
             chatBox.appendChild(messageContainer);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
 
         chatSocket.onclose = function () {
             console.warn("WebSocket connection closed.");
@@ -237,5 +353,15 @@
             fileInput.value = "";
         });
     });
+
+        document.getElementById('chat-file').addEventListener('change', function () {
+            const fileNameDisplay = document.getElementById('file-name');
+            if (this.files.length > 0) {
+            fileNameDisplay.textContent = this.files[0].name;
+            } else {
+            fileNameDisplay.textContent = "No file chosen";
+            }
+        });
+
 </script>
 {% endblock %}

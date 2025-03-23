@@ -3,29 +3,87 @@
 {% block title %}Chat Rooms{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Chat Rooms</h1>
-        <div class="row">
-            {% if chat_rooms %}
-                {% for room in chat_rooms %}
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">{{ room.event.name }}</h5>
-                                <p class="card-text text-muted">{{ room.participant_count }} Participants</p>
-                                {% if room.unread_messages > 0 %}
-                                <p class="text-danger"><strong>{{ room.unread_messages }} Unread Messages</strong></p>
-                                {% endif %}
-                                <a href="{% url 'chat:chat_room' room.event.id %}" class="btn btn-primary">Join Chat</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center">
-                    <p class="text-muted">No chat rooms available.</p>
-                </div>
-            {% endif %}
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Chat Rooms</h1>
+
+  <div class="row">
+    {% if chat_rooms %}
+      {% for room in chat_rooms %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 border border-secondary-subtle shadow-sm rounded-3">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <div>
+                <h5 class="card-title mb-2 text-brand">{{ room.event.name }}</h5>
+                
+                <!-- Date & Time -->
+                <p class="text-muted mb-1">
+                  <i class="bi bi-calendar-event"></i> {{ room.event.date|date:"M d, Y" }}
+                </p>
+                <p class="text-muted mb-2">
+                  <i class="bi bi-clock"></i> {{ room.event.start_time|time:"H:i" }} - {{ room.event.end_time|time:"H:i" }}
+                </p>
+
+                <p class="card-text text-muted">{{ room.participant_count }} Participants</p>
+
+                {% if room.unread_messages > 0 %}
+                  <span class="badge bg-danger mb-3">
+                    {{ room.unread_messages }} Unread Message{{ room.unread_messages|pluralize }}
+                  </span>
+                {% endif %}
+              </div>
+
+              <a href="{% url 'chat:chat_room' room.event.id %}" class="btn btn-chat w-100 mt-auto">
+                <i class="bi bi-chat-right-text"></i> Join Chat
+              </a>
+            </div>
+          </div>
         </div>
-    </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12 text-center">
+        <p class="text-muted">No chat rooms available.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Nexus Chat Styling -->
+<style>
+  .text-brand {
+    color: #2b9faa;
+  }
+
+  .btn-chat {
+    background-color: #2b9faa;
+    color: white;
+    font-weight: 500;
+    border: 2px solid #2b9faa;
+    border-radius: 15px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-chat:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .card-title {
+    font-weight: 600;
+  }
+
+  .badge.bg-danger {
+    font-size: 0.9rem;
+    padding: 0.5em 0.75em;
+    border-radius: 12px;
+  }
+
+  .card {
+    border-radius: 12px;
+  }
+
+  .card-body p i {
+    margin-right: 6px;
+  }
+</style>
 {% endblock %}

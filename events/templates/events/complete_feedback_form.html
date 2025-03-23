@@ -1,205 +1,175 @@
 {% extends 'base.html' %}
-
-{% block title %}Complete Feedback Form{% endblock %}
+{% block title %}Complete Feedback{% endblock %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
-    <div class="card shadow">
-
-        <div class="card-header text-white" style="background-color: #2b9faa;">
-
-            <h2 class="mb-0">Feedback for {{ event.name }}</h2>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">Please fill out this form to share your feedback on the event.</p>
-
-            <form method="post">
-                {% csrf_token %}
-
-                <!-- Feedback Questions -->
-                <div class="mb-3">
-                    <p><strong>{{ feedback_form.question_1 }}</strong></p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_1" value="1" id="rating_1_1">
-                        <label class="form-check-label" for="rating_1_1">1 - Poor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_1" value="2" id="rating_1_2">
-                        <label class="form-check-label" for="rating_1_2">2 - Fair</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_1" value="3" id="rating_1_3">
-                        <label class="form-check-label" for="rating_1_3">3 - Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_1" value="4" id="rating_1_4">
-                        <label class="form-check-label" for="rating_1_4">4 - Very Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_1" value="5" id="rating_1_5">
-                        <label class="form-check-label" for="rating_1_5">5 - Excellent</label>
-                    </div>
-                </div>
-
-                <!-- Repeat for all questions -->
-                <div class="mb-3">
-                    <p><strong>{{ feedback_form.question_2 }}</strong></p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="1" id="rating_2_1">
-                        <label class="form-check-label" for="rating_2_1">1 - Poor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="2" id="rating_2_2">
-                        <label class="form-check-label" for="rating_2_2">2 - Fair</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="3" id="rating_2_3">
-                        <label class="form-check-label" for="rating_2_3">3 - Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="4" id="rating_2_4">
-                        <label class="form-check-label" for="rating_2_4">4 - Very Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="5" id="rating_2_5">
-                        <label class="form-check-label" for="rating_2_5">5 - Excellent</label>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <p><strong>{{ feedback_form.question_3 }}</strong></p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="1" id="rating_2_1">
-                        <label class="form-check-label" for="rating_2_1">1 - Poor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="2" id="rating_2_2">
-                        <label class="form-check-label" for="rating_2_2">2 - Fair</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="3" id="rating_2_3">
-                        <label class="form-check-label" for="rating_2_3">3 - Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="4" id="rating_2_4">
-                        <label class="form-check-label" for="rating_2_4">4 - Very Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="5" id="rating_2_5">
-                        <label class="form-check-label" for="rating_2_5">5 - Excellent</label>
-                    </div>
-                </div>
-
-
-                <div class="mb-3">
-                    <p><strong>{{ feedback_form.question_4 }}</strong></p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="1" id="rating_2_1">
-                        <label class="form-check-label" for="rating_2_1">1 - Poor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="2" id="rating_2_2">
-                        <label class="form-check-label" for="rating_2_2">2 - Fair</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="3" id="rating_2_3">
-                        <label class="form-check-label" for="rating_2_3">3 - Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="4" id="rating_2_4">
-                        <label class="form-check-label" for="rating_2_4">4 - Very Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="5" id="rating_2_5">
-                        <label class="form-check-label" for="rating_2_5">5 - Excellent</label>
-                    </div>
-                </div>
-
-
-                <div class="mb-3">
-                    <p><strong>{{ feedback_form.question_5 }}</strong></p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="1" id="rating_2_1">
-                        <label class="form-check-label" for="rating_2_1">1 - Poor</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="2" id="rating_2_2">
-                        <label class="form-check-label" for="rating_2_2">2 - Fair</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="3" id="rating_2_3">
-                        <label class="form-check-label" for="rating_2_3">3 - Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="4" id="rating_2_4">
-                        <label class="form-check-label" for="rating_2_4">4 - Very Good</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="rating_2" value="5" id="rating_2_5">
-                        <label class="form-check-label" for="rating_2_5">5 - Excellent</label>
-                    </div>
-                </div>
-
-                <!-- Additional Open-Ended Questions -->
-                {% if feedback_form.additional_question_1 %}
-                <div class="mb-3">
-                    <label class="form-label"><strong>{{ feedback_form.additional_question_1 }}</strong></label>
-                    <textarea class="form-control" name="additional_answer_1" rows="3"></textarea>
-                </div>
-                {% endif %}
-
-                {% if feedback_form.additional_question_2 %}
-                <div class="mb-3">
-                    <label class="form-label"><strong>{{ feedback_form.additional_question_2 }}</strong></label>
-                    <textarea class="form-control" name="additional_answer_2" rows="3"></textarea>
-                </div>
-                {% endif %}
-
-                <!-- Follow-up Options -->
-                <div class="mb-3">
-                    <label class="form-label"><strong>Would you like to be notified about future events?</strong></label>
-                    <select class="form-select" name="notify_future_events">
-                        <option value="True">Yes</option>
-                        <option value="False">No</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label"><strong>Can we contact you for follow-up?</strong></label>
-                    <select class="form-select" name="allow_follow_up_contact">
-                        <option value="True">Yes</option>
-                        <option value="False">No</option>
-                    </select>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-submit w-100">
-                    <i class="bi bi-send-check"></i>  Submit Feedback
-                </button>
-            </form>
-        </div>
+  <div class="card shadow-sm border">
+    <div class="card-header text-white brand-header">
+      <h2 class="mb-0">Feedback for {{ feedback_form.event.name }}</h2>
+      <a href="{% url 'events:volunteer_events' %}" class="btn btn-report">
+        <i class="bi bi-arrow-left"></i> Back to My Events
+      </a>
     </div>
-</div>
-<style>
-    body, .card-body, .form-check-label, .form-label, .card-header h2, .card-title {
-    font-family: 'Inter', sans-serif;
-    }
 
-    /* Brand button styling */
-    .btn-submit {
-      background-color: #2b9faa;
-      border-color: #2b9faa;
-      border-radius: 15px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s ease-in-out;
-    }
-  
-    .btn-submit:hover {
-      background-color: #1B6165;
-      border-color: #1B6165;
-      color: white;
-    }
-  </style>
-  
+
+    <div class="card-body">
+
+      <p class="text-muted">Please rate the event and share any additional comments.</p>
+
+      <!-- Show form errors if any -->
+      {% if form.errors %}
+        <div class="alert alert-danger">
+          <strong>There were errors in your submission:</strong>
+          <ul class="mb-0">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- Question 1 -->
+        <div class="mb-4">
+          <label class="form-label"><strong>{{ feedback_form.question_1 }}</strong></label>
+          <select name="rating_1" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="1">1 - Very Poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="mb-4">
+          <label class="form-label"><strong>{{ feedback_form.question_2 }}</strong></label>
+          <select name="rating_2" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="1">1 - Very Poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="mb-4">
+          <label class="form-label"><strong>{{ feedback_form.question_3 }}</strong></label>
+          <select name="rating_3" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="1">1 - Very Poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="mb-4">
+          <label class="form-label"><strong>{{ feedback_form.question_4 }}</strong></label>
+          <select name="rating_4" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="1">1 - Very Poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="mb-4">
+          <label class="form-label"><strong>{{ feedback_form.question_5 }}</strong></label>
+          <select name="rating_5" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="1">1 - Very Poor</option>
+            <option value="2">2 - Poor</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Good</option>
+            <option value="5">5 - Excellent</option>
+          </select>
+        </div>
+
+        <!-- Additional Questions -->
+        <div class="mb-4">
+          <label class="form-label"><strong>What did you like most about the event?</strong></label>
+          <textarea name="additional_answer_1" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label"><strong>What could be improved?</strong></label>
+          <textarea name="additional_answer_2" class="form-control" rows="3"></textarea>
+        </div>
+
+        <!-- Boolean Fields -->
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" name="notify_future_events" id="notifyFutureEvents">
+          <label class="form-check-label" for="notifyFutureEvents">
+            Notify me about future events
+          </label>
+        </div>
+
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" name="allow_follow_up_contact" id="allowFollowUp">
+          <label class="form-check-label" for="allowFollowUp">
+            I agree to be contacted for follow-up
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-brand">
+            <i class="bi bi-send"></i> Submit Feedback
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Styles -->
+<style>
+  .brand-header {
+    background-color: #2b9faa;
+    padding: 1rem 1.25rem;
+  }
+
+  .btn {
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-brand {
+    background-color: #2b9faa;
+    color: white;
+    border: 2px solid #2b9faa;
+  }
+
+  .btn-brand:hover {
+    background-color: #1B6165;
+    border-color: #1B6165;
+    color: white;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-select,
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+</style>
 {% endblock %}

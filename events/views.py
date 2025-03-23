@@ -609,7 +609,7 @@ def publish_feedback(request, event_id):
     # To publish the feedback form
     feedback_form.published = True  
     feedback_form.save()
-    messages.success(request, "Feedback form has been published.")
+    messages.success(request, "Feedback form has been succesfully published")
 
     return redirect("events:organisation_dashboard")
 
@@ -634,23 +634,23 @@ def complete_feedback(request, event_id):
     return render(request, "events/complete_feedback.html", {"form": form, "feedback_form": feedback_form})
 
 # volunteers to submit feedback form
-@login_required
-def submit_feedback(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+# @login_required
+# def submit_feedback(request, event_id):
+#     event = get_object_or_404(Event, id=event_id)
 
-    if request.method == "POST":
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback = form.save(commit=False)
-            feedback.event = event
-            feedback.volunteer = request.user
-            feedback.save()
-            messages.success(request, "Feedback submitted successfully!")
-            return redirect('events:volunteer_events')  
-    else:
-        form = FeedbackForm()
+#     if request.method == "POST":
+#         form = FeedbackForm(request.POST)
+#         if form.is_valid():
+#             feedback = form.save(commit=False)
+#             feedback.event = event
+#             feedback.volunteer = request.user
+#             feedback.save()
+#             messages.success(request, "Feedback submitted successfully!")
+#             return redirect('events:volunteer_events')  
+#     else:
+#         form = FeedbackForm()
 
-    return render(request, 'events/submit_feedback.html', {'form': form, 'event': event})
+#     return render(request, 'events/submit_feedback.html', {'form': form, 'event': event})
 
 
 import json
@@ -780,16 +780,27 @@ def volunteer_list(request, event_id):
 
 
 
-@login_required
-def feedback_event_page(request, event_id):
-    # Render the Feedback Page for a specific event 
-    event = get_object_or_404(Event, id=event_id, organisation=request.user)
+# @login_required
+# def feedback_event_page(request, event_id):
+#     # Render the Feedback Page for a specific event 
+#     event = get_object_or_404(Event, id=event_id, organisation=request.user)
 
-    return render(request, "events/feedback_event.html", {"event": event})
+#     return render(request, "events/feedback_event.html", {"event": event})
 
+
+# @login_required
+# def event_detail(request, event_id):
+#     # View an event's details
+#     event = get_object_or_404(Event, id=event_id)
+#     return render(request, "events/event_detail.html", {"event": event})
+
+from django.utils.timezone import now
 
 @login_required
 def event_detail(request, event_id):
-    # View an event's details
     event = get_object_or_404(Event, id=event_id)
-    return render(request, "events/event_detail.html", {"event": event})
+    current_time = now()
+    return render(request, "events/event_detail.html", {
+        "event": event,
+        "current_time": current_time,
+    })

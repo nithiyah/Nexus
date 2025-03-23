@@ -15,7 +15,7 @@ urlpatterns = [
     path('cancel/<int:event_id>/', views.cancel_registration, name='cancel_registration'),  
     path('remove-volunteer/<int:registration_id>/', views.remove_volunteer, name='remove_volunteer'),
     path('publish-feedback/<int:event_id>/', views.publish_feedback, name='publish_feedback'),
-    path('submit-feedback/<int:event_id>/', views.submit_feedback, name='submit_feedback'),
+    # path('submit-feedback/<int:event_id>/', views.submit_feedback, name='submit_feedback'),
     path('view-feedback/<int:event_id>/', views.view_feedback, name='view_feedback'),
     path('create-feedback/<int:event_id>/', views.create_feedback_form, name='create_feedback_form'),
     path("complete-feedback/<int:event_id>/", views.complete_feedback, name="complete_feedback"),
@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('<int:event_id>/', views.event_detail, name='event_detail'),
 
-path('feedback/event/<int:event_id>/', views.feedback_event_page, name='feedback_event_page'),
+# path('feedback/event/<int:event_id>/', views.feedback_event_page, name='feedback_event_page'),
 
 
 

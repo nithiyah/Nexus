@@ -52,36 +52,49 @@ def chat_home(request):
 # Prevents unauthorized users from joining chats (volunteers must be registered).
 # Ensures messages load correctly.
 
+# @login_required
+# def chat_room(request, event_id):
+#    # Allow only registered volunteers and event organizer to access the chat room
+    
+#     event = get_object_or_404(Event, id=event_id)
+#     chatroom, created = ChatRoom.objects.get_or_create(event=event)
+
+#     # Check if user is the organisation or a registered volunteer
+#     is_registered = VolunteerEvent.objects.filter(event=event, volunteer=request.user).exists()
+    
+#     if request.user == event.organisation or is_registered:
+#         messages = chatroom.messages.order_by("timestamp")  # Load previous messages
+
+#         # Mark all unread messages as read for this user
+#         UnreadMessage.objects.filter(
+#             message__chatroom=chatroom, user=request.user, is_read=False
+#         ).update(is_read=True)
+
+
+
+
+#         return render(request, "chat/chat_room.html", {
+#             "event": event,
+#             "chatroom": chatroom,
+#             "messages": messages,
+#         })
+#     # else:
+#     #     return redirect("events:volunteer_events")  # Redirect if not authorized
+#     return HttpResponseForbidden("You are not authorised to join this chat room.")
+    
 @login_required
 def chat_room(request, event_id):
-   # Allow only registered volunteers and event organizer to access the chat room
-    
     event = get_object_or_404(Event, id=event_id)
     chatroom, created = ChatRoom.objects.get_or_create(event=event)
 
-    # Check if user is the organisation or a registered volunteer
-    is_registered = VolunteerEvent.objects.filter(event=event, volunteer=request.user).exists()
-    
-    if request.user == event.organisation or is_registered:
-        messages = chatroom.messages.order_by("timestamp")  # Load previous messages
+    # Use a unique name to avoid conflict with Django's messages framework
+    chat_messages = chatroom.messages.order_by("timestamp")
 
-        # Mark all unread messages as read for this user
-        UnreadMessage.objects.filter(
-            message__chatroom=chatroom, user=request.user, is_read=False
-        ).update(is_read=True)
-
-
-
-
-        return render(request, "chat/chat_room.html", {
-            "event": event,
-            "chatroom": chatroom,
-            "messages": messages,
-        })
-    # else:
-    #     return redirect("events:volunteer_events")  # Redirect if not authorized
-    return HttpResponseForbidden("You are not authorised to join this chat room.")
-    
+    return render(request, "chat/chat_room.html", {
+        "event": event,
+        "chatroom": chatroom,
+        "chat_messages": chat_messages,
+    })
 
 @csrf_exempt
 def send_message(request, event_id):
