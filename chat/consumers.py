@@ -11,7 +11,7 @@ from channels.sessions import SessionMiddlewareStack
 from channels.auth import AuthMiddlewareStack
 
 async def receive(self, text_data):
-    """Handle incoming messages and save to database."""
+    # Handle incoming messages and save to database
     data = json.loads(text_data)
     sender = self.scope["user"]
     message = data["message"]
@@ -65,7 +65,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def receive(self, text_data):
-        """Handle incoming messages including files and save to database."""
+        # Handle incoming messages including files and save to database
         data = json.loads(text_data)
         sender = self.scope["user"]
         message = data.get("message", None)
@@ -88,7 +88,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print(f"Broadcasted Message: {message_obj.content}")
 
     async def chat_message(self, event):
-        """Send messages and files to connected clients instantly."""
+        # Send messages and files to connected clients instantly
         message = event.get("message", "")
         file_url = event.get("file_url", "")
         sender = event["sender"]
