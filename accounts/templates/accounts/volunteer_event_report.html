@@ -4,6 +4,11 @@
 {% block content %}
 {% load static %}
 <style>
+  :root {
+    --brand-teal: #1b7980;
+    --brand-hover: #155a5e;
+  }
+
   .report-container {
     background-color: #fff;
     padding: 40px;
@@ -24,7 +29,7 @@
   }
 
   .report-title {
-    color: #1b7980;
+    color: var(--brand-teal);
     font-weight: 600;
     font-size: 1.8rem;
   }
@@ -34,9 +39,9 @@
   }
 
   .print-btn {
-    background-color: #1b7980;
+    background-color: var(--brand-teal);
     color: white;
-    border: 2px solid #1b7980;
+    border: 2px solid var(--brand-teal);
     border-radius: 10px;
     padding: 8px 20px;
     font-weight: 500;
@@ -44,19 +49,19 @@
   }
 
   .print-btn:hover {
-    background-color: #155a5e;
-    border-color: #155a5e;
+    background-color: var(--brand-hover);
+    border-color: var(--brand-hover);
   }
 
   .table th {
     background-color: #f5fafd;
-    color: #1b7980;
+    color: var(--brand-teal);
   }
 
   .total-summary {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #1b7980;
+    color: var(--brand-teal);
     margin-top: 15px;
     text-align: right;
   }
@@ -86,10 +91,15 @@
 </style>
 
 <div class="container mt-4 report-container" id="report-section">
-  <a href="{% url 'events:volunteer_events' %}" class="btn btn-outline-secondary mb-4" style="border-radius: 15px;">
-    <i class="bi bi-arrow-left"></i> Back to My Events
-  </a>
-  
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'events:volunteer_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'events:volunteer_events' %}">My Events</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Event Report</li>
+    </ol>
+  </nav>
+
   <div class="report-header">
     <div>
       <img src="{% static 'images/Nexus_logo.png' %}" alt="Nexus Logo" class="nexus-logo mb-2">
@@ -101,36 +111,29 @@
     </button>
   </div>
 
-  {% if volunteer_events %}
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Event Name</th>
-          <th>Date</th>
-          <th>Hours Earned</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for event in volunteer_events %}
-          <tr>
-            <td>{{ event.event.name }}</td>
-            <td>{{ event.event.date|date:"M d, Y" }}</td>
-            <td>{{ event.hours_contributed }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
+  {% if participations %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Event Name</th>
+        <th>Date</th>
+        <th>Hours Contributed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for participation in participations %}
+      <tr>
+        <td>{{ participation.event.name }}</td>
+        <td>{{ participation.event.date|date:"M d, Y" }}</td>
+        <td>{{ participation.hours_contributed }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% else %}
     <p class="text-center text-muted">No attended events found.</p>
   {% endif %}
-</div>
+  
 
-<!-- Optional JS for future PDF download trigger -->
-<!-- <script>
-  // You could use this hook later to generate PDF if you use libraries like html2pdf or jsPDF
-  function downloadPDF() {
-    window.print();
-  }
-</script> -->
+</div>
 {% endblock %}
