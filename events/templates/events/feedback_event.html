@@ -66,8 +66,9 @@
   <div class="card mb-4">
     <div class="card-body">
       <h3 class="card-title">{{ event.name }}</h3>
-      <p class="card-text text-muted">{{ event.date }} | {{ event.location }}</p>
+      <p class="card-text text-muted">{{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }} | {{ event.date|date:"M d, Y" }}</p>
       <p class="card-text">{{ event.description }}</p>
+
 
       <!-- Feedback Actions -->
       <div class="feedback-actions">

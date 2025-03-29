@@ -1,5 +1,7 @@
 import json
+import tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
+import pytest
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -75,9 +77,7 @@ class ChatTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn("file_url", response.json())
-        self.assertTrue(Message.objects.filter(file__isnull=False).exists())  
-
-
+        self.assertTrue(Message.objects.filter(file__isnull=False).exists())
 
     def test_unread_message_counter_logic(self):
         other_user = User.objects.create_user(username="vol2", password="pass", user_type="volunteer")
@@ -96,34 +96,7 @@ class ChatTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("count", response.json())
 
-    def test_unread_message_is_created(self):
-        message = Message.objects.create(
-            chatroom=self.chatroom,
-            sender=self.organisation,
-            content="Unread logic test"
-        )
-        UnreadMessage.objects.create(user=self.volunteer, message=message, is_read=False)
-
-        unread = UnreadMessage.objects.filter(user=self.volunteer, is_read=False).count()
-        self.assertEqual(unread, 1)
-
-    from django.core.files.uploadedfile import SimpleUploadedFile
-
-    # def test_unauthorized_user_redirected_from_chat(self):
-    #     dummy_image = SimpleUploadedFile("dummy.jpg", b"filecontent", content_type="image/jpeg")
-    #     stranger = User.objects.create_user(
-    #         username="stranger",
-    #         password="strangerpass",
-    #         user_type="volunteer",
-    #         profile_picture=dummy_image  
-    #     )
-
-    #     self.client.login(username="stranger", password="strangerpass")
-    #     response = self.client.get(reverse("chat:chat_room", args=[self.event.id]), follow=True)
-
-    #     # Check the  generic error message or redirect message shown on the pagesss
-    #     self.assertContains(response, "You are not authorised to access this chat")  
-
+    @pytest.mark.asyncio
     async def test_websocket_connection_authenticated(self):
         communicator = WebsocketCommunicator(
             ChatConsumer.as_asgi(),
@@ -134,9 +107,10 @@ class ChatTests(TestCase):
         communicator.scope["headers"] = []
 
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
         await communicator.disconnect()
 
+    @pytest.mark.asyncio
     async def test_websocket_send_receive(self):
         communicator = WebsocketCommunicator(
             ChatConsumer.as_asgi(),
@@ -147,16 +121,17 @@ class ChatTests(TestCase):
         communicator.scope["headers"] = []
 
         connected, _ = await communicator.connect()
-        self.assertTrue(connected)
+        assert connected
 
         await communicator.send_json_to({"message": "Hello WebSocket!"})
         response = await communicator.receive_json_from()
 
-        self.assertEqual(response["message"], "Hello WebSocket!")
-        self.assertEqual(response["sender"], "volunteer1")
+        assert response["message"] == "Hello WebSocket!"
+        assert response["sender"] == "volunteer1"
 
         await communicator.disconnect()
 
+    @pytest.mark.asyncio
     async def test_websocket_rejects_unauthenticated(self):
         communicator = WebsocketCommunicator(
             ChatConsumer.as_asgi(),
@@ -167,4 +142,36 @@ class ChatTests(TestCase):
         communicator.scope["headers"] = []
 
         connected, _ = await communicator.connect()
-        self.assertFalse(connected)
+        assert not connected
+
+
+
+    def test_file_upload_message(self):
+        self.client.login(username="volunteer1", password="testpass123")
+        chatroom = ChatRoom.objects.get(event=self.event)
+
+        with open(__file__, "rb") as dummy_file:
+            response = self.client.post(reverse("chat:send_message", args=[chatroom.event.id]), {
+                "file": SimpleUploadedFile("dummy.txt", dummy_file.read(), content_type="text/plain"),
+                "content": "Uploading a file via test!",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Message.objects.filter(file__icontains="dummy.txt").exists())
+
+
+
+    def test_unread_message_is_created(self):
+        # unread message tracking test
+        chatroom = ChatRoom.objects.get(event=self.event)
+
+        message = Message.objects.create(
+            chatroom=chatroom,
+            sender=self.organisation,
+            content="Unread logic test"
+        )
+
+        UnreadMessage.objects.create(user=self.volunteer, message=message, is_read=False)
+
+        unread = UnreadMessage.objects.filter(user=self.volunteer, is_read=False).count()
+        self.assertEqual(unread, 1)

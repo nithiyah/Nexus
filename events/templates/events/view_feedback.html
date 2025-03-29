@@ -5,71 +5,81 @@
 {% block content %}
 <div class="container mt-5">
 
-  <!-- Back Button -->
+  <!-- Breadcrumb -->
   <div class="mb-4">
-    <div class="container mt-4">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'events:organisation_dashboard' %}">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'events:feedback_event_page' event.id %}">Manage Feedback</a></li>
-          <li class="breadcrumb-item active" aria-current="page">View Feedback</li>
-        </ol>
-      </nav>
-    </div>
-    
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'events:organisation_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'events:feedback_event_page' event.id %}">Manage Feedback</a></li>
+        <li class="breadcrumb-item active" aria-current="page">View Feedback</li>
+      </ol>
+    </nav>
   </div>
 
-  <!-- Feedback Summary -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header brand-header text-white">
-      <h2 class="mb-0">Feedback Summary for {{ event.name }}</h2>
-    </div>
-    <div class="card-body">
-      <canvas id="feedbackChart" height="180"></canvas>
-    </div>
-  </div>
-
-  <!-- Individual Feedback Cards -->
-  {% if feedback_entries %}
-    <div class="row g-4">
-      {% for feedback in feedback_entries %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card feedback-card h-100 shadow-sm border border-secondary-subtle">
-            <div class="card-body">
-              <h5 class="card-title">{{ feedback.volunteer.full_name }}</h5>
-              <p><strong>Overall Event Experience:</strong> {{ feedback.rating_1 }}</p>
-              <p><strong>Registration Process:</strong> {{ feedback.rating_2 }}</p>
-              <p><strong>Event Location/Venue:</strong> {{ feedback.rating_3 }}</p>
-              <p><strong>Event Schedule and Timing:</strong> {{ feedback.rating_4 }}</p>
-              <p><strong>Communication:</strong> {{ feedback.rating_5 }}</p>
-
-              {% if feedback.additional_answer_1 %}
-                <p><strong>What did you like most?</strong><br>{{ feedback.additional_answer_1 }}</p>
-              {% endif %}
-
-              {% if feedback.additional_answer_2 %}
-                <p><strong>What did you like least?</strong><br>{{ feedback.additional_answer_2 }}</p>
-              {% endif %}
-
-              <p><strong>Notify about future events?</strong> {{ feedback.notify_future_events|yesno:"Yes,No" }}</p>
-              <p><strong>Follow-up contact allowed?</strong> {{ feedback.allow_follow_up_contact|yesno:"Yes,No" }}</p>
-            </div>
+  <!-- Graph + Feedback Section (Side by Side) -->
+  <div class="row g-4 align-items-start">
+    <!-- Feedback Summary Graph -->
+    <div class="col-lg-6">
+      <button class="btn btn-toggle-graph w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#feedbackGraphCollapse" aria-expanded="true" aria-controls="feedbackGraphCollapse">
+        <i class="bi bi-bar-chart-fill me-1"></i> Toggle Feedback Summary Graph
+      </button>
+      <div class="collapse show" id="feedbackGraphCollapse">
+        <div class="card shadow-sm">
+          <div class="card-header brand-header text-white">
+            <h5 class="mb-0">Feedback Summary</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="feedbackChart" height="180"></canvas>
           </div>
         </div>
-      {% endfor %}
+      </div>
     </div>
-  {% else %}
-    <div class="alert alert-info text-center mt-4">
-      No feedback has been submitted yet.
+
+    <!-- Feedback Accordion -->
+    <div class="col-lg-6">
+      {% if feedback_entries %}
+        <div class="accordion" id="feedbackAccordion">
+          {% for feedback in feedback_entries %}
+            <div class="accordion-item mb-3">
+              <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button class="accordion-button collapsed feedback-toggle w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                  <i class="bi bi-person-circle me-2 text-muted"></i> {{ feedback.volunteer.full_name }}
+                </button>
+              </h2>
+              <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#feedbackAccordion">
+                <div class="accordion-body">
+                  <p><strong>Overall:</strong> {{ feedback.rating_1 }}</p>
+                  <p><strong>Registration:</strong> {{ feedback.rating_2 }}</p>
+                  <p><strong>Venue:</strong> {{ feedback.rating_3 }}</p>
+                  <p><strong>Schedule:</strong> {{ feedback.rating_4 }}</p>
+                  <p><strong>Communication:</strong> {{ feedback.rating_5 }}</p>
+                  {% if feedback.additional_answer_1 %}
+                    <p><strong>Liked most:</strong> {{ feedback.additional_answer_1 }}</p>
+                  {% endif %}
+                  {% if feedback.additional_answer_2 %}
+                    <p><strong>Liked least:</strong> {{ feedback.additional_answer_2 }}</p>
+                  {% endif %}
+                  <p><strong>Future events?</strong> {{ feedback.notify_future_events|yesno:"Yes,No" }}</p>
+                  <p><strong>Follow-up?</strong> {{ feedback.allow_follow_up_contact|yesno:"Yes,No" }}</p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info text-center">
+          No feedback has been submitted yet.
+        </div>
+      {% endif %}
     </div>
-  {% endif %}
+  </div>
+
 </div>
 
-<!-- Chart.js Script -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   var averageRatings = JSON.parse('{{ average_ratings|escapejs }}');
-
   const ctx = document.getElementById('feedbackChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
@@ -78,13 +88,7 @@
       datasets: [{
         label: 'Average Ratings',
         data: averageRatings,
-        backgroundColor: [
-          '#2b9faa',
-          '#f4a261',
-          '#5e60ce',
-          '#e76f51',
-          '#1B6165'
-        ],
+        backgroundColor: ['#2b9faa', '#f4a261', '#5e60ce', '#e76f51', '#1B6165'],
         borderRadius: 8
       }]
     },
@@ -104,42 +108,51 @@
   });
 </script>
 
-<!-- Nexus Styling -->
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<!-- Custom Styling -->
 <style>
   .brand-header {
     background-color: #1b7980;
     padding: 1rem 1.25rem;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
   }
 
-  .btn-back {
-    background-color: #f1f1f1;
-    color: #333;
-    border: 2px solid #ccc;
+  .btn-toggle-graph,
+  .feedback-toggle {
+    background-color: #ffffff;
+    border: 2px solid #1b7980;
+    color: #1b7980;
     border-radius: 15px;
     font-weight: 500;
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
     transition: all 0.2s ease-in-out;
   }
 
-  .btn-back:hover {
-    background-color: #e0e0e0;
-    border-color: #bbb;
-    color: #000;
+  .btn-toggle-graph:hover,
+  .feedback-toggle:hover {
+    background-color: #f0fdfd;
+    border-color: #168388;
+    color: #125f63;
   }
 
-  .feedback-card {
-    border-radius: 15px;
-    padding: 1rem;
+  .accordion-button {
+    border: none;
+    box-shadow: none;
+
   }
 
-  .feedback-card .card-body p {
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .card-title {
-    font-weight: 600;
-    color: #1b7980;
-    margin-bottom: 1rem;
+  .accordion-body {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    padding: 0.75rem 1rem;
   }
 
   canvas {
