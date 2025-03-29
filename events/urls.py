@@ -19,11 +19,14 @@ urlpatterns = [
     path('view-feedback/<int:event_id>/', views.view_feedback, name='view_feedback'),
     path('create-feedback/<int:event_id>/', views.create_feedback_form, name='create_feedback_form'),
     path("complete-feedback/<int:event_id>/", views.complete_feedback, name="complete_feedback"),
-    path('feedback-hub/', views.feedback_hub, name='feedback_hub'),
+    # path('feedback-hub/', views.feedback_hub, name='feedback_hub'),
     path('volunteer-list/<int:event_id>/', views.volunteer_list, name='volunteer_list'),
     path('complete-event/<int:event_id>/', views.complete_event, name='complete_event'),
 
     path('<int:event_id>/', views.event_detail, name='event_detail'),
+    path('event/<int:event_id>/feedback/', views.feedback_event_page, name='feedback_event_page'),
+    path("complete-event/<int:event_id>/", views.complete_event, name="complete_event"),
+
 
 # path('feedback/event/<int:event_id>/', views.feedback_event_page, name='feedback_event_page'),
 

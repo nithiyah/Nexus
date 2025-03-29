@@ -3,6 +3,17 @@
 {% block title %}Create Feedback Form{% endblock %}
 
 {% block content %}
+
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'events:organisation_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'events:feedback_event_page' event.id %}">Manage Feedback</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Create Feedback Form</li>
+    </ol>
+  </nav>
+</div>
+
 <div class="container mt-5 mb-5">
   <div class="card shadow-sm border">
     <div class="card-header text-white brand-header">
@@ -25,7 +36,7 @@
               </div>
             </div>
           {% else %}
-            <!-- Standard input/textarea fields -->
+            <!-- Standard input fields -->
             <div class="mb-3">
               <p class="form-label">{{ field.label }}</p>
               <div class="w-100">

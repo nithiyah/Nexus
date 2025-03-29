@@ -13,6 +13,7 @@ class Event(models.Model):
         ('senior citizen', 'Senior Citizen'),
     ]
 
+    is_completed = models.BooleanField(default=False) 
     organisation = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -35,8 +36,9 @@ class Event(models.Model):
     #     duration = end_datetime - start_datetime
     #     return duration.total_seconds() / 3600  # Convert seconds to hours
 #############################################################################
+
     def get_duration_hours(self):
-        """Calculate duration of the event in hours."""
+        # Calculate duration of the event in hours
         if self.start_time and self.end_time:
             start_datetime = datetime.combine(self.date.date(), self.start_time)
             end_datetime = datetime.combine(self.date.date(), self.end_time)

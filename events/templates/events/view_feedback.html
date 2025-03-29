@@ -7,9 +7,16 @@
 
   <!-- Back Button -->
   <div class="mb-4">
-    <a href="{% url 'events:feedback_hub' %}" class="btn btn-back">
-      <i class="bi bi-arrow-left"></i> Back to Feedback Hub
-    </a>
+    <div class="container mt-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'events:organisation_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'events:feedback_event_page' event.id %}">Manage Feedback</a></li>
+          <li class="breadcrumb-item active" aria-current="page">View Feedback</li>
+        </ol>
+      </nav>
+    </div>
+    
   </div>
 
   <!-- Feedback Summary -->
@@ -53,7 +60,7 @@
     </div>
   {% else %}
     <div class="alert alert-info text-center mt-4">
-      <i class="bi bi-emoji-frown"></i> No feedback has been submitted yet.
+      No feedback has been submitted yet.
     </div>
   {% endif %}
 </div>
