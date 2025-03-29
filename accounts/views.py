@@ -33,9 +33,9 @@ def welcome(request):
 @login_required
 def login_redirect(request):
     if request.user.user_type == 'organisation':
-        return redirect('events:organisation_dashboard')  # Redirect to events app
+        return redirect('events:organisation_dashboard')  # Redirect to organisation dashboard
     else:
-        return redirect('events:volunteer_dashboard')  # Redirect to events app
+        return redirect('events:volunteer_dashboard')  # Redirect to volunteer dashboard
 
 
 class CustomLoginView(LoginView):
@@ -73,9 +73,6 @@ def register_volunteer(request):
                 fail_silently=False,
             )
 
-            # messages.success(request, "Your volunteer account has been created. Please log in.")
-            # login(request, user)
-            # return redirect('accounts:login')
             return render(request, 'accounts/registration_success.html')
 
         else:
@@ -85,60 +82,7 @@ def register_volunteer(request):
 
     return render(request, 'accounts/register_volunteer.html', {'form': form})
 
-# Registration Views
-# def register_volunteer(request):
-#     if request.method == 'POST':
-#         form = VolunteerRegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.user_type = 'volunteer'
-#             user.save()
 
-#             # Build context for the email template
-#             context = {
-#                 'username': user.username,
-#                 'login_url': request.build_absolute_uri('/login/')  
-#                   # or "https://yourdomain.com/login/"
-#             }
-
-#             # Render HTML & plain-text versions
-#             html_message = render_to_string('accounts/welcome_email.html', context)
-#             plain_message = strip_tags(html_message)
-
-#             subject = "Welcome to Nexus!"
-#             from_email = settings.DEFAULT_FROM_EMAIL
-#             recipient_list = [user.email]
-#             print("EMAIL LOGIC TRIGGERED")
-#             send_mail(
-#                 subject=subject,
-#                 message=plain_message,        # fallback if recipient can’t read HTML
-#                 from_email=from_email,
-#                 recipient_list=recipient_list,
-#                 html_message=html_message,    # our HTML version
-#                 fail_silently=False,
-#             )
-
-
-
-#             login(request, user)
-#             return redirect('accounts:login')
-#     else:
-#         form = VolunteerRegistrationForm()
-#     return render(request, 'accounts/register_volunteer.html', {'form': form})
-
-
-# def register_organisation(request):
-#     if request.method == 'POST':
-#         form = OrganisationRegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.user_type = 'organisation'
-#             user.save()
-#             login(request, user)
-#             return redirect('accounts:login')
-#     else:
-#         form = OrganisationRegistrationForm()
-#     return render(request, 'accounts/register_organisation.html', {'form': form})
 def register_organisation(request):
     if request.method == 'POST':
         form = OrganisationRegistrationForm(request.POST)
@@ -170,9 +114,6 @@ def register_organisation(request):
                 fail_silently=False,
             )
 
-            # messages.success(request, "Your organisation account has been created. Please log in.")
-            # login(request, user)
-            # return redirect('accounts:login')
             return render(request, 'accounts/registration_success.html')
 
         else:
@@ -182,30 +123,6 @@ def register_organisation(request):
     
     return render(request, 'accounts/register_organisation.html', {'form': form})
 
-# @login_required
-# def profile_view(request):
-#     user = request.user  # Get logged-in user
-#     if request.method == 'POST':
-#         form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('accounts:profile')  # Redirect to profile page after saving
-#     else:
-#         form = ProfileUpdateForm(instance=user)
-    
-#     return render(request, 'accounts/profile.html', {'form': form})
-# @login_required
-# def profile_view(request):
-#     if request.method == 'POST':
-#         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Profile has been successfully updated!")
-#             return redirect('accounts:profile')
-#     else:
-#         form = ProfileUpdateForm(instance=request.user)
-
-#     return render(request, 'accounts/profile.html', {'form': form})
 
 @login_required
 def profile_view(request):
@@ -244,15 +161,27 @@ class CustomPasswordResetView(PasswordResetView):
     success_url = reverse_lazy('accounts:password_reset_done') 
 
 
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
+from django.contrib.auth import logout
+
+# class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+#     template_name = 'accounts/password_reset_confirm.html'
+#     success_url = reverse_lazy("accounts:password_reset_complete")
+
+#     def dispatch(self, request, *args, **kwargs):
+#         response = super().dispatch(request, *args, **kwargs)
+#         try:
+#             # del request.session['_password_reset_token']
+#             self.request.session.pop('_password_reset_token', None)
+
+#         except KeyError:
+#             pass
+#         return response
+
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'accounts/password_reset_confirm.html'
-    success_url = reverse_lazy("password_reset_complete")
-
-    def form_valid(self, form):
-        # Log out the user before setting a new password
-        logout(self.request)
-        return super().form_valid(form)
-    
+    success_url = reverse_lazy("accounts:password_reset_complete")
 
 # @login_required
 # def public_profile_view(request, username):
@@ -264,9 +193,10 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 #         return redirect('accounts:profile')  # Redirect them to their own profile
 
 #     return render(request, 'accounts/public_profile.html', {'profile_user': profile_user})
+
 @login_required
 def public_profile_view(request, username):
-    # View another user's public profile, showing different details for volunteers and organizations
+    # View another user's public profile, showing different details for volunteers and organisations
     profile_user = get_object_or_404(User, username=username)
 
     # Ensure users cannot access their own profile through this view
@@ -279,13 +209,13 @@ def public_profile_view(request, username):
     total_hours = 0
 
     if profile_user.user_type == "organisation":
-        # Fetch events created by the organization
+        # Get the events created by the organisation
         events = Event.objects.filter(organisation=profile_user)
-        # Fetch announcements made by the organization
+        # Get the announcements made by the organisation
         announcements = Announcement.objects.filter(organisation=profile_user)
 
     elif profile_user.user_type == "volunteer":
-        # Fetch events the volunteer has registered for
+        # Get the events the volunteer has registered for
         registered_events = VolunteerEvent.objects.filter(volunteer=profile_user).select_related('event')
         # Calculate total hours contributed
         total_hours = VolunteerParticipation.objects.filter(volunteer=profile_user).aggregate(total_hours=models.Sum('hours_contributed'))['total_hours'] or 0
@@ -314,15 +244,35 @@ def public_profile_view(request, username):
 #     })
 @login_required
 def volunteer_event_report(request):
-    # Use VolunteerParticipation to access both event and hours
-    volunteer_events = VolunteerParticipation.objects.filter(volunteer=request.user).select_related('event')
+    participations = VolunteerParticipation.objects.filter(
+        volunteer=request.user,
+        event__is_completed=True
+    ).select_related('event')
 
-    total_hours = volunteer_events.aggregate(
-        total=Sum('hours_contributed')
-    )['total'] or 0
+    total_hours = participations.aggregate(total=Sum('hours_contributed'))['total'] or 0
 
     return render(request, 'accounts/volunteer_event_report.html', {
-        'volunteer_events': volunteer_events,
-        'total_hours': round(total_hours, 2),
+        'participations': participations,
+        'total_hours': total_hours,
     })
 
+# @login_required
+# def volunteer_event_report(request):
+#     # Fetch all participation entries
+#     participations = VolunteerParticipation.objects.filter(volunteer=request.user).select_related('event')
+
+#     # Loop through and auto-log hours if needed
+#     for participation in participations:
+#         event = participation.event
+#         if event.date < timezone.now() and participation.hours_contributed == 0:
+#             participation.hours_contributed = event.get_duration_hours()
+#             participation.save()
+
+#     total_hours = participations.aggregate(
+#         total=Sum('hours_contributed')
+#     )['total'] or 0
+
+#     return render(request, 'accounts/volunteer_event_report.html', {
+#         'volunteer_events': participations,
+#         'total_hours': round(total_hours, 2),
+#     })
