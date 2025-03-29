@@ -133,28 +133,16 @@
             </li>
 
             {% if request.user.is_authenticated %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  <i class="bi bi-megaphone"></i>Announcements
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'announcements:all_announcements' %}">All Announcements</a></li>
-                  {% if request.user.user_type == "volunteer" %}
-                    <li><a class="dropdown-item" href="{% url 'announcements:volunteer_announcements' %}">My Event Announcements</a></li>
-                  {% else %}
-                    <li><a class="dropdown-item" href="{% url 'announcements:announcement_list' %}">My Announcements</a></li>
-                  {% endif %}
-                </ul>
-              </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'announcements:announcement_list' %}">
+                <i class="bi bi-megaphone"></i>Announcements
+              </a>
+            </li>
+            
+              
             {% endif %}
 
-            {% if request.user.user_type == 'organisation' %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'events:feedback_hub' %}">
-                  <i class="bi bi-chat-dots"></i>Feedback Hub
-                </a>
-              </li>
-            {% endif %}
 
             <li class="nav-item">
               <a class="nav-link" href="{% if request.user.user_type == 'organisation' %}{% url 'events:organisation_events' %}{% else %}{% url 'events:volunteer_events' %}{% endif %}">
