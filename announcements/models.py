@@ -8,7 +8,7 @@ class Announcement(models.Model):
     )
     event = models.ForeignKey(
         Event, on_delete=models.CASCADE, related_name="announcements", blank=True, null=True
-    )  # Optional: Can be linked to a specific event or be a general announcement
+    )  # It can be linked to a specific event or be a general announcement
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
