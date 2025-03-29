@@ -72,7 +72,7 @@ def register_volunteer(request):
                 html_message=html_message,
                 fail_silently=False,
             )
-
+            messages.success(request, "Profile has been successfully created!")
             return render(request, 'accounts/registration_success.html')
 
         else:
@@ -113,7 +113,7 @@ def register_organisation(request):
                 html_message=html_message,
                 fail_silently=False,
             )
-
+            messages.success(request, "Profile has been successfully created!")
             return render(request, 'accounts/registration_success.html')
 
         else:

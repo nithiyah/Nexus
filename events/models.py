@@ -11,6 +11,13 @@ class Event(models.Model):
         ('education', 'Education'),
         ('social development', 'Social Development'),
         ('senior citizen', 'Senior Citizen'),
+        ('community development', 'Community Development'),
+        ('animal welfare', 'Animal Welfare'),
+        ('arts, culture & heritage', 'Arts, Culture & Heritage'),
+        ('fundraising', 'fundraising'),
+        ('technology & digital volunteering', 'Technology & Digital Volunteering'),
+        ('youth & children', 'Youth & Children'),
+
     ]
 
     is_completed = models.BooleanField(default=False) 
