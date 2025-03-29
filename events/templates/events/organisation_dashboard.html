@@ -22,7 +22,7 @@
                 <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Completed</option>
               </select>
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="category" class="form-label">Category:</label>
               <select class="form-select" name="category" id="category">
                 <option value="" selected>All Categories</option>
@@ -30,7 +30,22 @@
                   <option value="{{ key }}" {% if request.GET.category == key %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
               </select>
+            </div> -->
+            <div class="mb-3">
+              <label class="form-label">Category:</label>
+              <div class="d-flex flex-column gap-2">
+                {% for key, label in category_labels.items %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="category" value="{{ key }}"
+                           id="cat-org-{{ key }}" {% if key in selected_categories %}checked{% endif %}>
+                    <label class="form-check-label" for="cat-org-{{ key }}">
+                      {{ label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
             </div>
+            
             <div class="mb-3">
               <label for="start_date" class="form-label">Start Date:</label>
               <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
@@ -60,13 +75,10 @@
             <div class="card shadow-sm border border-secondary-subtle h-100 pt-4 position-relative">
               <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
                 <h5 class="card-title m-0 text-dark">{{ event.name }}</h5>
-                <span class="badge {% if event.date.date >= current_time.date %}bg-warning text-dark{% else %}bg-success text-white{% endif %} p-2 rounded-pill">
-                  {% if event.date.date >= current_time.date %}
-                    Ongoing
-                  {% else %}
-                    Completed
-                  {% endif %}
+                <span class="badge {% if event.date.date > today %}bg-info text-dark{% elif event.date.date == today %}bg-warning text-dark{% else %}bg-success text-white{% endif %} p-2 rounded-pill">
+                  {% if event.date.date > today %}Upcoming{% elif event.date.date == today %}Ongoing{% else %}Completed{% endif %}
                 </span>
+                
               </div>
 
               <div class="card-body d-flex flex-column">
@@ -82,34 +94,10 @@
                   </a>
 
                   <div class="w-100">
-                    <div class="dropdown w-100">
-                      <button class="btn btn-feedback-manage dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-file-text"></i> Manage Feedback
-                      </button>
-                      <ul class="dropdown-menu w-100">
-                        <li>
-                          <a class="dropdown-item" href="{% url 'events:create_feedback_form' event.id %}">
-                            <i class="bi bi-pencil-square me-1"></i> Create/Edit Form
-                          </a>
-                        </li>
-                        <li>
-                          {% if event.feedback_form and event.feedback_form.published %}
-                            <button class="dropdown-item text-muted" disabled>
-                              <i class="bi bi-check-circle me-1 text-success"></i> Feedback Published
-                            </button>
-                          {% else %}
-                            <a class="dropdown-item" href="{% url 'events:publish_feedback' event.id %}">
-                              <i class="bi bi-bullhorn me-1"></i> Publish Feedback
-                            </a>
-                          {% endif %}
-                        </li>                        
-                        <li>
-                          <a class="dropdown-item" href="{% url 'events:view_feedback' event.id %}">
-                            <i class="bi bi-eye me-1"></i> View Submitted Feedback
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
+                    <a href="{% url 'events:feedback_event_page' event.id %}" class="btn btn-feedback-manage w-100">
+                      <i class="bi bi-chat-left-text"></i> Feedback
+                    </a>
+                    
                   </div>
 
                   <a href="{% url 'chat:chat_room' event.id %}" class="btn btn-chat-room">
@@ -129,90 +117,6 @@
   </div>
 </div>
 
-<!-- Styles -->
-<!-- <style>
-.btn-volunteer-list {
-  background-color: #1b7980;
-  color: white;
-  border: 2px solid #1b7980;
-}
-.btn-volunteer-list:hover {
-  background-color: #155a5e;
-  border-color: #155a5e;
-  color: white;
-}
-
-.btn-feedback-manage {
-  background-color: #5e60ce;
-  color: white;
-  border: 2px solid #5e60ce;
-}
-.btn-feedback-manage:hover {
-  background-color: #4a4db4;
-  border-color: #4a4db4;
-  color: white;
-}
-
-.btn-chat-room {
-  background-color: #e76f51;
-  color: white;
-  border: 2px solid #e76f51;
-}
-.btn-chat-room:hover {
-  background-color: #c85b3b;
-  border-color: #c85b3b;
-  color: white;
-}
-.card-title {
-  color: #1C1C1C;
-  font-weight: 600;
-}
-
-.btn {
-  border-radius: 15px;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-filter {
-  background-color: #1b7980;
-  color: white;
-  border: 2px solid #1b7980;
-}
-.btn-filter:hover,
-.btn-filter:focus,
-.btn-filter:active {
-  background-color: #155a5e;
-  border-color: #155a5e;
-  color: white;
-  box-shadow: none;
-}
-
-.card-body .btn {
-  width: 100%;
-  max-width: 100%;
-  white-space: normal;
-  word-break: break-word;
-  text-align: left;
-}
-
-.dropdown-menu {
-  width: 100% ;
-  min-width: unset;
-  max-width: 100%;
-}
-
-.dropdown-menu .dropdown-item {
-  font-weight: 500;
-  white-space: normal;
-  word-break: break-word;
-  transition: all 0.2s ease-in-out;
-}
-.dropdown-menu .dropdown-item:hover {
-  background-color: #f1f1f1;
-  color: #2b9faa;
-}
-</style> -->
 <style>
   .btn-volunteer-list {
     background-color: #1b7980;
