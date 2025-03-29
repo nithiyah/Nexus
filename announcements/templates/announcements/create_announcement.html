@@ -2,6 +2,17 @@
 {% block title %}Create Announcement{% endblock %}
 
 {% block content %}
+
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'announcements:announcement_list' %}">Announcements</a></li>
+      <li class="breadcrumb-item active" aria-current="page">View</li>
+    </ol>
+  </nav>
+</div>
+
+
 <style>
     .announcement-card {
       border-radius: 15px;

@@ -66,29 +66,43 @@ class AnnouncementTests(TestCase):
         like_url = reverse("announcements:like_announcement", args=[self.announcement.id])
 
         # Like it
-        response1 = self.client.post(like_url)
-        self.assertRedirects(response1, reverse("announcements:announcement_list"))
+        response1 = self.client.post(like_url, follow=True)
         self.assertTrue(AnnouncementLike.objects.filter(user=self.volunteer, announcement=self.announcement).exists())
 
         # Unlike it
-        response2 = self.client.post(like_url)
-        self.assertRedirects(response2, reverse("announcements:announcement_list"))
+        response2 = self.client.post(like_url, follow=True)
         self.assertFalse(AnnouncementLike.objects.filter(user=self.volunteer, announcement=self.announcement).exists())
 
-    def test_all_announcements_view(self):
+    def test_announcement_list_view_filter_all(self):
         self.client.login(username="vol1", password="testpass123")
-        response = self.client.get(reverse("announcements:all_announcements"))
+        response = self.client.get(reverse("announcements:announcement_list") + "?filter=all")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.announcement.content)
+        self.assertContains(response, "All Announcements")
 
-
-    def test_volunteer_announcements_only_visible_to_volunteers(self):
+    def test_announcement_list_view_filter_my(self):
         self.client.login(username="vol1", password="testpass123")
-        response = self.client.get(reverse("announcements:volunteer_announcements"))
+        response = self.client.get(reverse("announcements:announcement_list") + "?filter=my")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.announcement.content)
+        self.assertContains(response, "My Announcements")
 
         self.client.logout()
         self.client.login(username="org1", password="testpass123")
-        response2 = self.client.get(reverse("announcements:volunteer_announcements"))
-        self.assertRedirects(response2, reverse("announcements:all_announcements"))
+        response2 = self.client.get(reverse("announcements:announcement_list") + "?filter=my")
+        self.assertEqual(response2.status_code, 200)
+        self.assertContains(response2, self.announcement.content)
+
+    def test_breadcrumb_in_detail_view(self):
+        self.client.login(username="vol1", password="testpass123")
+        response = self.client.get(reverse("announcements:announcement_detail", args=[self.announcement.id]))
+        self.assertContains(response, "breadcrumb")
+        self.assertContains(response, "Announcements")
+        self.assertContains(response, "View")
+
+    def test_breadcrumb_in_create_view(self):
+        self.client.login(username="org1", password="testpass123")
+        response = self.client.get(reverse("announcements:create_announcement"))
+        self.assertContains(response, "breadcrumb")
+        self.assertContains(response, "Announcements")
+        self.assertContains(response, "Create")

@@ -5,37 +5,55 @@ from .forms import AnnouncementForm, AnnouncementCommentForm
 from events.models import Event
 from django.contrib import messages
 
+# @login_required
+# def announcement_list(request):
+#     # Show all announcements relevant to the user
+#     if request.user.user_type == "organisation":
+#         announcements = Announcement.objects.filter(organisation=request.user)
+#     else:
+#         # Volunteers see announcements for events they registered for
+#         registered_events = request.user.registered_events.values_list('event_id', flat=True)
+#         announcements = Announcement.objects.filter(event__in=registered_events) | Announcement.objects.filter(event=None)
+
+#     return render(request, "announcements/announcement_list.html", {"announcements": announcements})
 @login_required
 def announcement_list(request):
-    # Show all announcements relevant to the user
+    filter_type = request.GET.get("filter", "my")  # default to 'my'
+
     if request.user.user_type == "organisation":
         announcements = Announcement.objects.filter(organisation=request.user)
     else:
-        # Volunteers see announcements for events they registered for
-        registered_events = request.user.registered_events.values_list('event_id', flat=True)
-        announcements = Announcement.objects.filter(event__in=registered_events) | Announcement.objects.filter(event=None)
+        if filter_type == "all":
+            announcements = Announcement.objects.all()
+        else:
+            registered_events = request.user.registered_events.values_list('event_id', flat=True)
+            announcements = Announcement.objects.filter(event__in=registered_events) | Announcement.objects.filter(event=None)
 
-    return render(request, "announcements/announcement_list.html", {"announcements": announcements})
+    announcements = announcements.order_by("-created_at")
+    return render(request, "announcements/announcement_list.html", {
+        "announcements": announcements,
+        "filter_type": filter_type,
+    })
 
-@login_required
-def all_announcements(request):
-    # View showing all organization announcements (Twitter-style)
-    announcements = Announcement.objects.all().order_by('-created_at')  # Show latest first
+# @login_required
+# def all_announcements(request):
+#     # View showing all organization announcements (Twitter-style)
+#     announcements = Announcement.objects.all().order_by('-created_at')  # Show latest first
 
-    return render(request, "announcements/all_announcements.html", {"announcements": announcements})
+#     return render(request, "announcements/all_announcements.html", {"announcements": announcements})
 
 
-@login_required
-def volunteer_announcements(request):
-    # View showing announcements related to events a volunteer has registered for
-    if request.user.user_type == "organisation":
-        messages.error(request, "Only volunteers can view event-related announcements.")
-        return redirect("announcements:all_announcements")
+# @login_required
+# def volunteer_announcements(request):
+#     # View showing announcements related to events a volunteer has registered for
+#     if request.user.user_type == "organisation":
+#         messages.error(request, "Only volunteers can view event-related announcements.")
+#         return redirect("announcements:all_announcements")
 
-    registered_events = request.user.registered_events.values_list('event_id', flat=True)
-    announcements = Announcement.objects.filter(event__in=registered_events).order_by('-created_at')
+#     registered_events = request.user.registered_events.values_list('event_id', flat=True)
+#     announcements = Announcement.objects.filter(event__in=registered_events).order_by('-created_at')
 
-    return render(request, "announcements/volunteer_announcements.html", {"announcements": announcements})
+#     return render(request, "announcements/volunteer_announcements.html", {"announcements": announcements})
 @login_required
 def create_announcement(request):
     # Allow organisations to create announcements
