@@ -313,7 +313,7 @@ def complete_event(request, event_id):
 
     # 2. Calculate duration and log hours for each registered volunteer
     duration_hours = event.get_duration_hours()
-    registered_volunteers = VolunteerEvent.objects.filter(event=event, status="registered")
+    registered_volunteers = VolunteerEvent.objects.filter(event=event, status="Registered")
 
     for registration in registered_volunteers:
         vp, created = VolunteerParticipation.objects.get_or_create(
@@ -390,7 +390,8 @@ def delete_event(request, event_id):
 @login_required
 def create_event(request):
     if request.user.user_type != 'organisation':
-        return redirect('home')  
+        return redirect('events:volunteer_dashboard') 
+        # return redirect('home')  
     
     if request.method == 'POST':
         form = EventForm(request.POST)
