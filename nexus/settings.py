@@ -27,9 +27,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6xjgv18!nz)^n%_*#f!#^t*^o)v6nuq*nwpw4%z52@82aco4v$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = []
+
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+
+# Trust HTTPS if in production (recommended for Render)
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS]
+
+# Security for cookies and redirects
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 
 
 # Application definition
@@ -102,17 +113,22 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 
 # EMAIL 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' this is for sending real emails
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # this is sending the emails on console
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # this is sending the emails on console
 
 
+EMAIL_HOST = 'smtp.sendgrid.net'
 
-EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'nithiyah02@gmail.com'  # my email address
-EMAIL_HOST_PASSWORD = 'flle qzou qksy ohfg'  # my gmail password
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+#EMAIL_HOST_USER = 'nithiyah02@gmail.com'  # my email address
+#EMAIL_HOST_PASSWORD = 'flle qzou qksy ohfg'  # my gmail password
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = 'noreply@nexus.com'
 
 
 TEMPLATES = [
@@ -137,22 +153,33 @@ ASGI_APPLICATION = "nexus.asgi.application"
 # Redis setup for WebSocket communication
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer", 
+    #     "BACKEND": "channels.layers.InMemoryChannelLayer", 
         
-          # Use Redis in production
+    #       # Use Redis in production
+    # 
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+    "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")],
     },
-}
+
+    }
+    }
 
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
 }
 
 
@@ -192,11 +219,16 @@ USE_I18N = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Define the directory where static files are collected
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),  # Ensure this directory exists
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
