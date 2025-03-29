@@ -6,9 +6,13 @@
 <div class="container mt-4">
     <h1 class="text-center">{{ chatroom.event.name }} Chat Room</h1>
     <div class="text-start mb-3">
-        <a href="{% url 'chat:chat_home' %}" class="btn btn-outline-secondary" style="border-radius: 15px;">
-          <i class="bi bi-arrow-left"></i> Back to Chat Home
-        </a>
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'chat:chat_home' %}">My Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Complete Feedback</li>
+          </ol>
+        </nav>
       </div>
       
 

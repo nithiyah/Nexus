@@ -33,7 +33,7 @@ class Message(models.Model):
 
 
 class UnreadMessage(models.Model):
-    # Tracks unread messages for each user in a chatroom
+    # Tracks the unread messages for each user in a chatroom
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     is_read = models.BooleanField(default=False)

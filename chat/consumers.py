@@ -10,6 +10,9 @@ from django.utils.timezone import now
 from channels.sessions import SessionMiddlewareStack
 from channels.auth import AuthMiddlewareStack
 
+from channels.auth import get_user
+from django.contrib.auth.models import AnonymousUser
+
 async def receive(self, text_data):
     # Handle incoming messages and save to database
     data = json.loads(text_data)
@@ -33,18 +36,15 @@ async def receive(self, text_data):
             "timestamp": singapore_time,  #  Now uses correct Singapore Time
         }
     )
-from channels.auth import get_user
-from django.contrib.auth.models import AnonymousUser
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        """Accept WebSocket connection."""
+        # Accept WebSocket connection
         self.event_id = self.scope["url_route"]["kwargs"]["event_id"]
-        self.room_group_name = f"chat_{self.event_id}"  # Ensure it matches `routing.py`
+        self.room_group_name = f"chat_{self.event_id}"  # Ensuring that it matches routing.py
  ###############################################################################
 
         # Ensure user authentication for WebSocket
-        # self.scope["user"] = await sync_to_async(get_user)(self.scope)
-        # self.scope["user"] = await get_user(self.scope)
         if "user" not in self.scope or self.scope["user"] is None:
             self.scope["user"] = await get_user(self.scope)
 

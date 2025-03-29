@@ -148,7 +148,7 @@ def send_message(request, event_id):
 
         
             
-            # Ensure the event organizer also gets unread messages (if they're not the sender)
+            # the event organiser also gets the unread messages (if they're not the sender)
             if request.user != event.organisation:
                 UnreadMessage.objects.create(user=event.organisation, message=message, is_read=False)
 
