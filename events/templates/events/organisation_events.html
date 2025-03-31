@@ -27,6 +27,7 @@
                 <option value="" selected>All</option>
                 <option value="ongoing" {% if request.GET.status == "ongoing" %}selected{% endif %}>Ongoing</option>
                 <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Completed</option>
+                <option value="upcoming" {% if request.GET.status == "upcoming" %}selected{% endif %}>Upcoming</option>
               </select>
             </div>
 

@@ -49,10 +49,12 @@ def volunteer_dashboard(request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
 
-        if status == 'ongoing':
-            events = events.filter(date__gte=now())
+        if status == 'upcoming':
+            events = events.filter(date__gt=now().date())
+        elif status == 'ongoing':
+            events = events.filter(date__date=now().date())
         elif status == 'completed':
-            events = events.filter(date__lt=now())
+            events = events.filter(date__lt=now().date())
 
         if selected_categories:
             events = events.filter(category__in=selected_categories)
@@ -114,10 +116,12 @@ def organisation_dashboard(request):
         end_date = request.GET.get('end_date')
 
         # Apply filtering logic
-        if status == 'ongoing':
-            events = events.filter(date__gte=now())
+        if status == 'upcoming':
+            events = events.filter(date__gt=now().date())
+        elif status == 'ongoing':
+            events = events.filter(date__date=now().date())
         elif status == 'completed':
-            events = events.filter(date__lt=now())
+            events = events.filter(date__lt=now().date())
 
 
         if selected_categories:
@@ -312,10 +316,13 @@ def volunteer_events(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    if status == 'ongoing':
-        registered_events = registered_events.filter(event__date__gte=now())
+    if status == 'upcoming':
+        registered_events = registered_events.filter(event__date__gt=now().date())
+    elif status == 'ongoing':
+        registered_events = registered_events.filter(event__date__date=now().date())
     elif status == 'completed':
-        registered_events = registered_events.filter(event__date__lt=now())
+        registered_events = registered_events.filter(event__date__lt=now().date())
+
 
     if selected_categories:
         registered_events = registered_events.filter(event__category__in=selected_categories)
@@ -360,10 +367,12 @@ def organisation_events(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    if status == 'ongoing':
-        events = events.filter(date__gte=now())
+    if status == 'upcoming':
+        events = events.filter(date__gt=now().date())
+    elif status == 'ongoing':
+        events = events.filter(date__date=now().date())
     elif status == 'completed':
-        events = events.filter(date__lt=now())
+        events = events.filter(date__lt=now().date())
 
     if category:
         events = events.filter(category=category)
