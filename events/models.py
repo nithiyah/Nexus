@@ -14,7 +14,7 @@ class Event(models.Model):
         ('community development', 'Community Development'),
         ('animal welfare', 'Animal Welfare'),
         ('arts, culture & heritage', 'Arts, Culture & Heritage'),
-        ('fundraising', 'fundraising'),
+        ('fundraising', 'Fundraising'),
         ('technology & digital volunteering', 'Technology & Digital Volunteering'),
         ('youth & children', 'Youth & Children'),
 
