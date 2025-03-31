@@ -5,106 +5,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from .forms import FeedbackFormForm
-from django.utils.timezone import now, localtime
+from django.utils.timezone import now, localtime, is_naive, make_aware
 from .models import Event, VolunteerEvent, FeedbackForm, FeedbackResponse
 from .forms import FeedbackResponseForm  
 from chat.models import ChatRoom
 from django.db.models import Sum
 from .models import VolunteerParticipation 
 import datetime
+from .models import Event, VolunteerEvent
+import json
+from django.http import JsonResponse
+from events.models import Event
 
 
-###################### EVENT VIEW ######################
-# volunteer_dashboard
-# organisation_dashboard
-# complete_event
-# volunteer_events
-# edit_event
-# delete_event
-# create_event
-
-# register_for_event
-# cancel_registration
-# volunteer_events
-# organisation_events
-# remove_volunteer
-# create_feedback_form
-# publish_feedback
-# complete_feedback
-# submit_feedback
-# view_feedback
-# complete_feedback
-# feedback_hub
-# volunteer_list
-# feedback_event_poge
-
-###################### EVENT VIEW ######################
-
-# @login_required
-# def volunteer_dashboard(request):
-#     if request.user.user_type == 'volunteer':
-#         events = Event.objects.all().distinct()
-
-#         # Registered eventid
-#         registered_event_ids = set(
-#             VolunteerEvent.objects.filter(volunteer=request.user, status='registered')
-#             .values_list('event_id', flat=True)
-#         )
-
-#         # Get the total hours volunteered
-#         total_hours = VolunteerParticipation.objects.filter(volunteer=request.user).aggregate(
-#             total_hours=Sum('hours_contributed')
-#         )['total_hours'] or 0
-
-#         # total events participated - volunteer
-#         total_events = VolunteerParticipation.objects.filter(volunteer=request.user).count()
-
-#         status = request.GET.get('status')
-#         selected_categories = request.GET.getlist('category')
-
-#         start_date = request.GET.get('start_date')
-#         end_date = request.GET.get('end_date')
-
-#         # Apply filtering logic
-#         if status == 'ongoing':
-#             events = events.filter(date__gte=now())
-#         elif status == 'completed':
-#             events = events.filter(date__lt=now())
-
-#         if selected_categories:
-#             events = events.filter(category__in=selected_categories)
-
-#         if start_date:
-#             events = events.filter(date__gte=start_date)
-        
-#         if end_date:
-#             events = events.filter(date__lte=end_date)
-
-#         # To make sure its distinct filter
-#         events = events.distinct()
-
-#         # To get unique categories for filtering dropdown
-#         category_choices = dict(Event.CATEGORY_CHOICES)
-#         categories = list(category_choices.keys())
-
-#         # Number of volunteer and open spots in each event
-#         for event in events:
-#             event.volunteer_count = VolunteerEvent.objects.filter(event=event, status='registered').count()
-#             event.open_spots = max(event.volunteers_needed - event.volunteer_count, 0)
-
-#         return render(request, 'events/volunteer_dashboard.html', {
-#             'events': events,
-#             'categories': categories,
-#             'category_labels': category_choices,
-#             'selected_categories': selected_categories,
-#             'registered_event_ids': registered_event_ids,
-#             'total_hours': round(total_hours, 2),
-#             'total_events': total_events,
-#             'today': now().date(),
-#             'current_time': now(),
-
-#         })
-#     return redirect('home')
 @login_required
 def volunteer_dashboard(request):
     if request.user.user_type == 'volunteer':
@@ -186,48 +99,7 @@ def volunteer_dashboard(request):
     return redirect('home')
 
 
-# @login_required
-# def volunteer_event_report(request):
-#     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
 
-#     # Auto-log hours for completed events
-#     for registration in registered_events:
-#         event = registration.event
-#         vp, _ = VolunteerParticipation.objects.get_or_create(volunteer=request.user, event=event)
-#         if vp.hours_contributed == 0 and event.date < now():
-#             vp.hours_contributed = event.get_duration_hours()
-#             vp.save()
-
-#     status = request.GET.get('status')
-#     selected_categories = request.GET.getlist('category')
-#     start_date = request.GET.get('start_date')
-#     end_date = request.GET.get('end_date')
-
-#     if status == 'ongoing':
-#         registered_events = registered_events.filter(event__date__gte=now())
-#     elif status == 'completed':
-#         registered_events = registered_events.filter(event__date__lt=now())
-
-#     if selected_categories:
-#         registered_events = registered_events.filter(event__category__in=selected_categories)
-#     if start_date:
-#         registered_events = registered_events.filter(event__date__gte=start_date)
-#     if end_date:
-#         registered_events = registered_events.filter(event__date__lte=end_date)
-
-#     category_choices = dict(Event.CATEGORY_CHOICES)
-
-#     # Attach hours to each registration
-#     for registration in registered_events:
-#         vp = VolunteerParticipation.objects.filter(volunteer=request.user, event=registration.event).first()
-#         registration.logged_hours = vp.hours_contributed if vp else 0
-
-#     return render(request, 'events/volunteer_event_report.html', {
-#         'registered_events': registered_events,
-#         'category_labels': category_choices,
-#         'selected_categories': selected_categories,
-#         'current_time': now(),
-#     })
 
 
 @login_required
@@ -272,27 +144,7 @@ def organisation_dashboard(request):
     return redirect('home')
 
 
-# def complete_event( event_id):
-#     event = get_object_or_404(Event, id=event_id)
 
-#     # Ensure event duration is calculated correctly
-#     duration_hours = event.get_duration_hours()
-#     print(f"DEBUG: Calculated event duration: {duration_hours} hours for event {event.name}")
-
-
-#     # Log hours for all volunteers who participated
-#     participants = VolunteerParticipation.objects.filter(event=event)
-#     if not participants.exists():
-#         print(f"DEBUG: No volunteers found for event {event.name}")
-
-#     for participant in participants:
-#         participant.hours_contributed = duration_hours
-#         participant.save()
-#         print(f"DEBUG: Logged {duration_hours} hours for {participant.volunteer.username}")
-
-#     print(f"DEBUG: Total volunteers updated: {participants.count()}")
-    
-#     return redirect('events:organisation_events')
 
 from django.contrib import messages
 from django.utils.timezone import now
@@ -325,34 +177,6 @@ def complete_event(request, event_id):
 
     messages.success(request, f"{event.name} marked as completed and hours logged.")
     return redirect("events:organisation_dashboard")
-
-
-# @login_required
-# def complete_event(request, event_id):
-#     event = get_object_or_404(Event, id=event_id)
-
-#     # Calculate event duration
-#     duration_hours = event.get_duration_hours()
-#     print(f"DEBUG: Calculated event duration: {duration_hours} hours for event {event.name}")
-
-#     # Ensure all registered volunteers have their hours logged
-#     registered_volunteers = VolunteerEvent.objects.filter(event=event, status='Registered')
-
-#     for registration in registered_volunteers:
-#         vp, created = VolunteerParticipation.objects.get_or_create(
-#             volunteer=registration.volunteer,
-#             event=event
-#         )
-#         vp.hours_contributed = duration_hours
-#         vp.save()
-#         print(f"DEBUG: Updated {registration.volunteer.username} with {vp.hours_contributed} hours")
-
-#     print(f"DEBUG: Total volunteers updated: {registered_volunteers.count()}")
-
-#     messages.success(request, f"Event {event.name} marked as completed, and hours logged.")
-#     return redirect('events:organisation_events')
-
-
 
 
 # Edit Event View
@@ -477,9 +301,6 @@ def cancel_registration(request, event_id):
     return redirect("events:volunteer_events")
 
 
-
-from django.utils.timezone import now
-
 @login_required
 def volunteer_events(request):
     registered_events = VolunteerEvent.objects.filter(volunteer=request.user)
@@ -528,14 +349,6 @@ def volunteer_events(request):
     })
 
 
-from django.utils.timezone import now, localtime, is_naive, make_aware
-
-
-
-from django.utils.timezone import now, is_naive, make_aware
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Event, VolunteerEvent
 
 @login_required
 def organisation_events(request):
@@ -595,8 +408,6 @@ def remove_volunteer(request, registration_id):
     return redirect("events:organisation_dashboard")
 
 
-
-
 @login_required
 def create_feedback_form(request, event_id):
     event = get_object_or_404(Event, id=event_id, organisation=request.user)
@@ -620,8 +431,6 @@ def create_feedback_form(request, event_id):
         'form': form,
         'event': event,
     })
-
-
 
 
 @login_required
@@ -670,8 +479,7 @@ def complete_feedback(request, event_id):
     })
 
 
-import json
-from django.http import JsonResponse
+
 
 @login_required
 def view_feedback(request, event_id):
@@ -736,11 +544,6 @@ def complete_feedback(request, event_id):
 
 
 
-from django.utils.timezone import now
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .models import Event
-
 @login_required
 def feedback_hub(request):
     if request.user.user_type == 'organisation':
@@ -789,9 +592,6 @@ def volunteer_list(request, event_id):
         "volunteers": volunteers,
     })
 
-
-from django.utils.timezone import now
-
 @login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -800,12 +600,6 @@ def event_detail(request, event_id):
         "event": event,
         "current_time": current_time,
     })
-
-
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from events.models import Event
-# from feedback.models import FeedbackForm  
 
 @login_required
 def feedback_event_page(request, event_id):
