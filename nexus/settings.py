@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6xjgv18!nz)^n%_*#f!#^t*^o)v6nuq*nwpw4%z52@82aco4v$'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = False
 
 
 # ALLOWED_HOSTS = []
@@ -95,7 +95,7 @@ LOGIN_URL = "accounts:login"
 
 
 LOGIN_REDIRECT_URL = '/login/redirect/'  # Redirect after successful login
-# LOGOUT_REDIRECT_URL = 'home'  # Redirect after logout
+
 
 LOGOUT_REDIRECT_URL = 'accounts:login'  # Redirects users to login page after logout
 
@@ -116,21 +116,17 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # EMAIL 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # this is sending the emails on console
 
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 
-# EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-#EMAIL_HOST_USER = 'nithiyah02@gmail.com'  # my email address
-#EMAIL_HOST_PASSWORD = 'flle qzou qksy ohfg'  # my gmail password
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = '"Nexus Team" <nithiyah02@gmail.com>'
+EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
   
 
 
@@ -159,10 +155,6 @@ ASGI_APPLICATION = "nexus.asgi.application"
 # Redis setup for WebSocket communication
 CHANNEL_LAYERS = {
     "default": {
-    #     "BACKEND": "channels.layers.InMemoryChannelLayer", 
-        
-    #       # Use Redis in production
-    # 
     "BACKEND": "channels_redis.core.RedisChannelLayer",
     "CONFIG": {
     "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")],
