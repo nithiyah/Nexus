@@ -266,8 +266,9 @@
             const profilePic = document.createElement("img");
             profilePic.className = "chat-profile-pic";
             profilePic.src = isSent
-                ? "{{ request.user.profile_picture.url|default_if_none:'https://via.placeholder.com/40' }}"
-                : "https://via.placeholder.com/40"; // You can’t get other users' pics unless fetched via AJAX
+                ? "{% if request.user.profile_picture %}{{ request.user.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}"
+                : "/media/profile_pics/default.jpg";
+
             profilePic.alt = sender;
 
             const profileLink = document.createElement("a");
